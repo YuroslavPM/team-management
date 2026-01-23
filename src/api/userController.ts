@@ -1,9 +1,11 @@
 import { axiosClient } from "../config/axios.config";
-import type { User } from "./userTypes";
-import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "../config/queryClient.config";
+import type { Login, RegisterPayload } from "./authTypes";
+import type { EditUser, User } from "./userTypes";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const userKeys = {
-  allUsers: "allUsers",
+  allUsers: ["allUsers"],
   userDetails: (userId: number) => [userKeys.allUsers, `userDetails-${userId}`],
 };
 
@@ -17,3 +19,62 @@ export const useGetAllUsers = () => {
     },
   });
 };
+
+export const useCreateUser = () => {
+  return useMutation({
+    mutationFn: async (data: RegisterPayload) =>
+      await axiosClient.post("/users", {
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.allUsers });
+    },
+  });
+};
+
+export const useGetUser = () => {
+  return useMutation({
+    mutationFn: async (data: Login) => {
+      const response = axiosClient.post("/users", data);
+      return (await response).data;
+    },
+    onSuccess: (user) => {
+      //how to have the id based on the email and secret
+      queryClient.invalidateQueries({
+        queryKey: userKeys.userDetails(user.id),
+      });
+    },
+  });
+};
+
+
+export const useUpdateUser = () =>{
+    return useMutation({
+      mutationFn: async (data: EditUser) =>
+        await axiosClient.put(`users/${data.id}`,{
+          ...data,
+          updatedAt: new Date()
+        }),
+      onSuccess: (user) => {
+        queryClient.invalidateQueries({
+          queryKey: userKeys.userDetails(user.data.id)
+        });
+      },
+    });
+};
+
+export const useDeleteUser = () => {
+    return useMutation({
+      mutationFn: async (userId: number|undefined) =>{
+        const response = axiosClient.delete(`users/${userId}`);
+        return (await response).data
+      },
+      onSuccess: (user) =>{
+        queryClient.invalidateQueries({
+          queryKey: userKeys.userDetails(user.userId)
+        })
+      }
+    })
+}
