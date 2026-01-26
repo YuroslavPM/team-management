@@ -10,7 +10,7 @@ export const teamKeys = {
 
 export const useGetAllTeams = () => {
   return useQuery<Team[]>({
-    queryKey: [teamKeys.allTeams],
+    queryKey: teamKeys.allTeams,
     queryFn: async () => {
       const { data } = await axiosClient.get("/teams");
       return data;
@@ -34,7 +34,7 @@ export const useCreateTeam = () => {
 
 export const useGetTeam = (teamId: number) => {
   return useQuery<Team>({
-    queryKey:[teamKeys.teamDetails(teamId)],
+    queryKey:teamKeys.teamDetails(teamId),
     queryFn: async () => {
         const { data } = await axiosClient.get(`teams/${teamId}`);
         return data;
@@ -70,20 +70,3 @@ export const useDeleteTeam = () => {
         }
       })
 };
-
-
-// export const addUserToTeam = () => {
-//   return useMutation({
-//     mutationFn: async (data: Team, userIds: number[]) =>
-//       await axiosClient.put(`teams/:${data.id}`, {
-//         ...data,
-//         updatedAt: new Date().getTime(),
-//         },
-//       }),
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: teamKeys.allTeams });
-//     },
-//   });
-// };
-
-

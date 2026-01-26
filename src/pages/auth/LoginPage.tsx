@@ -34,7 +34,6 @@ export default function LoginPage() {
 
   return (
     <Box
-      component="form"
       sx={{
         display: "flex",
         position: "fixed",
@@ -42,11 +41,8 @@ export default function LoginPage() {
         justifyContent: "center",
         alignItems: "center",
       }}
-      noValidate
-      autoComplete="off"
     >
       <Box
-        component="form"
         sx={{
           display: "flex",
           width: 400,
@@ -54,8 +50,6 @@ export default function LoginPage() {
           flexDirection: "column",
           gap: 3,
         }}
-        noValidate
-        autoComplete="off"
       >
         <Typography variant="h2" gutterBottom>
           Login

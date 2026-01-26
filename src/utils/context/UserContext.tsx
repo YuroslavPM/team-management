@@ -39,8 +39,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const saved = localStorage.getItem("user");
-    console.log("saved", saved);
-
     if (!saved) {
       return;
     }

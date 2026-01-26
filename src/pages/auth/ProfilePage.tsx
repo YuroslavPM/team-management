@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { userAuthContext } from "../../utils/context/UserContext";
-import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -15,9 +14,8 @@ import dayjs from "dayjs";
 import { EditUserModal } from "../../components/common/modals/EditUserModal";
 
 export const ProfilePage = () => {
-  const { currentUser } = userAuthContext();
+  const { currentUser, setCurrentUser } = userAuthContext();
   const userId = currentUser?.id;
-  const navigate = useNavigate();
   const userCreatedAt = currentUser?.createdAt;
   const { mutate } = useDeleteUser();
   const [isOpen, setIsOpen] = useState(false);
@@ -26,13 +24,8 @@ export const ProfilePage = () => {
     if (userId) {
       mutate(userId);
     }
-    navigate("/");
+    setCurrentUser(undefined);
   };
-
-  if (!currentUser) {
-    navigate("/login");
-    return;
-  }
 
   return (
     <Box>

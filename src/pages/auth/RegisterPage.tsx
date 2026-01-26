@@ -62,7 +62,6 @@ export default function RegisterPage() {
 
   return (
     <Box
-      component="form"
       sx={{
         display: "flex",
         position: "fixed",
@@ -70,11 +69,8 @@ export default function RegisterPage() {
         justifyContent: "center",
         alignItems: "center",
       }}
-      noValidate
-      autoComplete="off"
     >
       <Box
-        component="form"
         sx={{
           display: "flex",
           width: 400,
@@ -82,8 +78,6 @@ export default function RegisterPage() {
           flexDirection: "column",
           gap: 3,
         }}
-        noValidate
-        autoComplete="off"
       >
         <Typography variant="h2" gutterBottom>
           Register

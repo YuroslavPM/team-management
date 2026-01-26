@@ -1,5 +1,3 @@
-import type { User } from "./userTypes";
-
 export type RegisterPayload = {
   firstName: string;
   lastName: string;
@@ -10,8 +8,4 @@ export type RegisterPayload = {
 export type Login = {
   email: string;
   secret: string;
-};
-
-export type Auth = {
-  user: User;
 };
