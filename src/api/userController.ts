@@ -1,9 +1,11 @@
 import { axiosClient } from "../config/axios.config";
-import type { User } from "./userTypes";
-import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "../config/queryClient.config";
+import type { RegisterPayload } from "./authTypes";
+import type { EditUser, User } from "./userTypes";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const userKeys = {
-  allUsers: "allUsers",
+  allUsers: ["allUsers"],
   userDetails: (userId: number) => [userKeys.allUsers, `userDetails-${userId}`],
 };
 
@@ -11,9 +13,76 @@ export const useGetAllUsers = () => {
   return useQuery<User[]>({
     queryKey: [userKeys.allUsers],
     queryFn: async () => {
-      const { data } = await axiosClient.get(`/users`);
+      const response = await axiosClient.get(`/users`);
 
-      return data;
+      return response.data;
+    },
+  });
+};
+
+export const useCreateUser = () => {
+  return useMutation({
+    mutationFn: async (data: RegisterPayload) => {
+      const fetchedUsers = queryClient.getQueryData<User[]>(userKeys.allUsers);
+
+      const duplicatedEmail = fetchedUsers?.find((u) => u.email === data.email);
+
+      if (duplicatedEmail) {
+        throw new Error("Email already exists!");
+      }
+
+      const response = await axiosClient.post("/users", {
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.allUsers });
+    },
+  });
+};
+
+export const useGetUserById = (id: number) => {
+  return useQuery<User>({
+    queryKey: userKeys.userDetails(id),
+    queryFn: async () => {
+      const response = await axiosClient.get(`/users/${id}`);
+      return response.data;
+    },
+  });
+};
+
+export const useUpdateUser = () => {
+  return useMutation({
+    mutationFn: async (data: EditUser) => {
+      const response = await axiosClient.patch(`users/${data.id}`, {
+        ...data,
+        updatedAt: new Date(),
+      });
+
+      return response.data;
+    },
+    onSuccess: (user) => {
+      queryClient.invalidateQueries({
+        queryKey: userKeys.userDetails(user.id),
+      });
+    },
+  });
+};
+
+export const useDeleteUser = () => {
+  return useMutation({
+    mutationFn: async (userId: number) => {
+      const response = await axiosClient.delete(`users/${userId}`);
+      return response.data;
+    },
+    onSuccess: (user) => {
+      queryClient.invalidateQueries({
+        queryKey: userKeys.userDetails(user.id),
+      });
     },
   });
 };

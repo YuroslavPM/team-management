@@ -1,54 +1,109 @@
 {
   "teams": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Team Marvin",
       "users": [1, 2],
       "createdAt": "2025-01-10T10:00:00Z",
       "updatedAt": "2025-01-10T10:00:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Team Quark",
       "users": [],
       "createdAt": "2025-01-10T10:00:00Z",
       "updatedAt": "2025-01-10T10:00:00Z"
     }
   ],
-
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "displayName": "Alice Johnson",
       "email": "alice@example.com",
       "firstName": "Alice",
       "lastName": "Johnson",
+      "secret": "123456789",
       "createdAt": "2025-01-10T10:00:00Z",
       "updatedAt": "2025-01-10T10:00:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "displayName": "B. Lee",
       "email": "bob@example.com",
       "firstName": "Bob",
       "lastName": "Lee",
+      "secret": "123456789",
       "createdAt": "2025-01-10T10:00:00Z",
       "updatedAt": "2025-01-10T10:00:00Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "displayName": "Charlie",
       "email": "charlie@example.com",
       "firstName": "Charlie",
       "lastName": "Chen",
+      "secret": "123456789",
       "createdAt": "2025-01-10T10:00:00Z",
       "updatedAt": "2025-01-10T10:00:00Z"
+    },
+    {
+      "id": "7955",
+      "email": "ivan@abv.bg",
+      "firstName": "Ivan",
+      "lastName": "Danov",
+      "secret": "1234",
+      "createdAt": "2026-01-26T07:59:48.162Z",
+      "updatedAt": "2026-01-26T08:14:29.400Z"
+    },
+    {
+      "id": "7a7b",
+      "email": "ivan1@abv.bg",
+      "firstName": "Petar",
+      "lastName": "Petrov",
+      "secret": "1234",
+      "createdAt": "2026-01-26T08:35:46.188Z",
+      "updatedAt": "2026-01-26T08:38:51.161Z"
+    },
+    {
+      "id": "8c61",
+      "email": "",
+      "firstName": "",
+      "lastName": "",
+      "secret": "",
+      "createdAt": "2026-01-26T08:55:20.927Z",
+      "updatedAt": "2026-01-26T08:55:20.927Z"
+    },
+    {
+      "id": "3e49",
+      "email": "",
+      "firstName": "",
+      "lastName": "",
+      "secret": "",
+      "createdAt": "2026-01-26T08:56:49.576Z",
+      "updatedAt": "2026-01-26T08:56:49.576Z"
+    },
+    {
+      "id": "6e83",
+      "email": "",
+      "firstName": "asdasd",
+      "lastName": "",
+      "secret": "",
+      "createdAt": "2026-01-26T09:22:43.568Z",
+      "updatedAt": "2026-01-26T09:22:43.568Z"
+    },
+    {
+      "id": "6a0d",
+      "email": "",
+      "firstName": "",
+      "lastName": "",
+      "secret": "",
+      "createdAt": "2026-01-26T09:26:01.894Z",
+      "updatedAt": "2026-01-26T09:26:01.894Z"
     }
   ],
-
   "projects": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Project Atlas",
       "description": "Internal analytics platform",
       "status": "active",
@@ -59,7 +114,7 @@
       "updatedAt": "2025-01-10T10:00:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Mobile Banking App",
       "description": "Banking app MVP",
       "status": "paused",
@@ -70,7 +125,7 @@
       "updatedAt": "2025-01-10T10:00:00Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Web Banking App",
       "description": "Banking app MVP for WEB",
       "status": "completed",
@@ -81,10 +136,9 @@
       "updatedAt": "2025-01-10T10:00:00Z"
     }
   ],
-
   "tasks": [
     {
-      "id": 1,
+      "id": "1",
       "title": "Create initial wireframes",
       "description": "Basic screens for dashboard",
       "status": "todo",
@@ -95,7 +149,7 @@
       "updatedAt": "2025-01-10T10:00:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "title": "Implement login page",
       "description": "Basic email/password form",
       "status": "in-progress",
@@ -106,7 +160,7 @@
       "updatedAt": "2025-01-10T10:00:00Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "title": "API Integration",
       "description": "Connect axios to json-server",
       "status": "todo",
