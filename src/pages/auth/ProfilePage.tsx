@@ -15,13 +15,13 @@ import dayjs from "dayjs";
 import { EditUserModal } from "../../components/common/modals/EditUserModal";
 
 export const ProfilePage = () => {
-
-  const {currentUser} = userAuthContext();
+  const { currentUser } = userAuthContext();
   const userId = currentUser?.id;
   const navigate = useNavigate();
   const userCreatedAt = currentUser?.createdAt;
   const { mutate } = useDeleteUser();
   const [isOpen, setIsOpen] = useState(false);
+
   const handleDeleteUser = () => {
     if (userId) {
       mutate(userId);
@@ -67,7 +67,7 @@ export const ProfilePage = () => {
           <Button
             size="small"
             onClick={() => {
-                setIsOpen(true);
+              setIsOpen(true);
             }}
             sx={{
               bgcolor: "#87CEEB",
@@ -84,9 +84,6 @@ export const ProfilePage = () => {
             sx={{
               bgcolor: "red",
               color: "white",
-              textDecoration: "underline",
-              textDecorationColor: "white",
-              textUnderlineOffset: "3px",
             }}
             onClick={handleDeleteUser}
           >

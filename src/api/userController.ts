@@ -22,12 +22,21 @@ export const useGetAllUsers = () => {
 
 export const useCreateUser = () => {
   return useMutation({
-    mutationFn: async (data: RegisterPayload) =>
-      await axiosClient.post("/users", {
+    mutationFn: async (data: RegisterPayload) =>{
+      
+      const fetchedUsers = queryClient.getQueryData<User[]>(userKeys.allUsers);
+
+      const dublicatedEmail = fetchedUsers?.find((u)=> u.email === data.email);
+
+      if(dublicatedEmail){
+        throw new Error("Email already exists!");
+      }
+      
+      return await axiosClient.post("/users", {
         ...data,
         createdAt: new Date(),
         updatedAt: new Date(),
-      }),
+      })},
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.allUsers });
     },
@@ -49,11 +58,20 @@ export const useGetUser = () => {
   });
 };
 
+export const useGetUserById = (id:number|undefined) => {
+  return useQuery<User>({
+    queryKey: [userKeys.userDetails, id],
+    queryFn: async () => {
+      const { data } = await axiosClient.get(`/users/${id}`, );
+      return data;
+    },
+  });
+};
 
 export const useUpdateUser = () =>{
     return useMutation({
       mutationFn: async (data: EditUser) =>
-        await axiosClient.put(`users/${data.id}`,{
+        await axiosClient.patch(`users/${data.id}`,{
           ...data,
           updatedAt: new Date()
         }),

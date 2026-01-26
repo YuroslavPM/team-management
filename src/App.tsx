@@ -13,14 +13,14 @@ function App() {
   const theme = createTheme();
 
   return (
-    <UserProvider>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <UserProvider>
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <RouterProvider router={router} />
         </ThemeProvider>
-      </QueryClientProvider>
-    </UserProvider>
+      </UserProvider>
+    </QueryClientProvider>
   );
 }
 

@@ -6,6 +6,13 @@ import { TeamsPage } from "./TeamsPage";
 import LoginPage from "./auth/LoginPage";
 import RegisterPage from "./auth/RegisterPage";
 import { ProfilePage } from "./auth/ProfilePage";
+import { authRoutes, loggedRoutes, ProtectedRoute } from "./PrivateRoute";
+
+const TeamsProtectedPage = authRoutes(TeamsPage);
+const ProfileProtectedPage = authRoutes(ProfilePage);
+const LoginProtectedPage = loggedRoutes(LoginPage);
+const RegisterProtectedPage = loggedRoutes(RegisterPage);
+
 
 export const routes: RouteObject[] = [
   {
@@ -15,11 +22,15 @@ export const routes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <LandingPage />,
+        element: (
+          <ProtectedRoute>
+            <LandingPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/teams",
-        element: <TeamsPage />,
+        element: <TeamsProtectedPage />,
       },
     ],
   },
@@ -29,9 +40,8 @@ export const routes: RouteObject[] = [
     errorElement: <ErrorPage />,
     children: [
       {
-        // path: "/login",
         index: true,
-        element: <LoginPage />,
+        element: <LoginProtectedPage />,
       },
     ],
   },
@@ -41,9 +51,8 @@ export const routes: RouteObject[] = [
     errorElement: <ErrorPage />,
     children: [
       {
-        // path: "/login",
         index: true,
-        element: <RegisterPage />,
+        element: <RegisterProtectedPage />,
       },
     ],
   },
@@ -53,9 +62,8 @@ export const routes: RouteObject[] = [
     errorElement: <ErrorPage />,
     children: [
       {
-        // path: "/login",
         index: true,
-        element: <ProfilePage />,
+        element: <ProfileProtectedPage />,
       },
     ],
   },

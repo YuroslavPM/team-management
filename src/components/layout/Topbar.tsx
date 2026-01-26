@@ -1,38 +1,38 @@
-import { AppBar, Box, Button,IconButton, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  Button,
+  IconButton,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { useContext, useState } from "react";
-import { UserContext } from "../../utils/context/UserContext";
+import { useState } from "react";
+import { userAuthContext } from "../../utils/context/UserContext";
 
 type TopbarProps = {
   title?: string;
 };
 
 export const Topbar = ({ title = "Team Management" }: TopbarProps) => {
-  
-    const user = useContext(UserContext);
-    const navigation = useNavigate();
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const navigation = useNavigate();
+  const { currentUser, handleLogout } = userAuthContext();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-    const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
-      setAnchorEl(event.currentTarget);
-    };
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-    const handleClose = () => {
-      setAnchorEl(null);
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
-    };
-    
-    const handleLogout = () => {
-      user.setCurrentUser(undefined);
-      navigation("/");
-    };
-
-    const teamManagmentClick = () =>{
-      navigation("/")
-    }
+  const teamManagementClick = () => {
+    navigation("/");
+  };
 
   return (
     <AppBar
@@ -40,12 +40,19 @@ export const Topbar = ({ title = "Team Management" }: TopbarProps) => {
       sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
     >
       <Toolbar>
-        <Typography onClick={teamManagmentClick} variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+        <Typography
+          onClick={teamManagementClick}
+          variant="h6"
+          noWrap
+          component="div"
+          sx={{ flexGrow: 1 }}
+        >
           {title}
         </Typography>
 
-        {user.currentUser ? (
-          <Box>
+        {currentUser ? (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Typography>{currentUser.firstName}</Typography>
             <IconButton
               size="large"
               aria-label="account of current user"
@@ -56,26 +63,6 @@ export const Topbar = ({ title = "Team Management" }: TopbarProps) => {
             >
               <AccountCircle />
             </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-            >
-              <MenuItem onClick={() => navigation("/profile")}>
-                Profile
-              </MenuItem>
-              <MenuItem onClick={handleLogout}>Log out</MenuItem>
-            </Menu>
           </Box>
         ) : (
           <Button
@@ -88,6 +75,25 @@ export const Topbar = ({ title = "Team Management" }: TopbarProps) => {
           </Button>
         )}
       </Toolbar>
+
+      <Menu
+        id="menu-appbar"
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        keepMounted
+        transformOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem onClick={() => navigation("/profile")}>Profile</MenuItem>
+        <MenuItem onClick={handleLogout}>Log out</MenuItem>
+      </Menu>
     </AppBar>
   );
 };

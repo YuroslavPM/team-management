@@ -16,20 +16,28 @@ type EditUserModalProps = {
 export const EditUserModal = (props: EditUserModalProps) => {
   const { onClose, open } = props;
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const { currentUser } = userAuthContext();
+  const { currentUser, setCurrentUser } = userAuthContext();
+  const [firstName, setFirstName] = useState(currentUser?.firstName);
+  const [lastName, setLastName] = useState(currentUser?.lastName);
 
   const navigate = useNavigate();
   const { mutate } = useUpdateUser();
 
   const handleClick = () => {
-    if (currentUser?.id) {
-      mutate({
-        id: currentUser?.id,
-        firstName: firstName,
-        lastName: lastName,
-      });
+    if (currentUser?.id && currentUser?.firstName && currentUser?.lastName) {
+      mutate(
+        {
+          id: currentUser?.id,
+          firstName: firstName!,
+          lastName: lastName!,
+        },
+        {
+          onSuccess: (data) => {
+            setCurrentUser(data.data);
+            onClose();
+          },
+        },
+      );
     }
   };
 
@@ -47,6 +55,9 @@ export const EditUserModal = (props: EditUserModalProps) => {
     border: "2px solid #000",
     boxShadow: 24,
     p: 4,
+    display: "flex",
+    flexDirection: "column",
+    gap: 1,
   };
 
   return (
@@ -85,7 +96,7 @@ export const EditUserModal = (props: EditUserModalProps) => {
         <Button variant="contained" onClick={handleClick}>
           Redact
         </Button>
-        <Button variant="contained" onClick={()=>{ }}>
+        <Button variant="contained" onClick={onClose}>
           Close
         </Button>
       </Box>
