@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import {
   Autocomplete,
   Box,
@@ -33,37 +34,31 @@ export const CreateUpdateTeamModal = (props: CreateTeamModalProps) => {
   const [selectedUsers, setSelectedUsers] = useState<User[]>();
 
   useEffect(() => {
-    setSelectedUsers(
-      users
-        .filter((user) => team?.users.includes(user.id))
-    );
-  }, [open]);
+    if (team?.users) {
+      setSelectedUsers(users.filter((user) => team?.users.includes(user.id)));
+    }
+  }, [open, team?.users, users]);
 
   const handleClick = () => {
     if (!team) {
       createTeam({
-        name: teamName || "",
+        name: teamName,
         users: selectedUsers?.map((user) => user.id || "") || [],
       });
-      setSelectedUsers(undefined);
-      onClose();
-      return;
+    } else {
+      updateTeam({
+        id: team.id,
+        name: teamName,
+        users: selectedUsers?.map((user) => user.id || "") || [],
+      });
     }
-    updateTeam({
-      id: team?.id || "",
-      name: teamName || "",
-      users: selectedUsers?.map((user) => user.id || "") || [],
-    });
+
+    setSelectedUsers(undefined);
     onClose();
   };
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
+    <Modal open={open} onClose={onClose}>
       <Box
         sx={{
           position: "absolute",
@@ -77,26 +72,24 @@ export const CreateUpdateTeamModal = (props: CreateTeamModalProps) => {
           p: 4,
           display: "flex",
           flexDirection: "column",
-          gap: 1,
+          gap: 2,
         }}
       >
         <Typography id="modal-modal-title" variant="h6" component="h2">
           {!team ? "Create Team" : "Edit Team"}
         </Typography>
-        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          Team Name:
-        </Typography>
+
         <TextField
           required
           id="filled-basic"
+          label="Team name"
+          placeholder="Fill name"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             setTeamName(event.target.value);
           }}
           defaultValue={team?.name}
         />
-        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          Attach users:
-        </Typography>
+
         <Autocomplete
           multiple
           id="fixed-tags-demo"
@@ -112,13 +105,16 @@ export const CreateUpdateTeamModal = (props: CreateTeamModalProps) => {
               return <Chip key={key} label={option.firstName} {...itemProps} />;
             })
           }
-          style={{ width: 500 }}
           renderInput={(params) => (
-            <TextField {...params} label="Fixed tag" placeholder="Team mates" />
+            <TextField
+              {...params}
+              label="Team users"
+              placeholder="Team mates"
+            />
           )}
         />
-        <Button variant="contained" onClick={handleClick}>
-          Create
+        <Button variant="contained" onClick={handleClick} disabled={Boolean(!teamName || !selectedUsers)}>
+          {!team ? "Create" : "Edit"}
         </Button>
         <Button variant="contained" onClick={onClose}>
           Close

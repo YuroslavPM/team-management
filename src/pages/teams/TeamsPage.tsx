@@ -16,13 +16,15 @@ import { useGetAllUsers } from "../../api/userController";
 import type { Team } from "../../api/teams/teamTypes";
 
 export const TeamsPage = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const { currentUser } = userAuthContext();
+
   const { data: teams } = useGetAllTeams();
-  const [team, setTeam] = useState<Team>();
-  const [teamId, setTeamId] = useState("");
   const { data: users } = useGetAllUsers();
   const { mutate: deleteTeam } = useDeleteTeam();
+
+  const [teamId, setTeamId] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [team, setTeam] = useState<Team>();
 
   const handleTeamDelete = () => {
     deleteTeam(teamId);
