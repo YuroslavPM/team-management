@@ -7,12 +7,13 @@ import LoginPage from "./auth/LoginPage";
 import RegisterPage from "./auth/RegisterPage";
 import { ProfilePage } from "./auth/ProfilePage";
 import { authRoutes, loggedRoutes, ProtectedRoute } from "./PrivateRoute";
+import { ProjectPage } from "./projects/ProjectPage";
 
 const TeamsProtectedPage = authRoutes(TeamsPage);
+const ProjectProtectedPage = authRoutes(ProjectPage);
 const ProfileProtectedPage = authRoutes(ProfilePage);
 const LoginProtectedPage = loggedRoutes(LoginPage);
 const RegisterProtectedPage = loggedRoutes(RegisterPage);
-
 
 export const routes: RouteObject[] = [
   {
@@ -31,6 +32,10 @@ export const routes: RouteObject[] = [
       {
         path: "/teams",
         element: <TeamsProtectedPage />,
+      },
+      {
+        path: "/projects",
+        element: <ProjectProtectedPage />,
       },
     ],
   },
