@@ -1,3 +1,9 @@
+import { useState } from "react";
+import { useGetAllProjects } from "../api/projects/projectController";
+import { useGetAllTeams } from "../api/teams/teamController";
+import { useGetAllUsers } from "../api/userController";
+import { userAuthContext } from "../utils/context/UserContext";
+import type { Project } from "../api/projects/projectTypes";
 import {
   Avatar,
   Box,
@@ -7,32 +13,18 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
-import { CreateUpdateTeamModal } from "../../components/common/modals/CreateUpdateTeamModal";
-import { useDeleteTeam, useGetAllTeams } from "../../api/teams/teamController";
 import { deepOrange } from "@mui/material/colors";
-import { userAuthContext } from "../../utils/context/UserContext";
-import { useGetAllUsers } from "../../api/userController";
-import type { Team } from "../../api/teams/teamTypes";
+import { CreateUpdateTeamModal } from "../components/views/Teams/CreateUpdateTeamModal";
 
-export const TeamsPage = () => {
+export const ProjectPage = () => {
   const { currentUser } = userAuthContext();
 
+  const { data: projects } = useGetAllProjects();
   const { data: teams } = useGetAllTeams();
   const { data: users } = useGetAllUsers();
-  const { mutate: deleteTeam } = useDeleteTeam();
 
-  const [teamId, setTeamId] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [team, setTeam] = useState<Team>();
-
-  const handleTeamDelete = () => {
-    deleteTeam(teamId);
-  };
-
-  const userTeams = teams?.filter(
-    (team) => currentUser && team.users.includes(currentUser.id),
-  );
+  const [project, setProject] = useState<Project>();
 
   return (
     <Box sx={{ display: "flex", gap: 2, flexDirection: "column" }}>

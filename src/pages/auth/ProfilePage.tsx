@@ -11,7 +11,7 @@ import { getDisplayName } from "../../utils/helpers/getDisplayName";
 import { deepOrange } from "@mui/material/colors";
 import { useDeleteUser } from "../../api/userController";
 import dayjs from "dayjs";
-import { EditUserModal } from "../../components/common/modals/EditUserModal";
+import { EditUserModal } from "../../components/views/Profile/EditUserModal";
 
 export const ProfilePage = () => {
   const { currentUser, setCurrentUser } = userAuthContext();
