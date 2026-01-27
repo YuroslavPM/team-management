@@ -75,7 +75,7 @@ export const useUpdateUser = () => {
 
 export const useDeleteUser = () => {
   return useMutation({
-    mutationFn: async (userId: number) => {
+    mutationFn: async (userId: string) => {
       const response = await axiosClient.delete(`users/${userId}`);
       return response.data;
     },

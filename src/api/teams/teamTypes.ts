@@ -1,5 +1,10 @@
-export type Team ={
-    id: number;
-    name: string;
-    users: number[];
-}
+export type Team = {
+  id: string;
+  name: string;
+  users: string[];
+};
+
+export type TeamPayload = {
+  name: string;
+  users: string[];
+};
