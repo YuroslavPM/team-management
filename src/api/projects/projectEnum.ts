@@ -3,5 +3,7 @@ export const ProjectStatus = {
   Active: "active",
   Paused: "paused",
   Cancel: "cancel",
-} as const
+} as const;
 
+export type ProjectStatusTypes =
+  (typeof ProjectStatus)[keyof typeof ProjectStatus];

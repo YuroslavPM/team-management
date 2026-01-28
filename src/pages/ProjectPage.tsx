@@ -1,111 +1,72 @@
 import { useState } from "react";
-import { useGetAllProjects } from "../api/projects/projectController";
-import { useGetAllTeams } from "../api/teams/teamController";
-import { useGetAllUsers } from "../api/userController";
+import {
+  useDeleteProject,
+  useGetAllProjects,
+} from "../api/projects/projectController";
 import { userAuthContext } from "../utils/context/UserContext";
 import type { Project } from "../api/projects/projectTypes";
-import {
-  Avatar,
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Typography,
-} from "@mui/material";
-import { deepOrange } from "@mui/material/colors";
-import { CreateUpdateTeamModal } from "../components/views/Teams/CreateUpdateTeamModal";
+import { Box, Button, Typography } from "@mui/material";
+import { CreateUpdateProjectModal } from "../components/views/Projects/CreateUpdateProjectModal";
+import { ProjectCard } from "../components/views/Projects/ProjectCard";
 
 export const ProjectPage = () => {
   const { currentUser } = userAuthContext();
 
   const { data: projects } = useGetAllProjects();
-  const { data: teams } = useGetAllTeams();
-  const { data: users } = useGetAllUsers();
+  const { mutate: deleteProject } = useDeleteProject();
 
+  const [projectId, setProjectId] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [project, setProject] = useState<Project>();
+
+  const handleTeamDelete = () => {
+    deleteProject(projectId);
+  };
+
+  const userProjects = projects?.filter(
+    (project) =>
+      (currentUser && project.adminIds.includes(currentUser.id)) ||
+      project.memberIds.includes(currentUser!.id),
+  );
 
   return (
     <Box sx={{ display: "flex", gap: 2, flexDirection: "column" }}>
       <Box>
-        <Typography sx={{ fontSize: 24 }}>Team Page</Typography>
+        <Typography sx={{ fontSize: 24 }}>Project Page</Typography>
         <Button
           variant="contained"
           onClick={() => {
-            setTeam(undefined);
+            setProject(undefined);
             setIsOpen(true);
           }}
-          sx={{ gap: 2 }}
+          sx={{ gap: 3 }}
         >
-          Create Team
+          Create Project
         </Button>
       </Box>
 
-      {/* Teams */}
-      {userTeams?.map((team) => (
-        <Card
-          sx={{
-            minWidth: 500,
-            minHeight: 200,
-            bgcolor: "#e7e9ee",
-            width: "round(11px, 1px)",
+      {userProjects?.map((project, i) => (
+        <ProjectCard
+          key={i}
+          project={project}
+          onEditClick={() => {
+            setIsOpen(true);
+            setProject(project);
           }}
-          key={team.id}
-        >
-          <CardContent>
-            <Avatar sx={{ bgcolor: deepOrange[500] }}>
-              {team?.name.charAt(0).toUpperCase()}
-            </Avatar>
-            <Typography variant="h5" component="div">
-              {team.name}
-            </Typography>
-            <Typography variant="body2">
-              Mates:{" "}
-              {users
-                ?.filter((user) => team.users.includes(user.id))
-                .map((u) => u.firstName)
-                .join(", ")}
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <Button
-              size="small"
-              onClick={() => {
-                setIsOpen(true);
-                setTeam(team);
-              }}
-              sx={{
-                bgcolor: "#87CEEB",
-                color: "white",
-              }}
-            >
-              Edit
-            </Button>
-            <Button
-              size="small"
-              sx={{
-                bgcolor: "red",
-                color: "white",
-              }}
-              onClick={() => {
-                setTeamId(team.id);
-                handleTeamDelete();
-              }}
-            >
-              Delete
-            </Button>
-          </CardActions>
-        </Card>
+          onDelete={() => {
+            setProjectId(project.id);
+            handleTeamDelete();
+          }}
+        />
       ))}
 
-      <CreateUpdateTeamModal
+      <CreateUpdateProjectModal
         open={isOpen}
         onClose={() => {
           setIsOpen(false);
-          setTeam(undefined);
+          setProject(undefined);
         }}
-        team={team}
+        project={project}
       />
     </Box>
   );

@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import type { Project } from "./projectTypes";
+import type { Project, ProjectPayload } from "./projectTypes";
 import { axiosClient } from "../../config/axios.config";
 import { queryClient } from "../../config/queryClient.config";
 import { teamKeys } from "../teams/teamController";
@@ -22,9 +22,9 @@ export const useGetAllProjects = () => {
   });
 };
 
-export const useCreateProjects = () => {
+export const useCreateProject = () => {
   return useMutation({
-    mutationFn: async (data: Project) => {
+    mutationFn: async (data: ProjectPayload) => {
       const response = await axiosClient.post("projects", {
         ...data,
         createdAt: new Date(),
@@ -38,9 +38,9 @@ export const useCreateProjects = () => {
   });
 };
 
-export const useUpdateProjects = () => {
+export const useUpdateProject = () => {
   return useMutation({
-    mutationFn: async (data: Project) => {
+    mutationFn: async (data: ProjectPayload & { id: string }) => {
       const response = await axiosClient.patch(`projects/${data.id}`, {
         ...data,
         updatedAt: new Date(),
@@ -49,21 +49,24 @@ export const useUpdateProjects = () => {
     },
     onSuccess: (project) => {
       queryClient.invalidateQueries({
-        queryKey: teamKeys.teamDetails(project.data),
+        queryKey: projectKeys.projectDetails(project.id),
+      });
+      queryClient.invalidateQueries({
+        queryKey: projectKeys.allProjects,
       });
     },
   });
 };
 
-export const useDeleteProjects = () => {
+export const useDeleteProject = () => {
   return useMutation({
     mutationFn: async (projectId: string) => {
       const response = await axiosClient.delete(`projects/${projectId}`);
-      return response;
+      return response.data;
     },
     onSuccess: (project) => {
       queryClient.invalidateQueries({
-        queryKey: projectKeys.projectDetails(project.data),
+        queryKey: projectKeys.projectDetails(project.id),
       });
       queryClient.invalidateQueries({
         queryKey: projectKeys.allProjects,

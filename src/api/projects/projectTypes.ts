@@ -1,12 +1,20 @@
-import {ProjectStatus} from "./projectEnum"
-export type ProjectStatus = typeof ProjectStatus[keyof typeof ProjectStatus];
+import { type ProjectStatusTypes } from "./projectEnum";
 
 export type Project = {
-    id:string,
-    name: string,
-    description: string,
-    status: ProjectStatus,
-    adminIds: number[],
-    memberIds: number[],
-    teamIds: number[];
-}
+  id: string;
+  name: string;
+  description: string;
+  status: ProjectStatusTypes;
+  adminIds: string[];
+  memberIds: string[];
+  teamIds: string[];
+};
+
+export type ProjectPayload = {
+  name: string;
+  description: string;
+  status: ProjectStatusTypes;
+  adminIds: string[];
+  memberIds: string[];
+  teamIds: string[];
+};

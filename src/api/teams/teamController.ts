@@ -37,7 +37,7 @@ export const useCreateTeam = () => {
 export const useUpdateTeam = () => {
   return useMutation({
     mutationFn: async (data: TeamPayload & { id: string }) => {
-      const response = await axiosClient.put(`teams/${data.id}`, {
+      const response = await axiosClient.patch(`teams/${data.id}`, {
         ...data,
         updatedAt: new Date().getTime(),
       });
@@ -47,6 +47,9 @@ export const useUpdateTeam = () => {
       queryClient.invalidateQueries({
         queryKey: teamKeys.teamDetails(team.data.id),
       });
+       queryClient.invalidateQueries({
+         queryKey: teamKeys.allTeams,
+       });
     },
   });
 };
