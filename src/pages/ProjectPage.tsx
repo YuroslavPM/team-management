@@ -8,6 +8,7 @@ import type { Project } from "../api/projects/projectTypes";
 import { Box, Button, Typography } from "@mui/material";
 import { CreateUpdateProjectModal } from "../components/views/Projects/CreateUpdateProjectModal";
 import { ProjectCard } from "../components/views/Projects/ProjectCard";
+import { AlertDialog } from "../components/common/AlertDialog";
 
 export const ProjectPage = () => {
   const { currentUser } = userAuthContext();
@@ -17,6 +18,7 @@ export const ProjectPage = () => {
 
   const [projectId, setProjectId] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [project, setProject] = useState<Project>();
 
   const handleTeamDelete = () => {
@@ -55,7 +57,7 @@ export const ProjectPage = () => {
           }}
           onDelete={() => {
             setProjectId(project.id);
-            handleTeamDelete();
+            setIsOpenDeleteModal(true);
           }}
         />
       ))}
@@ -68,6 +70,15 @@ export const ProjectPage = () => {
         }}
         project={project}
       />
+      <AlertDialog
+        title={"Delete project!"}
+        message={"Are you sure you want to delete the project?"}
+        open={isOpenDeleteModal}
+        onClose={() => {
+          setIsOpenDeleteModal(false);
+        }}
+        handleConfirm={handleTeamDelete}
+      ></AlertDialog>
     </Box>
   );
 };

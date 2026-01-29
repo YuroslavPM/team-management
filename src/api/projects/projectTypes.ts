@@ -8,6 +8,8 @@ export type Project = {
   adminIds: string[];
   memberIds: string[];
   teamIds: string[];
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type ProjectPayload = {

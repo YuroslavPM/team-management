@@ -30,7 +30,7 @@ export const useCreateProject = () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       });
-      return response;
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: teamKeys.allTeams });

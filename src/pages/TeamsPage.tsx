@@ -5,6 +5,7 @@ import { useDeleteTeam, useGetAllTeams } from "../api/teams/teamController";
 import { userAuthContext } from "../utils/context/UserContext";
 import type { Team } from "../api/teams/teamTypes";
 import { TeamCard } from "../components/views/Teams/TeamCard";
+import { AlertDialog } from "../components/common/AlertDialog";
 
 export const TeamsPage = () => {
   const { currentUser } = userAuthContext();
@@ -14,6 +15,7 @@ export const TeamsPage = () => {
 
   const [teamId, setTeamId] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [team, setTeam] = useState<Team>();
 
   const handleTeamDelete = () => {
@@ -25,44 +27,56 @@ export const TeamsPage = () => {
   );
 
   return (
-    <Box sx={{ display: "flex", gap: 2, flexDirection: "column" }}>
-      <Box>
-        <Typography sx={{ fontSize: 24 }}>Team Page</Typography>
-        <Button
-          variant="contained"
-          onClick={() => {
+    <>
+      <Box sx={{ display: "flex", gap: 2, flexDirection: "column" }}>
+        <Box>
+          <Typography sx={{ fontSize: 24 }}>Team Page</Typography>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setTeam(undefined);
+              setIsOpen(true);
+            }}
+            sx={{ gap: 2 }}
+          >
+            Create Team
+          </Button>
+        </Box>
+
+        {userTeams?.map((team, i) => (
+          <TeamCard
+            key={i}
+            team={team}
+            onEditClick={() => {
+              setIsOpen(true);
+              setTeam(team);
+            }}
+            onDeleteClick={() => {
+              setTeamId(team.id);
+              setIsOpenDeleteModal(true);
+            }}
+          />
+        ))}
+
+        <CreateUpdateTeamModal
+          open={isOpen}
+          onClose={() => {
+            setIsOpen(false);
             setTeam(undefined);
-            setIsOpen(true);
           }}
-          sx={{ gap: 2 }}
-        >
-          Create Team
-        </Button>
+          team={team}
+        />
       </Box>
 
-      {userTeams?.map((team, i) => (
-        <TeamCard
-          key={i}
-          team={team}
-          onEditClick={() => {
-            setIsOpen(true);
-            setTeam(team);
-          }}
-          onDeleteClick={() => {
-            setTeamId(team.id);
-            handleTeamDelete();
-          }}
-        />
-      ))}
-
-      <CreateUpdateTeamModal
-        open={isOpen}
+      <AlertDialog
+        title={"Delete team!"}
+        message={"Are you sure you want to delete this team?"}
+        open={isOpenDeleteModal}
         onClose={() => {
-          setIsOpen(false);
-          setTeam(undefined);
+          setIsOpenDeleteModal(false);
         }}
-        team={team}
-      />
-    </Box>
+        handleConfirm={handleTeamDelete}
+      ></AlertDialog>
+    </>
   );
 };
