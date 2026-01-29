@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   useCreateProject,
   useUpdateProject,
@@ -17,17 +17,17 @@ import {
   Chip,
   Button,
   FormControl,
-  InputLabel,
   MenuItem,
   Select,
   type SelectChangeEvent,
+  InputLabel,
 } from "@mui/material";
 import { useGetAllTeams } from "../../../api/teams/teamController";
-import { userAuthContext } from "../../../utils/context/UserContext";
 import {
   ProjectStatus,
   type ProjectStatusTypes,
 } from "../../../api/projects/projectEnum";
+import { useEffect } from "react";
 
 type CreateUpdateProjectProps = {
   open: boolean;
@@ -35,108 +35,98 @@ type CreateUpdateProjectProps = {
   onClose: () => void;
 };
 
+type ProjectForm = {
+  name: string;
+  description: string;
+  status: ProjectStatusTypes;
+  admins: User[];
+  members: User[];
+  teams: Team[];
+};
+
 export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
   const { open, project, onClose } = props;
-
-  const { currentUser } = userAuthContext();
 
   const { mutate: createProject } = useCreateProject();
   const { mutate: updateProject } = useUpdateProject();
   const { data: users = [] } = useGetAllUsers();
-  const { data: teams = [] } = useGetAllTeams();
+  const { data: allTeams = [] } = useGetAllTeams();
 
-  const [projectName, setProjectName] = useState(project?.name || "");
-  const [projectDescription, setProjectDescription] = useState(
-    project?.description || "",
-  );
-  const [projectStatus, setProjectStatus] = useState<ProjectStatusTypes>(
-    project?.status as ProjectStatusTypes,
-  );
-  const [selectedAdmins, setSelectedAdmins] = useState<User[]>();
-  const [selectedMembers, setSelectedMembers] = useState<User[]>();
-  const [selectedTeams, setSelectedTeams] = useState<Team[]>();
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm<ProjectForm>();
 
   useEffect(() => {
-    setProjectName("");
-    if (project?.name) {
-      setProjectName(project.name);
+    if (project) {
+      reset({
+        name: project?.name || "",
+        description: project?.description || "",
+        status: project?.status,
+      });
     }
-  }, [open, project?.name]);
 
-  useEffect(() => {
-    setProjectDescription("");
-    if (project?.description) {
-      setProjectDescription(project.description);
+    if (project && allTeams && users) {
+      reset({
+        admins: project?.adminIds
+          ?.map((user) => users.find((x) => x.id === user))
+          ?.filter(Boolean),
+        members: project?.memberIds?.map((user) =>
+          users.find((x) => x.id === user),
+        ),
+        teams: project?.teamIds?.map((team) =>
+          allTeams.find((x) => x.id === team),
+        ),
+      });
+    } else {
+      reset({
+        admins: undefined,
+        members: undefined,
+        teams: undefined,
+      });
     }
-  }, [open, project?.description]);
+  }, [users, allTeams, project, reset]);
 
-  useEffect(() => {
-    if (project?.status) {
-      setProjectStatus(project.status);
-    }
-  }, [open, project?.status]);
+  const admins = watch("admins") || [];
+  const teams = watch("teams") || [];
+  const members = watch("members") || [];
+  const status = watch("status") || [];
 
-  useEffect(() => {
-    setSelectedAdmins(undefined);
-    if (project?.adminIds) {
-      setSelectedAdmins(
-        users.filter((user) => project?.adminIds.includes(user.id)),
-      );
-    }
-  }, [open, project?.adminIds, users]);
-
-  useEffect(() => {
-    setSelectedMembers(undefined);
-    if (project?.memberIds) {
-      setSelectedMembers(
-        users.filter((user) => project?.memberIds.includes(user.id)),
-      );
-    }
-  }, [open, project?.memberIds, users]);
-
-  useEffect(() => {
-    setSelectedTeams(undefined);
-    if (project?.teamIds) {
-      setSelectedTeams(
-        teams.filter((user) => project?.teamIds.includes(user.id)),
-      );
-    }
-  }, [open, project?.teamIds, users, teams]);
-
-  const handleClick = () => {
-    if (!project && projectName && projectDescription) {
+  const handleClick = (formData: ProjectForm) => {
+    if (!project) {
       createProject({
-        name: projectName,
-        description: projectDescription,
-        status: projectStatus,
-        adminIds: selectedAdmins?.map((user) => user.id || "") || [],
-        memberIds: selectedMembers?.map((user) => user.id || "") || [],
-        teamIds: selectedTeams?.map((team) => team.id) || [],
+        name: formData.name,
+        description: formData.description,
+        status: formData.status,
+        adminIds: formData.admins?.map((user) => user.id || "") || [],
+        memberIds: formData.members?.map((user) => user.id || "") || [],
+        teamIds: formData.teams?.map((team) => team.id) || [],
       });
     } else {
       updateProject({
         id: project!.id,
-        name: projectName,
-        description: projectDescription,
-        status: projectStatus,
-        adminIds: selectedAdmins?.map((user) => user.id || "") || [],
-        memberIds: selectedMembers?.map((user) => user.id || "") || [],
-        teamIds: selectedTeams?.map((team) => team.id) || [],
+        name: formData.name,
+        description: formData.description,
+        status: formData.status,
+        adminIds: formData.admins?.map((user) => user.id || "") || [],
+        memberIds: formData.members?.map((user) => user.id || "") || [],
+        teamIds: formData.teams?.map((team) => team.id) || [],
       });
     }
-    setSelectedAdmins(undefined);
-    setSelectedMembers(undefined);
-    setSelectedTeams(undefined);
-    onClose();
-  };
 
-  const handleChangeStatus = (event: SelectChangeEvent) => {
-    setProjectStatus(event.target.value as ProjectStatusTypes);
+    reset();
+    onClose();
   };
 
   return (
     <Modal open={open} onClose={onClose}>
       <Box
+        component={"form"}
+        onSubmit={handleSubmit((data) => handleClick(data))}
         sx={{
           position: "absolute",
           top: "50%",
@@ -155,124 +145,147 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
         <Typography id="modal-modal-title" variant="h6" component="h2">
           {!project ? "Create Project" : "Edit Project"}
         </Typography>
-
-        <TextField
-          required
-          id="filled-basic"
-          label="Project name"
-          placeholder="Fill name"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setProjectName(event.target.value);
-          }}
-          defaultValue={project?.name}
-        />
-        <TextField
-          required
-          id="filled-multiline-flexible"
-          label="Project description"
-          placeholder="Fill description"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setProjectDescription(event.target.value);
-          }}
-          multiline
-          maxRows={4}
-          defaultValue={project?.description}
-        />
-        <FormControl fullWidth>
-          <InputLabel id="status-select-label">Status</InputLabel>
-          <Select
-            labelId="status-select-label"
-            id="status-select"
-            value={projectStatus}
-            label="Status"
-            onChange={handleChangeStatus}
-          >
-            {Object.values(ProjectStatus).map((s) => (
-              <MenuItem value={s}>{s}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <Autocomplete
-          multiple
-          id="admins-selected"
-          value={selectedAdmins}
-          onChange={(event, newValue) => {
-            setSelectedAdmins(newValue);
-          }}
-          options={users.filter((user) => !selectedMembers?.includes(user))}
-          getOptionLabel={(option) => option.firstName}
-          renderValue={(values, getItemProps) =>
-            values.map((option, index) => {
-              const { key, ...itemProps } = getItemProps({ index });
-              return <Chip key={key} label={option.firstName} {...itemProps} />;
-            })
-          }
-          renderInput={(params) => (
+        <Controller
+          name="name"
+          control={control}
+          render={({ field }) => (
             <TextField
-              {...params}
-              label="Project admins"
-              placeholder="Project admins"
+              {...field}
+              label="Project name"
+              error={!!errors.name}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setValue("name", event.target.value);
+              }}
+              placeholder="Fill name"
+              defaultValue={project?.name}
             />
           )}
         />
-        <Autocomplete
-          multiple
-          id="members-selected"
-          value={selectedMembers}
-          onChange={(event, newValue) => {
-            setSelectedMembers(newValue);
-          }}
-          options={users.filter((user) => !selectedAdmins?.includes(user))}
-          getOptionLabel={(option) => option.firstName}
-          renderValue={(values, getItemProps) =>
-            values.map((option, index) => {
-              const { key, ...itemProps } = getItemProps({ index });
-              return <Chip key={key} label={option.firstName} {...itemProps} />;
-            })
-          }
-          renderInput={(params) => (
+        <Controller
+          name="description"
+          control={control}
+          render={({ field }) => (
             <TextField
-              {...params}
-              label="Project members"
-              placeholder="Project members"
+              {...field}
+              label="Project description"
+              error={!!errors.name}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setValue("description", event.target.value);
+              }}
+              placeholder="Fill description"
+              multiline
+              maxRows={4}
+              defaultValue={project?.description}
             />
           )}
         />
-        <Autocomplete
-          multiple
-          id="teams-selected"
-          value={selectedTeams}
-          onChange={(event, newValue) => {
-            setSelectedTeams(newValue);
-          }}
-          options={teams.filter((team) => team.users.includes(currentUser!.id))}
-          getOptionLabel={(option) => option.name}
-          renderValue={(values, getItemProps) =>
-            values.map((option, index) => {
-              const { key, ...itemProps } = getItemProps({ index });
-              return <Chip key={key} label={option.name} {...itemProps} />;
-            })
-          }
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Assign team"
-              placeholder="Assign team"
+        <Controller
+          name="status"
+          control={control}
+          render={({ field }) => (
+            <FormControl fullWidth>
+              <InputLabel id="status-select-label">Status</InputLabel>
+              <Select
+                {...field}
+                value={status}
+                label="Status"
+                onChange={(event: SelectChangeEvent) => {
+                  setValue("status", event.target.value as ProjectStatusTypes);
+                }}
+              >
+                {Object.values(ProjectStatus).map((s) => (
+                  <MenuItem value={s}>{s}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+        />
+        <Controller
+          name="admins"
+          control={control}
+          render={({ field }) => (
+            <Autocomplete
+              {...field}
+              multiple
+              options={users.filter((user) => !members?.includes(user))}
+              getOptionLabel={(option) => option.firstName}
+              onChange={(_e, value) => {
+                setValue("admins", value);
+              }}
+              renderValue={(values) =>
+                values.map((option) => {
+                  return <Chip key={option.id} label={option.firstName} />;
+                })
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Project admins"
+                  placeholder="Project admins"
+                />
+              )}
             />
           )}
         />
-
-        <Button
-          variant="contained"
-          onClick={handleClick}
-          disabled={Boolean(
-            !projectName ||
-            !projectDescription ||
-            !projectStatus ||
-            !selectedAdmins ||
-            !selectedMembers,
+        <Controller
+          name="members"
+          control={control}
+          render={({ field }) => (
+            <Autocomplete
+              {...field}
+              multiple
+              options={users.filter((user) => !admins?.includes(user))}
+              getOptionLabel={(option) => option.firstName}
+              onChange={(_e, value) => {
+                setValue("members", value);
+              }}
+              renderValue={(values, getItemProps) =>
+                values.map((option, index) => {
+                  const { key, ...itemProps } = getItemProps({ index });
+                  return (
+                    <Chip key={key} label={option.firstName} {...itemProps} />
+                  );
+                })
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Project members"
+                  placeholder="Project members"
+                />
+              )}
+            />
           )}
-        >
+        />
+        <Controller
+          name="teams"
+          control={control}
+          render={({ field }) => (
+            <Autocomplete
+              {...field}
+              multiple
+              options={allTeams?.filter((x) => !teams.includes(x)) || []}
+              getOptionLabel={(option) => option.name}
+              onChange={(_e, value) => {
+                setValue("teams", value);
+              }}
+              renderValue={(values, getItemProps) =>
+                values.map((option, index) => {
+                  const { key, ...itemProps } = getItemProps({ index });
+                  return <Chip key={key} label={option?.name} {...itemProps} />;
+                })
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Assign team"
+                  placeholder="Assign team"
+                />
+              )}
+            />
+          )}
+        />
+        <Button type="submit" variant="contained">
           {!project ? "Create" : "Edit"}
         </Button>
         <Button variant="contained" onClick={onClose}>
