@@ -35,7 +35,7 @@ export const ProjectCardDetails = ({
         minWidth: 500,
         minHeight: 280,
         bgcolor: "#e7e9ee",
-        width: "round(11px, 1px)",
+        width: 1,
         boxShadow: 3,
         fontFamily: "Arial",
       }}
@@ -111,6 +111,10 @@ export const ProjectCardDetails = ({
           sx={{
             bgcolor: "#87CEEB",
             color: "white",
+            width: 100,
+            height: 45,
+            fontSize: 16,
+            fontWeight: "bold",
             boxShadow: 2,
           }}
         >
@@ -122,6 +126,10 @@ export const ProjectCardDetails = ({
           sx={{
             bgcolor: "red",
             color: "white",
+            width: 100,
+            height: 45,
+            fontSize: 16,
+            fontWeight: "bold",
             boxShadow: 2,
           }}
           onClick={onDelete}

@@ -11,7 +11,6 @@ import {
 import InboxIcon from "@mui/icons-material/Inbox";
 import MailIcon from "@mui/icons-material/Mail";
 import AssignmentIcon from "@mui/icons-material/Assignment";
-import TaskIcon from "@mui/icons-material/Task";
 import { NavLink } from "react-router-dom";
 
 const drawerWidth = 240;
@@ -20,7 +19,6 @@ const navItems = [
   { label: "Home", path: "/", icon: <InboxIcon /> },
   { label: "Teams", path: "/teams", icon: <MailIcon /> },
   { label: "Projects", path: "/projects", icon: <AssignmentIcon /> },
-  { label: "Tasks", path: "/tasks", icon: <TaskIcon /> },
 ];
 
 export const Sidebar = () => {

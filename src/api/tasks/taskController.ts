@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import type { Task } from "./taskTypes";
+import type { Task, TaskPayload } from "./taskTypes";
 import { axiosClient } from "../../config/axios.config";
 import { queryClient } from "../../config/queryClient.config";
 
@@ -20,7 +20,7 @@ export const useGetAllTasks = () => {
 
 export const useCreateTask = () => {
   return useMutation({
-    mutationFn: async (data: Task) => {
+    mutationFn: async (data: TaskPayload) => {
       const response = await axiosClient.post("tasks", {
         ...data,
         createdAt: new Date(),
@@ -39,7 +39,7 @@ export const useCreateTask = () => {
 
 export const useUpdateTask = () => {
   return useMutation({
-    mutationFn: async (data: Task & { id: string }) => {
+    mutationFn: async (data: TaskPayload & { id: string }) => {
       const response = await axiosClient.patch(`tasks/${data.id}`, {
         ...data,
         updatedAt: new Date(),

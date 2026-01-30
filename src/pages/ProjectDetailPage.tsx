@@ -3,86 +3,137 @@ import {
   useDeleteProject,
   useGetAllProjects,
 } from "../api/projects/projectController";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { userAuthContext } from "../utils/context/UserContext";
 import type { Project } from "../api/projects/projectTypes";
 import { Box, Button, Typography } from "@mui/material";
 import { CreateUpdateProjectModal } from "../components/views/Projects/CreateUpdateProjectModal";
 import { ProjectCardDetails } from "../components/views/Projects/ProjectCardDetails";
-import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { AlertDialog } from "../components/common/AlertDialog";
+import { TaskTable } from "../components/views/Tasks/TaskTable";
+import { useGetAllTasks, useDeleteTask } from "../api/tasks/taskController";
+import type { Task } from "../api/tasks/taskTypes";
+import { CreateUpdateTaskModal } from "../components/views/Tasks/CreateUpdateTaskModal";
 
 export const ProjectDetailPage = () => {
-  const { currentUser } = userAuthContext();
-
-  const { data: projects } = useGetAllProjects();
+  const { data: tasks } = useGetAllTasks();
+  const { data: getProjects } = useGetAllProjects();
   const { mutate: deleteProject } = useDeleteProject();
+  const { mutate: deleteTask } = useDeleteTask();
 
-  const [projectId, setProjectId] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
-  const [project, setProject] = useState<Project>();
-  const navigate = useNavigate();
-
-  const handleTeamDelete = () => {
-    deleteProject(projectId);
-  };
-
-  const userProjects = projects?.filter(
-    (project) =>
-      (currentUser && project.adminIds.includes(currentUser.id)) ||
-      project.memberIds.includes(currentUser!.id),
+  const { id } = useParams();
+  const [taskId, setTaskId] = useState("");
+  const [task, setTask] = useState<Task>();
+  const userTasks = tasks?.filter((task) => task.projectId === id);
+  const [isOpenProjectModal, setIsOpen] = useState(false);
+  const [isOpenTaskModal, setIsOpenTaskModal] = useState(false);
+  const [isOpenProjectDeleteModal, setIsOpenProjectDeleteModal] =
+    useState(false);
+  const [isOpenTaskDeleteModal, setIsOpenTaskDeleteModal] = useState(false);
+  const [project, setProject] = useState<Project | undefined>(
+    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+    getProjects?.find((project) => project.id === id)!,
   );
 
+  const handleTeamDelete = () => {
+    deleteProject(id!);
+  };
+
+  const handleTaskDelete = () => {
+    deleteTask(taskId);
+  };
+
   return (
-    <Box sx={{ display: "flex", gap: 2, flexDirection: "column" }}>
+    <Box
+      sx={{
+        display: "flex",
+        gap: 2,
+        flexDirection: "column",
+        minWidth: "100%",
+      }}
+    >
       <Box>
         <Typography sx={{ fontSize: 24, fontWeight: "bold" }}>
           Detail Project Page
         </Typography>
       </Box>
-      {userProjects?.map((project, i) => (
-        <ProjectCardDetails
-          key={i}
-          project={project}
-          onEditClick={() => {
-            setIsOpen(true);
-            setProject(project);
-          }}
-          onDelete={() => {
-            setProjectId(project.id);
-            setIsOpenDeleteModal(true);
-          }}
-        />
-      ))}
-      <Box>
-        <Button
-          variant="contained"
-          startIcon={<ArrowBackIcon />}
-          onClick={() => {
-            navigate("/projects");
-          }}
-          sx={{ gap: 3, boxShadow:3 }}
-        >
-          Go to project page
-        </Button>
+      <ProjectCardDetails
+        project={project!}
+        onEditClick={() => {
+          setIsOpen(true);
+          setProject(project);
+        }}
+        onDelete={() => {
+          setIsOpenProjectDeleteModal(true);
+        }}
+      />
+      <Typography sx={{ fontSize: 24, fontWeight: "bold" }}>
+        Tasks for the project
+      </Typography>
+      <Button
+        variant="contained"
+        onClick={() => {
+          setTask(undefined);
+          setIsOpenTaskModal(true);
+        }}
+        sx={{ gap: 3, boxShadow: 3, width: 160 }}
+      >
+        Create Task
+      </Button>
+      <Box sx={{ minWidth: 1 }}>
+        {userTasks?.map((task, i) => (
+          <TaskTable
+            key={i}
+            task={task}
+            onEditClick={() => {
+              setIsOpenTaskModal(true);
+              setTask(task);
+            }}
+            onDelete={() => {
+              setTaskId(task.id);
+              setIsOpenTaskDeleteModal(true);
+            }}
+          />
+        ))}
       </Box>
       <CreateUpdateProjectModal
-        open={isOpen}
+        open={isOpenProjectModal}
         onClose={() => {
           setIsOpen(false);
           setProject(undefined);
         }}
         project={project}
       />
-      <AlertDialog
-        title={"Delete project!"}
-        message={"Are you sure you want to delete the project?"}
-        open={isOpenDeleteModal}
+      <CreateUpdateTaskModal
+        open={isOpenTaskModal}
         onClose={() => {
-          setIsOpenDeleteModal(false);
+          setIsOpenTaskModal(false);
+          setTask(undefined);
         }}
-        handleConfirm={handleTeamDelete}
+        task={task}
+        project={project!}
+      />
+      <AlertDialog
+        title={isOpenProjectDeleteModal ? "Delete Project!" : "Delete Task!"}
+        message={
+          isOpenProjectDeleteModal
+            ? "Are you sure you want to delete the project?"
+            : "Are you sure you want to delete the task?"
+        }
+        open={
+          isOpenProjectDeleteModal
+            ? isOpenProjectDeleteModal
+            : isOpenTaskDeleteModal
+        }
+        onClose={() => {
+          if (isOpenProjectDeleteModal) {
+            setIsOpenProjectDeleteModal(false);
+          } else {
+            setIsOpenTaskDeleteModal(false);
+          }
+        }}
+        handleConfirm={
+          isOpenProjectDeleteModal ? handleTeamDelete : handleTaskDelete
+        }
       ></AlertDialog>
     </Box>
   );
