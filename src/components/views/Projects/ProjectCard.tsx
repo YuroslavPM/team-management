@@ -11,6 +11,7 @@ import { useGetAllUsers } from "../../../api/userController";
 import { useGetAllTeams } from "../../../api/teams/teamController";
 import type { Project } from "../../../api/projects/projectTypes";
 import { useNavigate } from "react-router-dom";
+import { CommonText } from "../../common/CommonText";
 
 export type ProjectCardProps = {
   project: Project;
@@ -43,7 +44,7 @@ export const ProjectCard = ({
         <Typography variant="h5" component="div">
           {project.name}
         </Typography>
-        <Typography variant="body2">Status: {project.status}</Typography>
+        <CommonText text={"Status: "} style={null} variant={"body2"} value={project.status} />
         <Typography variant="body2">
           Admins:{" "}
           {users

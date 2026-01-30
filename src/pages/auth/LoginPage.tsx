@@ -6,6 +6,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { Snackbar, Typography } from "@mui/material";
 import { useState, type ChangeEvent } from "react";
 import { userAuthContext } from "../../utils/context/UserContext";
+import { CommonButton } from "../../components/common/CommonButton";
+import { CommonText } from "../../components/common/CommonText";
 
 export default function LoginPage() {
   const { setCurrentUser } = userAuthContext();
@@ -51,9 +53,7 @@ export default function LoginPage() {
           gap: 3,
         }}
       >
-        <Typography variant="h2" gutterBottom>
-          Login
-        </Typography>
+        <CommonText text={"Login"} style={""} variant="h2" gutterBottom />
         <TextField
           id="outlined-controlled"
           label="Email"
@@ -71,9 +71,13 @@ export default function LoginPage() {
             setSecret(event.target.value);
           }}
         />
-        <Button variant="contained" onClick={handleClick}>
-          Login
-        </Button>
+        <CommonButton
+          text={"Login"}
+          style={{ bgcolor: "#2168eb", color: "white" }}
+          variant="contained"
+          onClick={handleClick}
+        />
+
         <Typography gutterBottom sx={{ color: "text.secondary", fontSize: 16 }}>
           <NavLink to="/register">Register here!</NavLink>
         </Typography>

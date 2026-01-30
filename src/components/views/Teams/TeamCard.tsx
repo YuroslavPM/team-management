@@ -9,6 +9,7 @@ import {
 import { deepOrange } from "@mui/material/colors";
 import type { Team } from "../../../api/teams/teamTypes";
 import { useGetAllUsers } from "../../../api/userController";
+import { CommonText } from "../../common/CommonText";
 
 type TeamCardProps = {
   team: Team;
@@ -40,13 +41,13 @@ export const TeamCard = ({
         <Typography variant="h5" component="div">
           {team.name}
         </Typography>
-        <Typography variant="body2">
-          Mates:{" "}
-          {users
+        <CommonText
+          text={"Mates:"}
+          value={users
             ?.filter((user) => team.users.includes(user.id))
             .map((u) => u.firstName)
             .join(", ")}
-        </Typography>
+          variant={"body2"} style={null}        />
       </CardContent>
       <CardActions>
         <Button

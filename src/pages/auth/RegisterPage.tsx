@@ -6,6 +6,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useCreateUser } from "../../api/userController";
 import { Typography } from "@mui/material";
+import { CommonButton } from "../../components/common/CommonButton";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -145,6 +146,16 @@ export default function RegisterPage() {
           }}
           helperText={secretError}
         />
+        <CommonButton
+          text={"Register"}
+          variant="contained"
+          onClick={handleClick}
+          disabled={Boolean(
+            firstNameError || lastNameError || emailError || secretError,
+          )}
+          style={{ bgcolor: "#2168eb", color: "white" }}
+        />
+
         <Button
           variant="contained"
           onClick={handleClick}
