@@ -15,7 +15,6 @@ import {
   TextField,
   Autocomplete,
   Chip,
-  Button,
   FormControl,
   MenuItem,
   Select,
@@ -28,6 +27,7 @@ import {
   type ProjectStatusTypes,
 } from "../../../api/projects/projectEnum";
 import { useEffect } from "react";
+import { CommonButton } from "../../common/CommonButton";
 
 type CreateUpdateProjectProps = {
   open: boolean;
@@ -285,12 +285,18 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
             />
           )}
         />
-        <Button type="submit" variant="contained">
-          {!project ? "Create" : "Edit"}
-        </Button>
-        <Button variant="contained" onClick={onClose}>
-          Close
-        </Button>
+        <CommonButton
+          text={!project ? "Create" : "Edit"}
+          style={{ bgcolor: "#2a70f3", color: "white" }}
+          variant="contained"
+          type="submit"
+        />
+        <CommonButton
+          text={"Close"}
+          style={{ bgcolor: "#2a70f3", color: "white" }}
+          variant="contained"
+          onClick={onClose}
+        />
       </Box>
     </Modal>
   );

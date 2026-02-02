@@ -4,7 +4,7 @@ import {
   useGetAllProjects,
 } from "../api/projects/projectController";
 import type { Project } from "../api/projects/projectTypes";
-import { Box, Button, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { CreateUpdateProjectModal } from "../components/views/Projects/CreateUpdateProjectModal";
 import { ProjectCardDetails } from "../components/views/Projects/ProjectCardDetails";
 import { useParams } from "react-router-dom";
@@ -13,6 +13,8 @@ import { TaskTable } from "../components/views/Tasks/TaskTable";
 import { useGetAllTasks, useDeleteTask } from "../api/tasks/taskController";
 import type { Task } from "../api/tasks/taskTypes";
 import { CreateUpdateTaskModal } from "../components/views/Tasks/CreateUpdateTaskModal";
+import { CommonText } from "../components/common/CommonText";
+import { CommonButton } from "../components/common/CommonButton";
 
 export const ProjectDetailPage = () => {
   const { data: tasks } = useGetAllTasks();
@@ -52,9 +54,11 @@ export const ProjectDetailPage = () => {
       }}
     >
       <Box>
-        <Typography sx={{ fontSize: 24, fontWeight: "bold" }}>
-          Detail Project Page
-        </Typography>
+        <CommonText
+          text={"Detail Product Page"}
+          value={null}
+          style={{ fontSize: 24, fontWeight: "bold" }}
+        />
       </Box>
       <ProjectCardDetails
         project={project!}
@@ -66,19 +70,25 @@ export const ProjectDetailPage = () => {
           setIsOpenProjectDeleteModal(true);
         }}
       />
-      <Typography sx={{ fontSize: 24, fontWeight: "bold" }}>
-        Tasks for the project
-      </Typography>
-      <Button
-        variant="contained"
+      <CommonText
+        text={"Tasks for the project"}
+        value={null}
+        style={{ fontSize: 24, fontWeight: "bold" }}
+      />
+      <CommonButton
+        text={"Create task"}
+        style={{
+          gap: 3,
+          boxShadow: 3,
+          width: 160,
+          bgcolor: "#2a70f3",
+          color: "white",
+        }}
         onClick={() => {
           setTask(undefined);
           setIsOpenTaskModal(true);
         }}
-        sx={{ gap: 3, boxShadow: 3, width: 160 }}
-      >
-        Create Task
-      </Button>
+      />
       <Box sx={{ minWidth: 1 }}>
         {userTasks?.map((task, i) => (
           <TaskTable
@@ -134,7 +144,7 @@ export const ProjectDetailPage = () => {
         handleConfirm={
           isOpenProjectDeleteModal ? handleTeamDelete : handleTaskDelete
         }
-      ></AlertDialog>
+      />
     </Box>
   );
 };

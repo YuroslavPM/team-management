@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useState } from "react";
 import { CreateUpdateTeamModal } from "../components/views/Teams/CreateUpdateTeamModal";
 import { useDeleteTeam, useGetAllTeams } from "../api/teams/teamController";
@@ -6,6 +6,7 @@ import { userAuthContext } from "../utils/context/UserContext";
 import type { Team } from "../api/teams/teamTypes";
 import { TeamCard } from "../components/views/Teams/TeamCard";
 import { AlertDialog } from "../components/common/AlertDialog";
+import { CommonButton } from "../components/common/CommonButton";
 
 export const TeamsPage = () => {
   const { currentUser } = userAuthContext();
@@ -31,16 +32,15 @@ export const TeamsPage = () => {
       <Box sx={{ display: "flex", gap: 2, flexDirection: "column" }}>
         <Box>
           <Typography sx={{ fontSize: 24 }}>Team Page</Typography>
-          <Button
+          <CommonButton
+            text={"Create team"}
+            style={{ bgcolor: "#2a70f3", color: "white", gap: 3 }}
             variant="contained"
             onClick={() => {
               setTeam(undefined);
               setIsOpen(true);
             }}
-            sx={{ gap: 2 }}
-          >
-            Create Team
-          </Button>
+          />
         </Box>
 
         {userTeams?.map((team, i) => (

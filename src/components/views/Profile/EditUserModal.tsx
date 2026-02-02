@@ -2,11 +2,12 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-import { Button, TextField } from "@mui/material";
+import { TextField } from "@mui/material";
 import { useState } from "react";
 import { userAuthContext } from "../../../utils/context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useUpdateUser } from "../../../api/userController";
+import { CommonButton } from "../../common/CommonButton";
 
 type EditUserModalProps = {
   open: boolean;
@@ -52,20 +53,22 @@ export const EditUserModal = (props: EditUserModalProps) => {
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
-      <Box sx={{
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        width: 400,
-        bgcolor: "background.paper",
-        border: "2px solid #000",
-        boxShadow: 24,
-        p: 4,
-        display: "flex",
-        flexDirection: "column",
-        gap: 1,}
-        }>
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 400,
+          bgcolor: "background.paper",
+          border: "2px solid #000",
+          boxShadow: 24,
+          p: 4,
+          display: "flex",
+          flexDirection: "column",
+          gap: 1,
+        }}
+      >
         <Typography id="modal-modal-title" variant="h6" component="h2">
           Edit Profile
         </Typography>
@@ -91,12 +94,18 @@ export const EditUserModal = (props: EditUserModalProps) => {
             setLastName(event.target.value);
           }}
         />
-        <Button variant="contained" onClick={handleClick}>
-          Redact
-        </Button>
-        <Button variant="contained" onClick={onClose}>
-          Close
-        </Button>
+        <CommonButton
+          text={"Redact"}
+          style={{ bgcolor: "#2a70f3", color: "white" }}
+          variant="contained"
+          onClick={handleClick}
+        />
+        <CommonButton
+          text={"Close"}
+          style={{ bgcolor: "#2a70f3", color: "white" }}
+          variant="contained"
+          onClick={onClose}
+        />
       </Box>
     </Modal>
   );

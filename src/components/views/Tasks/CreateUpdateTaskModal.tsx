@@ -15,7 +15,6 @@ import { useEffect } from "react";
 import {
   Modal,
   Box,
-  Typography,
   TextField,
   FormControl,
   InputLabel,
@@ -23,11 +22,12 @@ import {
   MenuItem,
   Autocomplete,
   Chip,
-  Button,
   type SelectChangeEvent,
 } from "@mui/material";
 import type { Project } from "../../../api/projects/projectTypes";
 import type { User } from "../../../api/userTypes";
+import { CommonText } from "../../common/CommonText";
+import { CommonButton } from "../../common/CommonButton";
 
 type CreateUpdateTaskProps = {
   open: boolean;
@@ -73,16 +73,15 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
           users.find((x) => x.id === user),
         ),
       });
-    }
-    else{
+    } else {
       reset({
-        title:"",
+        title: "",
         description: "",
         status: undefined,
         priority: undefined,
         projectId: project.id,
-        assignedUserId: undefined
-      })
+        assignedUserId: undefined,
+      });
     }
   }, [users, task, project, reset]);
 
@@ -137,9 +136,12 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
           gap: 2,
         }}
       >
-        <Typography id="modal-modal-title" variant="h6" component="h2">
-          {!task ? "Create Task" : "Edit Task"}
-        </Typography>
+        <CommonText
+          text={!task ? "Create Task" : "Edit Task"}
+          value={null}
+          variant={"h6"}
+          style={null}
+        />
         <Controller
           name="title"
           control={control}
@@ -253,12 +255,18 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
             />
           )}
         />
-        <Button type="submit" variant="contained">
-          {!task ? "Create" : "Edit"}
-        </Button>
-        <Button variant="contained" onClick={onClose}>
-          Close
-        </Button>
+        <CommonButton
+          text={!task ? "Create" : "Edit"}
+          style={{ bgcolor: "#2a70f3", color: "white" }}
+          variant="contained"
+          type="submit"
+        />
+        <CommonButton
+          text={"Close"}
+          style={{ bgcolor: "#2a70f3", color: "white" }}
+          variant="contained"
+          onClick={onClose}
+        />
       </Box>
     </Modal>
   );

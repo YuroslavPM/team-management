@@ -12,8 +12,9 @@ type CommonButtonPayload = {
     "text" | "outlined" | "contained",
     ButtonPropsVariantOverrides
   >;
+  type?: "submit" | "reset" | "button" | undefined;
   icon?: React.ReactNode;
-  disabled?:boolean;
+  disabled?: boolean;
   onClick?: () => void;
 };
 

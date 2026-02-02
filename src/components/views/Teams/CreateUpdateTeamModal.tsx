@@ -2,7 +2,6 @@
 import {
   Autocomplete,
   Box,
-  Button,
   Chip,
   Modal,
   TextField,
@@ -16,6 +15,7 @@ import { useEffect, useState } from "react";
 import { useGetAllUsers } from "../../../api/userController";
 import type { User } from "../../../api/userTypes";
 import type { Team } from "../../../api/teams/teamTypes";
+import { CommonButton } from "../../common/CommonButton";
 
 type CreateTeamModalProps = {
   open: boolean;
@@ -113,12 +113,19 @@ export const CreateUpdateTeamModal = (props: CreateTeamModalProps) => {
             />
           )}
         />
-        <Button variant="contained" onClick={handleClick} disabled={Boolean(!teamName || !selectedUsers)}>
-          {!team ? "Create" : "Edit"}
-        </Button>
-        <Button variant="contained" onClick={onClose}>
-          Close
-        </Button>
+        <CommonButton
+          text={!team ? "Create" : "Edit"}
+          style={{ bgcolor: "#2a70f3", color: "white" }}
+          variant="contained"
+          disabled={Boolean(!teamName || !selectedUsers)}
+          onClick={handleClick}
+        />
+        <CommonButton
+          text={"Close"}
+          style={{ bgcolor: "#2a70f3", color: "white" }}
+          variant="contained"
+          onClick={onClose}
+        />
       </Box>
     </Modal>
   );

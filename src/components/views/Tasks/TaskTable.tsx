@@ -9,8 +9,8 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  Button,
 } from "@mui/material";
+import { CommonButton } from "../../common/CommonButton";
 
 export type TaskTableProps = {
   task: Task;
@@ -86,26 +86,18 @@ export const TaskTable = ({ task, onEditClick, onDelete }: TaskTableProps) => {
                 .join(", ")}
             </TableCell>
             <TableCell align="center" sx={{ gap: 1, display: "flex" }}>
-              <Button
+              <CommonButton
+                text={"Edit"}
+                style={{ bgcolor: "#87CEEB", color: "white" }}
                 size="small"
                 onClick={onEditClick}
-                sx={{
-                  bgcolor: "#87CEEB",
-                  color: "white",
-                }}
-              >
-                Edit
-              </Button>
-              <Button
+              />
+              <CommonButton
+                text={"Delete"}
+                style={{ bgcolor: "red", color: "white" }}
                 size="small"
-                sx={{
-                  bgcolor: "red",
-                  color: "white",
-                }}
                 onClick={onDelete}
-              >
-                Delete
-              </Button>
+              />
             </TableCell>
           </TableRow>
         </TableBody>

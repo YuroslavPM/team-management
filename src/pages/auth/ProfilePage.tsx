@@ -4,8 +4,6 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
 import { Avatar } from "@mui/material";
 import { getDisplayName } from "../../utils/helpers/getDisplayName";
 import { deepOrange } from "@mui/material/colors";
@@ -13,6 +11,8 @@ import { useDeleteUser } from "../../api/userController";
 import dayjs from "dayjs";
 import { EditUserModal } from "../../components/views/Profile/EditUserModal";
 import { AlertDialog } from "../../components/common/AlertDialog";
+import { CommonButton } from "../../components/common/CommonButton";
+import { CommonText } from "../../components/common/CommonText";
 
 export const ProfilePage = () => {
   const { currentUser, setCurrentUser } = userAuthContext();
@@ -41,55 +41,55 @@ export const ProfilePage = () => {
           }}
         >
           <CardContent>
-            <Typography
+            <CommonText
+              text={"Welcome "}
+              value={getDisplayName(currentUser) + "!"}
+              style={{ color: "text.secondary", fontSize: 16 }}
               gutterBottom
-              sx={{ color: "text.secondary", fontSize: 16 }}
-            >
-              Welcome {getDisplayName(currentUser)}!
-            </Typography>
+            />
             <Avatar sx={{ bgcolor: deepOrange[500] }}>
               {currentUser?.firstName.charAt(0)}
             </Avatar>
-            <Typography variant="h5" component="div">
-              {currentUser?.firstName}
-            </Typography>
-            <Typography variant="body2">
-              E-mail:{currentUser?.email}
-              <br />
-              You are here since: {dayjs(userCreatedAt).format("DD/MM/YYYY")}
-            </Typography>
+            <CommonText
+              text={""}
+              value={currentUser?.firstName}
+              variant={"h5"}
+              style={null}
+            />
+            <CommonText
+              text={"E-mail: "}
+              value={currentUser?.email}
+              variant={"body2"}
+              style={null}
+            />
+            <CommonText
+              text={"You are here since: "}
+              value={dayjs(userCreatedAt).format("DD/MM/YYYY")}
+              variant={"body2"}
+              style={null}
+            />
           </CardContent>
           <CardActions>
-            <Button
+            <CommonButton
+              text={"Edit"}
+              style={{ bgcolor: "#87CEEB", color: "white" }}
               size="small"
               onClick={() => {
                 setIsOpen(true);
               }}
-              sx={{
-                bgcolor: "#87CEEB",
-                color: "white",
-              }}
-            >
-              Edit
-            </Button>
-
-            <EditUserModal open={isOpen} onClose={() => setIsOpen(false)} />
-
-            <Button
+            />
+            <CommonButton
+              text={"Delete"}
+              style={{ bgcolor: "red", color: "white" }}
               size="small"
-              sx={{
-                bgcolor: "red",
-                color: "white",
-              }}
               onClick={() => {
                 setIsOpenDeleteModal(true);
               }}
-            >
-              Delete
-            </Button>
+            />
           </CardActions>
         </Card>
       </Box>
+      <EditUserModal open={isOpen} onClose={() => setIsOpen(false)} />
       <AlertDialog
         title={"Delete user"}
         message={"Are you sure you want to delete your account?"}
@@ -98,7 +98,7 @@ export const ProfilePage = () => {
           setIsOpenDeleteModal(false);
         }}
         handleConfirm={handleDeleteUser}
-      ></AlertDialog>
+      />
     </>
   );
 };

@@ -1,5 +1,4 @@
 import * as React from "react";
-import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -155,16 +154,6 @@ export default function RegisterPage() {
           )}
           style={{ bgcolor: "#2168eb", color: "white" }}
         />
-
-        <Button
-          variant="contained"
-          onClick={handleClick}
-          disabled={Boolean(
-            firstNameError || lastNameError || emailError || secretError,
-          )}
-        >
-          Register
-        </Button>
         <Typography gutterBottom sx={{ color: "text.secondary", fontSize: 16 }}>
           <NavLink to="/login">Login here!</NavLink>
         </Typography>
