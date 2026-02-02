@@ -1,4 +1,4 @@
-import { Typography, type SxProps, type Theme, type TypographyPropsVariantOverrides, type TypographyVariant} from "@mui/material";
+import { Box, Typography, type SxProps, type Theme, type TypographyPropsVariantOverrides, type TypographyVariant} from "@mui/material";
 import type { OverridableStringUnion } from "@mui/types";
 
 type CommonTextPayload = {
@@ -16,5 +16,14 @@ type CommonTextPayload = {
 export const CommonText = (props:CommonTextPayload)=>{
     const{text,value, style, variant} = props;
     
-    return <Typography variant={variant} sx={style}>{text}{value}</Typography>;
+    return (
+      <Box sx={{ display: "flex", flexDirection: "row" }}>
+        <Typography variant={variant} sx={style? style : { fontWeight: "bold"}}>
+          {text}
+        </Typography>
+        <Typography variant={variant} sx={style}>
+          {value}
+        </Typography>
+      </Box>
+    );
 };
