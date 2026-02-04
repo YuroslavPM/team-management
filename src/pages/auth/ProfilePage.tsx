@@ -21,7 +21,7 @@ export const ProfilePage = () => {
     if (user?.id) {
       mutate(user.id);
     }
-    if(user?.id === currentUser?.id){
+    if (user?.id === currentUser?.id) {
       setCurrentUser(undefined);
     }
   };
@@ -39,20 +39,24 @@ export const ProfilePage = () => {
             setIsOpenDeleteModal(true);
           }}
         />
-        <Box sx={{ minWidth: 1, marginTop: 15 }}>
-          <UsersTable
-            allUsers={allUsers!}
-            onEditClick={() => {
-              setIsOpenEditModal(true);
-            }}
-            onDelete={() => {
-              setIsOpenDeleteModal(true);
-            }}
-            user={(value: User) => {
-              setUser(value);
-            }}
-          />
-        </Box>
+        {currentUser?.isAdmin ? (
+          <Box
+            sx={{ minWidth: 1, marginTop: 15 }}
+          >
+            <UsersTable
+              allUsers={allUsers!}
+              onEditClick={() => {
+                setIsOpenEditModal(true);
+              }}
+              onDelete={() => {
+                setIsOpenDeleteModal(true);
+              }}
+              user={(value: User) => {
+                setUser(value);
+              }}
+            />
+          </Box>
+        ) : null}
       </Box>
 
       <EditUserModal

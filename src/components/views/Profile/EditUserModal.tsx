@@ -1,12 +1,26 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-import { Button, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  Checkbox,
+  Chip,
+  FormControlLabel,
+  TextField,
+} from "@mui/material";
 import { useEffect } from "react";
 import { useUpdateUser } from "../../../api/userController";
 import { CommonButton } from "../../common/CommonButton";
 import type { User } from "../../../api/userTypes";
 import { Controller, useForm } from "react-hook-form";
+import type { Team } from "../../../api/teams/teamTypes";
+import {
+  useGetAllTeams,
+  useUpdateTeam,
+} from "../../../api/teams/teamController";
+import { useGetAllProjects } from "../../../api/projects/projectController";
+import { useGetAllTasks } from "../../../api/tasks/taskController";
 
 type EditUserModalProps = {
   open: boolean;
@@ -17,47 +31,66 @@ type EditUserModalProps = {
 type EditUserForm = {
   firstName: string;
   lastName: string;
+  isAdmin: boolean;
+  teams: Team[];
 };
 
 export const EditUserModal = (props: EditUserModalProps) => {
   const { onClose, open, user } = props;
 
-  const { mutate: updateProject } = useUpdateUser();
+  const { mutate: updateUser } = useUpdateUser();
+  const { mutate: updateTeam } = useUpdateTeam();
+  const { data: allTeams } = useGetAllTeams();
+  const { data: allProjects } = useGetAllProjects();
+  const { data: allTasks } = useGetAllTasks();
+
+  const userTeams = allTeams?.filter((team) =>
+    team.users.find((x) => x === user?.id),
+  );
 
   const {
     control: editUser,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isValid },
   } = useForm<EditUserForm>({
     mode: "onChange",
     defaultValues: {
       firstName: user?.firstName,
       lastName: user?.lastName,
+      isAdmin: user?.isAdmin,
+      // teams: userTeams,
     },
   });
 
+  const teams = watch("teams") || [];
+
   useEffect(() => {
-    if (user) {
+    if (user && open) {
       reset({
         firstName: user?.firstName,
         lastName: user?.lastName,
+        isAdmin: user?.isAdmin,
       });
-    }else{
+    } else {
       reset({
-        firstName:"",
-        lastName:""
-      })
+        firstName: "",
+        lastName: "",
+        teams: undefined,
+      });
     }
-  });
+  }, [open, reset, user]);
 
   const handleClick = (formData: EditUserForm) => {
     if (user.id && formData.firstName && formData.lastName) {
-      updateProject(
+      updateUser(
         {
           id: user?.id,
           firstName: formData.firstName,
           lastName: formData.lastName,
+          isAdmin: formData.isAdmin,
         },
         {
           onSuccess: () => {
@@ -66,6 +99,11 @@ export const EditUserModal = (props: EditUserModalProps) => {
         },
       );
     }
+    // if(formData.teams){
+    //   updateTeam({
+    //     users:
+    //   })
+    // }
     reset();
   };
 
@@ -78,7 +116,10 @@ export const EditUserModal = (props: EditUserModalProps) => {
     >
       <Box
         component={"form"}
-        onSubmit={handleSubmit((data) => handleClick(data))}
+        onSubmit={handleSubmit((data) => {
+          // console.log(data);
+          handleClick(data);
+        })}
         sx={{
           position: "absolute",
           top: "50%",
@@ -136,6 +177,52 @@ export const EditUserModal = (props: EditUserModalProps) => {
                 field.onChange(e);
               }}
               helperText={errors.lastName?.message}
+            />
+          )}
+        />
+        <Controller
+          name="isAdmin"
+          control={editUser}
+          render={({ field }) => (
+            <FormControlLabel
+              {...field}
+              control={
+                <Checkbox
+                  checked={!!field.value}
+                  onChange={(e) => {
+                    field.onChange(e.target.checked);
+                  }}
+                />
+              }
+              label="Admin"
+            />
+          )}
+        />
+        <Controller
+          name="teams"
+          control={editUser}
+          render={({ field }) => (
+            <Autocomplete
+              {...field}
+              multiple
+              options={allTeams?.filter((x) => !teams.includes(x)) || []}
+              getOptionLabel={(option) => option.name}
+              onChange={(_e, value) => {
+                setValue("teams", value);
+              }}
+              renderValue={(values, getItemProps) =>
+                values.map((option, index) => {
+                  const { key, ...itemProps } = getItemProps({ index });
+                  return <Chip key={key} label={option?.name} {...itemProps} />;
+                })
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Assign team"
+                  placeholder="Assign team"
+                />
+              )}
             />
           )}
         />
