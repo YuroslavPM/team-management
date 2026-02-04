@@ -1,41 +1,45 @@
-import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { useGetAllUsers } from "../../api/userController";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Snackbar, Typography } from "@mui/material";
-import { useState, type ChangeEvent } from "react";
+import { Button, Typography } from "@mui/material";
 import { userAuthContext } from "../../utils/context/UserContext";
-import { CommonButton } from "../../components/common/CommonButton";
 import { CommonText } from "../../components/common/CommonText";
+import { Controller, useForm } from "react-hook-form";
+
+type LoginForm = {
+  email: string;
+  secret: string;
+};
 
 export default function LoginPage() {
   const { setCurrentUser } = userAuthContext();
   const navigate = useNavigate();
-
   const { data } = useGetAllUsers();
-  const [email, setEmail] = useState("");
-  const [secret, setSecret] = useState("");
-  const [showError, setShowError] = useState(false);
 
-  const handleClick = () => {
-    const user = data?.find((x) => x.email === email && x.secret === secret);
+  const onSubmit = (formData: LoginForm) => {
+    const user = data?.find(
+      (x) => x.email === formData.email && x.secret === formData.secret,
+    );
 
     if (user) {
       setCurrentUser(user);
-
       navigate("/");
-    } else {
-      setShowError(true);
     }
+    reset();
   };
 
-  const handleClose = () => {
-    setShowError(false);
-  };
+  const {
+    control: login,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid },
+  } = useForm<LoginForm>({ mode: "onChange" });
 
   return (
     <Box
+      component={"form"}
+      onSubmit={handleSubmit((data) => onSubmit(data))}
       sx={{
         display: "flex",
         position: "fixed",
@@ -53,41 +57,56 @@ export default function LoginPage() {
           gap: 3,
         }}
       >
-        <CommonText text={"Login"} style={""} variant="h2" gutterBottom />
-        <TextField
-          id="outlined-controlled"
-          label="Email"
-          value={email}
-          onChange={(event: ChangeEvent<HTMLInputElement>) => {
-            setEmail(event.target.value);
-          }}
-        />
-        <TextField
-          id="outlined-controlled"
-          label="Password"
-          type="password"
-          value={secret}
-          onChange={(event: ChangeEvent<HTMLInputElement>) => {
-            setSecret(event.target.value);
-          }}
-        />
-        <CommonButton
+        <CommonText
           text={"Login"}
-          style={{ bgcolor: "#2168eb", color: "white" }}
-          variant="contained"
-          onClick={handleClick}
+          variant="h2"
+          gutterBottom
+          value={undefined}
+          style={null}
         />
-
+        <Controller
+          name="email"
+          control={login}
+          rules={{
+            validate: (value) => value.includes("@") || "Invalid email address",
+          }}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="Email"
+              error={!!errors.email}
+              onChange={(e) => {
+                field.onChange(e);
+              }}
+              helperText={errors.email?.message}
+            />
+          )}
+        />
+        <Controller
+          name="secret"
+          control={login}
+          rules={{
+            required: "Password is required!",
+          }}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="Password"
+              type="password"
+              error={!!errors.secret}
+              onChange={(e) => {
+                field.onChange(e);
+              }}
+              helperText={errors.secret?.message}
+            />
+          )}
+        />
+        <Button variant="contained" disabled={!isValid} type="submit">
+          Login
+        </Button>
         <Typography gutterBottom sx={{ color: "text.secondary", fontSize: 16 }}>
           <NavLink to="/register">Register here!</NavLink>
         </Typography>
-        <Snackbar
-          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-          open={showError}
-          onClose={handleClose}
-          message="Wrong email or password"
-          autoHideDuration={6000}
-        />
       </Box>
     </Box>
   );

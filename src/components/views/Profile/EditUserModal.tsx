@@ -1,50 +1,73 @@
-import * as React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-import { TextField } from "@mui/material";
-import { useState } from "react";
-import { userAuthContext } from "../../../utils/context/UserContext";
-import { useNavigate } from "react-router-dom";
+import { Button, TextField } from "@mui/material";
+import { useEffect } from "react";
 import { useUpdateUser } from "../../../api/userController";
 import { CommonButton } from "../../common/CommonButton";
+import type { User } from "../../../api/userTypes";
+import { Controller, useForm } from "react-hook-form";
 
 type EditUserModalProps = {
   open: boolean;
   onClose: () => void;
+  user: User;
+};
+
+type EditUserForm = {
+  firstName: string;
+  lastName: string;
 };
 
 export const EditUserModal = (props: EditUserModalProps) => {
-  const { onClose, open } = props;
+  const { onClose, open, user } = props;
 
-  const { currentUser, setCurrentUser } = userAuthContext();
-  const [firstName, setFirstName] = useState(currentUser?.firstName);
-  const [lastName, setLastName] = useState(currentUser?.lastName);
+  const { mutate: updateProject } = useUpdateUser();
 
-  const navigate = useNavigate();
-  const { mutate } = useUpdateUser();
+  const {
+    control: editUser,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid },
+  } = useForm<EditUserForm>({
+    mode: "onChange",
+    defaultValues: {
+      firstName: user?.firstName,
+      lastName: user?.lastName,
+    },
+  });
 
-  const handleClick = () => {
-    if (currentUser?.id && currentUser?.firstName && currentUser?.lastName) {
-      mutate(
+  useEffect(() => {
+    if (user) {
+      reset({
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+      });
+    }else{
+      reset({
+        firstName:"",
+        lastName:""
+      })
+    }
+  });
+
+  const handleClick = (formData: EditUserForm) => {
+    if (user.id && formData.firstName && formData.lastName) {
+      updateProject(
         {
-          id: currentUser?.id,
-          firstName: firstName!,
-          lastName: lastName!,
+          id: user?.id,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
         },
         {
-          onSuccess: (data) => {
-            setCurrentUser(data.data);
+          onSuccess: () => {
             onClose();
           },
         },
       );
     }
+    reset();
   };
-
-  if (!currentUser) {
-    navigate("/login");
-  }
 
   return (
     <Modal
@@ -54,6 +77,8 @@ export const EditUserModal = (props: EditUserModalProps) => {
       aria-describedby="modal-modal-description"
     >
       <Box
+        component={"form"}
+        onSubmit={handleSubmit((data) => handleClick(data))}
         sx={{
           position: "absolute",
           top: "50%",
@@ -72,34 +97,51 @@ export const EditUserModal = (props: EditUserModalProps) => {
         <Typography id="modal-modal-title" variant="h6" component="h2">
           Edit Profile
         </Typography>
-        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          First Name
-        </Typography>
-        <TextField
-          required
-          id="filled-basic"
-          defaultValue={currentUser?.firstName}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setFirstName(event.target.value);
+        <Controller
+          name="firstName"
+          control={editUser}
+          rules={{
+            validate: (value) =>
+              value.length >= 3 || "First name must be at least 3 characters",
           }}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              required
+              placeholder="First name"
+              defaultValue={user?.firstName}
+              error={!!errors.firstName}
+              onChange={(e) => {
+                field.onChange(e);
+              }}
+              helperText={errors.firstName?.message}
+            />
+          )}
         />
-        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          Last Name
-        </Typography>
-        <TextField
-          required
-          id="filled-basic"
-          defaultValue={currentUser?.lastName}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setLastName(event.target.value);
+        <Controller
+          name="lastName"
+          control={editUser}
+          rules={{
+            validate: (value) =>
+              value.length >= 3 || "Last name must be at least 3 characters",
           }}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              required
+              placeholder="Last name"
+              defaultValue={user?.lastName}
+              error={!!errors.lastName}
+              onChange={(e) => {
+                field.onChange(e);
+              }}
+              helperText={errors.lastName?.message}
+            />
+          )}
         />
-        <CommonButton
-          text={"Redact"}
-          style={{ bgcolor: "#2a70f3", color: "white" }}
-          variant="contained"
-          onClick={handleClick}
-        />
+        <Button type="submit" variant="contained" disabled={!isValid}>
+          Redact
+        </Button>
         <CommonButton
           text={"Close"}
           style={{ bgcolor: "#2a70f3", color: "white" }}

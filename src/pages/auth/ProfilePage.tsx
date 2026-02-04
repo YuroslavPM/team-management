@@ -1,98 +1,68 @@
 import { useState } from "react";
 import { userAuthContext } from "../../utils/context/UserContext";
 import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import { Avatar } from "@mui/material";
-import { getDisplayName } from "../../utils/helpers/getDisplayName";
-import { deepOrange } from "@mui/material/colors";
-import { useDeleteUser } from "../../api/userController";
-import dayjs from "dayjs";
+import { useDeleteUser, useGetAllUsers } from "../../api/userController";
 import { EditUserModal } from "../../components/views/Profile/EditUserModal";
 import { AlertDialog } from "../../components/common/AlertDialog";
-import { CommonButton } from "../../components/common/CommonButton";
-import { CommonText } from "../../components/common/CommonText";
+import { ProfileCard } from "../../components/views/Profile/ProfileCard";
+import { UsersTable } from "../../components/views/Profile/UsersTable";
+import type { User } from "../../api/userTypes";
 
 export const ProfilePage = () => {
   const { currentUser, setCurrentUser } = userAuthContext();
-  const userId = currentUser?.id;
-  const userCreatedAt = currentUser?.createdAt;
   const { mutate } = useDeleteUser();
-  const [isOpen, setIsOpen] = useState(false);
+  const { data: allUsers } = useGetAllUsers();
+
+  const [user, setUser] = useState<User>();
+  const [isOpenEditModal, setIsOpenEditModal] = useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
 
   const handleDeleteUser = () => {
-    if (userId) {
-      mutate(userId);
+    if (user?.id) {
+      mutate(user.id);
     }
-    setCurrentUser(undefined);
+    if(user?.id === currentUser?.id){
+      setCurrentUser(undefined);
+    }
   };
 
   return (
     <>
       <Box>
-        <Card
-          sx={{
-            minWidth: 500,
-            minHeight: 200,
-            bgcolor: "#e7e9ee",
-            width: "round(11px, 1px)",
+        <ProfileCard
+          user={currentUser}
+          onEditClick={() => {
+            setUser(currentUser);
+            setIsOpenEditModal(true);
           }}
-        >
-          <CardContent>
-            <CommonText
-              text={"Welcome "}
-              value={getDisplayName(currentUser) + "!"}
-              style={{ color: "text.secondary", fontSize: 16 }}
-              gutterBottom
-            />
-            <Avatar sx={{ bgcolor: deepOrange[500] }}>
-              {currentUser?.firstName.charAt(0)}
-            </Avatar>
-            <CommonText
-              text={""}
-              value={currentUser?.firstName}
-              variant={"h5"}
-              style={null}
-            />
-            <CommonText
-              text={"E-mail: "}
-              value={currentUser?.email}
-              variant={"body2"}
-              style={null}
-            />
-            <CommonText
-              text={"You are here since: "}
-              value={dayjs(userCreatedAt).format("DD/MM/YYYY")}
-              variant={"body2"}
-              style={null}
-            />
-          </CardContent>
-          <CardActions>
-            <CommonButton
-              text={"Edit"}
-              style={{ bgcolor: "#87CEEB", color: "white" }}
-              size="small"
-              onClick={() => {
-                setIsOpen(true);
-              }}
-            />
-            <CommonButton
-              text={"Delete"}
-              style={{ bgcolor: "red", color: "white" }}
-              size="small"
-              onClick={() => {
-                setIsOpenDeleteModal(true);
-              }}
-            />
-          </CardActions>
-        </Card>
+          onDeleteClick={() => {
+            setIsOpenDeleteModal(true);
+          }}
+        />
+        <Box sx={{ minWidth: 1, marginTop: 15 }}>
+          <UsersTable
+            allUsers={allUsers!}
+            onEditClick={() => {
+              setIsOpenEditModal(true);
+            }}
+            onDelete={() => {
+              setIsOpenDeleteModal(true);
+            }}
+            user={(value: User) => {
+              setUser(value);
+            }}
+          />
+        </Box>
       </Box>
-      <EditUserModal open={isOpen} onClose={() => setIsOpen(false)} />
+
+      <EditUserModal
+        open={isOpenEditModal}
+        onClose={() => setIsOpenEditModal(false)}
+        user={user!}
+      />
       <AlertDialog
         title={"Delete user"}
-        message={"Are you sure you want to delete your account?"}
+        message={"Are you sure you want to delete this account?"}
         open={isOpenDeleteModal}
         onClose={() => {
           setIsOpenDeleteModal(false);

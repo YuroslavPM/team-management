@@ -13,10 +13,6 @@ export type ProjectCardProps = {
   onDelete: () => void;
 };
 
-function getRandomNumber(max: number) {
-  return Math.floor(Math.random() * max);
-}
-
 export const ProjectCard = ({
   project,
   onEditClick,
@@ -25,8 +21,7 @@ export const ProjectCard = ({
   const { data: users } = useGetAllUsers();
   const { data: teams } = useGetAllTeams();
   const navigate = useNavigate();
-  const number = getRandomNumber(2);
-  console.log("random:", number);
+
   return (
     <Card
       sx={{

@@ -17,13 +17,16 @@ export const CommonText = (props:CommonTextPayload)=>{
     const{text,value, style, variant} = props;
     
     return (
-      <Box sx={{ display: "flex", flexDirection: "row" }}>
-        <Typography variant={variant} sx={style? style : { fontWeight: "bold"}}>
-          {text}
-        </Typography>
-        <Typography variant={variant} sx={style}>
-          {value}
-        </Typography>
-      </Box>
+        <Box sx={{ display: "flex", flexDirection: "row" }}>
+          <Typography
+            variant={variant}
+            sx={style ? style : { fontWeight: "bold" }}
+          >
+            {text}
+          </Typography>
+          <Typography variant={variant} sx={style}>
+            {value}
+          </Typography>
+        </Box>
     );
 };
