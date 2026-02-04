@@ -11,15 +11,26 @@ import {
   TableBody,
 } from "@mui/material";
 import { CommonButton } from "../../common/CommonButton";
+import { useEffect, useState } from "react";
+import type { PriorityStatusTypes } from "../../../api/tasks/taskEnum";
 
 export type TaskTableProps = {
-  task: Task;
+  tasks: Task[];
   onEditClick: () => void;
   onDelete: () => void;
 };
 
-export const TaskTable = ({ task, onEditClick, onDelete }: TaskTableProps) => {
+type TaskTableRows = {
+  title: string;
+  description: string;
+  priority: PriorityStatusTypes;
+  assignedUserId: string[];
+  created_at: Date;
+};
+
+export const TaskTable = ({ tasks, onEditClick, onDelete }: TaskTableProps) => {
   const { data: users } = useGetAllUsers();
+  const [rows, setRows] = useState<TaskTableRows[]>([]);
 
   const cellStyle = {
     fontWeight: 700,
@@ -31,6 +42,18 @@ export const TaskTable = ({ task, onEditClick, onDelete }: TaskTableProps) => {
     color: "black",
     fontSize: "15px",
   };
+
+  useEffect(() => {
+    const data = tasks.map((task) => ({
+      title: task.title,
+      description: task.description,
+      priority: task.priority,
+      assignedUserId: task.assignedUserId,
+      created_at: task.created_at
+    }));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setRows(data);
+  },[tasks]);
 
   return (
     <TableContainer component={Paper}>
@@ -63,25 +86,26 @@ export const TaskTable = ({ task, onEditClick, onDelete }: TaskTableProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          <TableRow
-            key={task.title}
+          {rows.map((row)=>
+          (<TableRow
+            key={row.title}
             sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
           >
             <TableCell component="th" scope="row" style={rowStyle}>
-              {task.title}
+              {row.title}
             </TableCell>
             <TableCell align="center" style={rowStyle}>
-              {task.description}
+              {row.description}
             </TableCell>
             <TableCell align="center" style={rowStyle}>
-              {task.priority}
+              {row.priority}
             </TableCell>
             <TableCell align="center" style={rowStyle}>
-              {dayjs(task.created_at).format("DD/MM/YYYY")}
+              {dayjs(row.created_at).format("DD/MM/YYYY")}
             </TableCell>
             <TableCell align="center" style={rowStyle}>
               {users
-                ?.filter((user) => task.assignedUserId.includes(user.id))
+                ?.filter((user) => row.assignedUserId.includes(user.id))
                 .map((u) => u.firstName)
                 .join(", ")}
             </TableCell>
@@ -99,7 +123,7 @@ export const TaskTable = ({ task, onEditClick, onDelete }: TaskTableProps) => {
                 onClick={onDelete}
               />
             </TableCell>
-          </TableRow>
+          </TableRow>))}
         </TableBody>
       </Table>
     </TableContainer>

@@ -89,22 +89,21 @@ export const ProjectDetailPage = () => {
           setIsOpenTaskModal(true);
         }}
       />
-      <Box sx={{ minWidth: 1 }}>
-        {userTasks?.map((task, i) => (
+      {userTasks ? (
+        <Box sx={{ minWidth: 1 }}>
           <TaskTable
-            key={i}
-            task={task}
+            tasks={userTasks}
             onEditClick={() => {
               setIsOpenTaskModal(true);
               setTask(task);
             }}
             onDelete={() => {
-              setTaskId(task.id);
+              setTaskId(task!.id);
               setIsOpenTaskDeleteModal(true);
             }}
           />
-        ))}
-      </Box>
+        </Box>
+      ) : null}
       <CreateUpdateProjectModal
         open={isOpenProjectModal}
         onClose={() => {
