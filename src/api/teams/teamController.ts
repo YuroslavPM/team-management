@@ -30,8 +30,8 @@ export const useCreateTeam = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: teamKeys.allTeams });
-    },
-  });
+    }
+});
 };
 
 export const useUpdateTeam = () => {
@@ -43,10 +43,7 @@ export const useUpdateTeam = () => {
       });
       return response.data;
     },
-    onSuccess: (team) => {
-      queryClient.invalidateQueries({
-        queryKey: teamKeys.teamDetails(team.data.id),
-      });
+    onSuccess: () => {
        queryClient.invalidateQueries({
          queryKey: teamKeys.allTeams,
        });

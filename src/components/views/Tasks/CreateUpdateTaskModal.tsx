@@ -23,6 +23,7 @@ import {
   Autocomplete,
   Chip,
   type SelectChangeEvent,
+  Button,
 } from "@mui/material";
 import type { Project } from "../../../api/projects/projectTypes";
 import type { User } from "../../../api/userTypes";
@@ -255,12 +256,10 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
             />
           )}
         />
-        <CommonButton
-          text={!task ? "Create" : "Edit"}
-          style={{ bgcolor: "#2a70f3", color: "white" }}
-          variant="contained"
-          type="submit"
-        />
+        <Button variant="contained" type="submit">
+          {!task ? "Create" : "Edit"}
+        </Button>
+
         <CommonButton
           text={"Close"}
           style={{ bgcolor: "#2a70f3", color: "white" }}

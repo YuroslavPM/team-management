@@ -20,6 +20,7 @@ import {
   Select,
   type SelectChangeEvent,
   InputLabel,
+  Button,
 } from "@mui/material";
 import { useGetAllTeams } from "../../../api/teams/teamController";
 import {
@@ -285,12 +286,9 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
             />
           )}
         />
-        <CommonButton
-          text={!project ? "Create" : "Edit"}
-          style={{ bgcolor: "#2a70f3", color: "white" }}
-          variant="contained"
-          type="submit"
-        />
+        <Button type="submit" variant="contained">
+          {!project ? "Create" : "Edit"}
+        </Button>
         <CommonButton
           text={"Close"}
           style={{ bgcolor: "#2a70f3", color: "white" }}

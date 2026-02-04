@@ -30,9 +30,6 @@ export const useCreateTask = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.allTasks });
-      queryClient.invalidateQueries({
-        queryKey: taskKeys.allTasks,
-      });
     },
   });
 };

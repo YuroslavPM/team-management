@@ -2,7 +2,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import type { Project, ProjectPayload } from "./projectTypes";
 import { axiosClient } from "../../config/axios.config";
 import { queryClient } from "../../config/queryClient.config";
-import { teamKeys } from "../teams/teamController";
 
 export const projectKeys = {
   allProjects: ["allProjects"],
@@ -33,7 +32,7 @@ export const useCreateProject = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: teamKeys.allTeams });
+      queryClient.invalidateQueries({ queryKey: projectKeys.allProjects });
     },
   });
 };

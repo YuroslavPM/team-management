@@ -65,13 +65,12 @@ export const useUpdateUser = () => {
 
       return response.data;
     },
-    onSuccess: (user) => {
-      queryClient.invalidateQueries({
-        queryKey: userKeys.userDetails(user.id),
-      });
+
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: userKeys.allUsers,
       });
+      
     },
   });
 };
@@ -84,10 +83,10 @@ export const useDeleteUser = () => {
     },
     onSuccess: (user) => {
       queryClient.invalidateQueries({
-        queryKey: userKeys.userDetails(user.id),
+      queryKey: [userKeys.userDetails(user.id)],
       });
       queryClient.invalidateQueries({
-        queryKey: userKeys.allUsers,
+        queryKey: [userKeys.allUsers],
       });
     },
   });
