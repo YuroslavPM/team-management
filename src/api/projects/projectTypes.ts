@@ -20,3 +20,10 @@ export type ProjectPayload = {
   memberIds: string[];
   teamIds: string[];
 };
+
+export type ActionUserToProject = {
+  id: string;
+  adminIds: string[];
+  memberIds: string[];
+  updatedAt: Date;
+};

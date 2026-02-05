@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import type { Task, TaskPayload } from "./taskTypes";
+import type { ActionUserToTask, Task, TaskPayload } from "./taskTypes";
 import { axiosClient } from "../../config/axios.config";
 import { queryClient } from "../../config/queryClient.config";
 
@@ -47,6 +47,35 @@ export const useUpdateTask = () => {
       queryClient.invalidateQueries({
         queryKey: taskKeys.taskDetails(task.id),
       });
+      queryClient.invalidateQueries({
+        queryKey: taskKeys.allTasks,
+      });
+    },
+  });
+};
+
+export const useAddUserToTask = () => {
+  return useMutation({
+    mutationFn: async (data: ActionUserToTask) => {
+      const response = await axiosClient.patch(`tasks/${data.id}`, data);
+
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: taskKeys.allTasks,
+      });
+    },
+  });
+};
+
+export const useRemoveUserToTask = () => {
+  return useMutation({
+    mutationFn: async (data: ActionUserToTask) => {
+      const response = await axiosClient.patch(`tasks/${data.id}`, data);
+      return response.data;
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: taskKeys.allTasks,
       });

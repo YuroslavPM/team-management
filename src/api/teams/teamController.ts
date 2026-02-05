@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import type { Team, TeamPayload } from "./teamTypes";
+import type { ActionUserToTeam, Team, TeamPayload } from "./teamTypes";
 import { axiosClient } from "../../config/axios.config";
 import { queryClient } from "../../config/queryClient.config";
 
@@ -30,8 +30,8 @@ export const useCreateTeam = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: teamKeys.allTeams });
-    }
-});
+    },
+  });
 };
 
 export const useUpdateTeam = () => {
@@ -44,9 +44,38 @@ export const useUpdateTeam = () => {
       return response.data;
     },
     onSuccess: () => {
-       queryClient.invalidateQueries({
-         queryKey: teamKeys.allTeams,
-       });
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.allTeams,
+      });
+    },
+  });
+};
+
+export const useAddUserToTeam = () => {
+  return useMutation({
+    mutationFn: async (data: ActionUserToTeam) => {
+      const response = await axiosClient.patch(`teams/${data.id}`, data);
+
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.allTeams,
+      });
+    },
+  });
+};
+
+export const useRemoveUserToTeam = () => {
+  return useMutation({
+    mutationFn: async (data: ActionUserToTeam) => {
+      const response = await axiosClient.patch(`teams/${data.id}`, data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.allTeams,
+      });
     },
   });
 };

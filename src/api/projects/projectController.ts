@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import type { Project, ProjectPayload } from "./projectTypes";
+import type { ActionUserToProject, Project, ProjectPayload } from "./projectTypes";
 import { axiosClient } from "../../config/axios.config";
 import { queryClient } from "../../config/queryClient.config";
 
@@ -50,6 +50,36 @@ export const useUpdateProject = () => {
       queryClient.invalidateQueries({
         queryKey: projectKeys.projectDetails(project.id),
       });
+      queryClient.invalidateQueries({
+        queryKey: projectKeys.allProjects,
+      });
+    },
+  });
+};
+
+export const useAddUserToProject = () => {
+  return useMutation({
+    mutationFn: async (data: ActionUserToProject) => {
+      const response = await axiosClient.patch(`projects/${data.id}`, data);
+
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: projectKeys.allProjects,
+      });
+    },
+  });
+};
+
+export const useRemoveUserToProject = () => {
+  return useMutation({
+    mutationFn: async (data: ActionUserToProject) => {
+      const response = await axiosClient.patch(`projects/${data.id}`, data);
+
+      return response.data;
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: projectKeys.allProjects,
       });

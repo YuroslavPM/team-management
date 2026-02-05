@@ -11,7 +11,7 @@ export const userKeys = {
 
 export const useGetAllUsers = () => {
   return useQuery<User[]>({
-    queryKey: [userKeys.allUsers],
+    queryKey: userKeys.allUsers,
     queryFn: async () => {
       const response = await axiosClient.get(`/users`);
 
@@ -70,7 +70,6 @@ export const useUpdateUser = () => {
       queryClient.invalidateQueries({
         queryKey: userKeys.allUsers,
       });
-      
     },
   });
 };
@@ -83,10 +82,10 @@ export const useDeleteUser = () => {
     },
     onSuccess: (user) => {
       queryClient.invalidateQueries({
-      queryKey: [userKeys.userDetails(user.id)],
+        queryKey: userKeys.userDetails(user.id),
       });
       queryClient.invalidateQueries({
-        queryKey: [userKeys.allUsers],
+        queryKey: userKeys.allUsers,
       });
     },
   });
