@@ -21,11 +21,7 @@ export const useGetAllTeams = () => {
 export const useCreateTeam = () => {
   return useMutation({
     mutationFn: async (data: TeamPayload) => {
-      const response = await axiosClient.post("/teams", {
-        ...data,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      const response = await axiosClient.post("/teams",data);
       return response;
     },
     onSuccess: () => {
@@ -36,11 +32,8 @@ export const useCreateTeam = () => {
 
 export const useUpdateTeam = () => {
   return useMutation({
-    mutationFn: async (data: TeamPayload & { id: string }) => {
-      const response = await axiosClient.patch(`teams/${data.id}`, {
-        ...data,
-        updatedAt: new Date().getTime(),
-      });
+    mutationFn: async (data: Team) => {
+      const response = await axiosClient.patch(`teams/${data.id}`, data);
       return response.data;
     },
     onSuccess: () => {

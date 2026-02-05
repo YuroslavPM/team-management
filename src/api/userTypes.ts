@@ -15,4 +15,5 @@ export type EditUser = {
   firstName: string;
   lastName: string;
   isAdmin: boolean;
+  updatedAt: Date;
 };

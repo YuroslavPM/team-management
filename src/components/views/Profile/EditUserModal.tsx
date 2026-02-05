@@ -124,6 +124,7 @@ export const EditUserModal = (props: EditUserModalProps) => {
           firstName: formData.firstName,
           lastName: formData.lastName,
           isAdmin: formData.isAdmin,
+          updatedAt: new Date(),
         },
         {
           onSuccess: () => {

@@ -21,11 +21,7 @@ export const useGetAllTasks = () => {
 export const useCreateTask = () => {
   return useMutation({
     mutationFn: async (data: TaskPayload) => {
-      const response = await axiosClient.post("tasks", {
-        ...data,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      const response = await axiosClient.post("tasks", data);
       return response.data;
     },
     onSuccess: () => {
@@ -36,11 +32,8 @@ export const useCreateTask = () => {
 
 export const useUpdateTask = () => {
   return useMutation({
-    mutationFn: async (data: TaskPayload & { id: string }) => {
-      const response = await axiosClient.patch(`tasks/${data.id}`, {
-        ...data,
-        updatedAt: new Date(),
-      });
+    mutationFn: async (data: Task) => {
+      const response = await axiosClient.patch(`tasks/${data.id}`, data);
       return response.data;
     },
     onSuccess: (task) => {

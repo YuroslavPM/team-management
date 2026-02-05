@@ -99,6 +99,8 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
         projectId: project.id,
         assignedUserId:
           formData.assignedUserId.map((user) => user.id || "") || [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
       });
     } else {
       updateTask({
@@ -110,6 +112,8 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
         projectId: project.id,
         assignedUserId:
           formData.assignedUserId.map((user) => user.id || "") || [],
+        createdAt: project.createdAt,
+        updatedAt: new Date(),
       });
     }
 

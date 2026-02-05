@@ -39,6 +39,8 @@ export default function RegisterPage() {
       lastName: formData?.lastName,
       email: formData?.email,
       secret: formData?.secret,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     const user = data?.find(

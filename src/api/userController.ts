@@ -31,11 +31,7 @@ export const useCreateUser = () => {
         throw new Error("Email already exists!");
       }
 
-      const response = await axiosClient.post("/users", {
-        ...data,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      const response = await axiosClient.post("/users", data);
 
       return response.data;
     },
@@ -58,10 +54,7 @@ export const useGetUserById = (id: number) => {
 export const useUpdateUser = () => {
   return useMutation({
     mutationFn: async (data: EditUser) => {
-      const response = await axiosClient.patch(`users/${data.id}`, {
-        ...data,
-        updatedAt: new Date(),
-      });
+      const response = await axiosClient.patch(`users/${data.id}`, data);
 
       return response.data;
     },

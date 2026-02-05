@@ -70,12 +70,15 @@ export const CreateUpdateTeamModal = (props: CreateTeamModalProps) => {
       createTeam({
         name: formData.teamName,
         users: formData.teamUsers?.map((user) => user.id || "") || [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
       });
     } else {
       updateTeam({
         id: team.id,
         name: formData.teamName,
         users: formData.teamUsers?.map((user) => user.id || "") || [],
+        updatedAt: new Date(),
       });
     }
     reset();
@@ -133,7 +136,7 @@ export const CreateUpdateTeamModal = (props: CreateTeamModalProps) => {
           name="teamUsers"
           control={createUpdateTeam}
           rules={{
-            required:"Team users is required!"
+            required: "Team users is required!",
           }}
           render={({ field }) => (
             <Autocomplete

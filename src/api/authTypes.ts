@@ -3,6 +3,8 @@ export type RegisterPayload = {
   lastName: string;
   email: string;
   secret: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type Login = {

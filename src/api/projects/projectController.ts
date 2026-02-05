@@ -1,5 +1,9 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import type { ActionUserToProject, Project, ProjectPayload } from "./projectTypes";
+import type {
+  ActionUserToProject,
+  Project,
+  ProjectPayload,
+} from "./projectTypes";
 import { axiosClient } from "../../config/axios.config";
 import { queryClient } from "../../config/queryClient.config";
 
@@ -24,11 +28,7 @@ export const useGetAllProjects = () => {
 export const useCreateProject = () => {
   return useMutation({
     mutationFn: async (data: ProjectPayload) => {
-      const response = await axiosClient.post("projects", {
-        ...data,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      const response = await axiosClient.post("projects", data);
       return response.data;
     },
     onSuccess: () => {
@@ -39,11 +39,8 @@ export const useCreateProject = () => {
 
 export const useUpdateProject = () => {
   return useMutation({
-    mutationFn: async (data: ProjectPayload & { id: string }) => {
-      const response = await axiosClient.patch(`projects/${data.id}`, {
-        ...data,
-        updatedAt: new Date(),
-      });
+    mutationFn: async (data: Project) => {
+      const response = await axiosClient.patch(`projects/${data.id}`, data);
       return response.data;
     },
     onSuccess: (project) => {
