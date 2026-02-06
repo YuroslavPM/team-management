@@ -212,7 +212,7 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
             <Autocomplete
               {...field}
               multiple
-              options={users.filter((user) => !members?.includes(user))}
+              options={users?.filter((user) => !members?.includes(user))}
               getOptionLabel={(option) => option.firstName}
               onChange={(_e, value) => {
                 setValue("admins", value);
@@ -239,7 +239,7 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
             <Autocomplete
               {...field}
               multiple
-              options={users.filter((user) => !admins?.includes(user))}
+              options={users?.filter((user) => !admins?.includes(user))}
               getOptionLabel={(option) => option.firstName}
               onChange={(_e, value) => {
                 setValue("members", value);
@@ -248,7 +248,7 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
                 values.map((option, index) => {
                   const { key, ...itemProps } = getItemProps({ index });
                   return (
-                    <Chip key={key} label={option.firstName} {...itemProps} />
+                    <Chip key={key} label={option?.firstName} {...itemProps} />
                   );
                 })
               }

@@ -49,11 +49,11 @@ export const TaskTable = ({ tasks, onEditClick, onDelete }: TaskTableProps) => {
       description: task.description,
       priority: task.priority,
       assignedUserId: task.assignedUserId,
-      created_at: task.created_at
+      created_at: task.createdAt,
     }));
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setRows(data);
-  },[tasks]);
+  }, [tasks]);
 
   return (
     <TableContainer component={Paper}>
@@ -86,44 +86,45 @@ export const TaskTable = ({ tasks, onEditClick, onDelete }: TaskTableProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row)=>
-          (<TableRow
-            key={row.title}
-            sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-          >
-            <TableCell component="th" scope="row" style={rowStyle}>
-              {row.title}
-            </TableCell>
-            <TableCell align="center" style={rowStyle}>
-              {row.description}
-            </TableCell>
-            <TableCell align="center" style={rowStyle}>
-              {row.priority}
-            </TableCell>
-            <TableCell align="center" style={rowStyle}>
-              {dayjs(row.created_at).format("DD/MM/YYYY")}
-            </TableCell>
-            <TableCell align="center" style={rowStyle}>
-              {users
-                ?.filter((user) => row.assignedUserId.includes(user.id))
-                .map((u) => u.firstName)
-                .join(", ")}
-            </TableCell>
-            <TableCell align="center" sx={{ gap: 1, display: "flex" }}>
-              <CommonButton
-                text={"Edit"}
-                style={{ bgcolor: "#87CEEB", color: "white" }}
-                size="small"
-                onClick={onEditClick}
-              />
-              <CommonButton
-                text={"Delete"}
-                style={{ bgcolor: "red", color: "white" }}
-                size="small"
-                onClick={onDelete}
-              />
-            </TableCell>
-          </TableRow>))}
+          {rows.map((row) => (
+            <TableRow
+              key={row.title}
+              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+            >
+              <TableCell component="th" scope="row" style={rowStyle}>
+                {row.title}
+              </TableCell>
+              <TableCell align="center" style={rowStyle}>
+                {row.description}
+              </TableCell>
+              <TableCell align="center" style={rowStyle}>
+                {row.priority}
+              </TableCell>
+              <TableCell align="center" style={rowStyle}>
+                {dayjs(row.created_at).format("DD/MM/YYYY")}
+              </TableCell>
+              <TableCell align="center" style={rowStyle}>
+                {users
+                  ?.filter((user) => row.assignedUserId.includes(user.id))
+                  .map((u) => u.firstName)
+                  .join(", ")}
+              </TableCell>
+              <TableCell align="center" sx={{ gap: 1, display: "flex" }}>
+                <CommonButton
+                  text={"Edit"}
+                  style={{ bgcolor: "#87CEEB", color: "white" }}
+                  size="small"
+                  onClick={onEditClick}
+                />
+                <CommonButton
+                  text={"Delete"}
+                  style={{ bgcolor: "red", color: "white" }}
+                  size="small"
+                  onClick={onDelete}
+                />
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </TableContainer>

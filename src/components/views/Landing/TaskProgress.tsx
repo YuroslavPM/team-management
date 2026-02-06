@@ -1,0 +1,56 @@
+import * as React from "react";
+import Avatar from "@mui/material/Avatar";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import LinearProgress from "@mui/material/LinearProgress";
+import Stack from "@mui/material/Stack";
+import type { SxProps } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+
+export interface TasksProgressProps {
+  sx?: SxProps;
+  value: number|undefined;
+}
+
+export function TasksProgress({
+  value,
+  sx,
+}: TasksProgressProps): React.JSX.Element {
+  return (
+    <Card sx={sx}>
+      <CardContent>
+        <Stack spacing={2}>
+          <Stack
+            direction="row"
+            sx={{ alignItems: "flex-start", justifyContent: "space-between" }}
+            spacing={3}
+          >
+            <Stack spacing={1}>
+              <Typography
+                color="text.secondary"
+                gutterBottom
+                variant="overline"
+              >
+                Task Progress
+              </Typography>
+              <Typography variant="h4">{value}%</Typography>
+            </Stack>
+            <Avatar
+              sx={{
+                bgcolor: "#ececec",
+                height: "56px",
+                width: "56px",
+              }}
+            >
+              <FormatListBulletedIcon sx={{ fontSize: 30, backgroundColor: "#ffa600" }} />
+            </Avatar>
+          </Stack>
+          <div>
+            <LinearProgress value={value} variant="determinate"/>
+          </div>
+        </Stack>
+      </CardContent>
+    </Card>
+  );
+}
