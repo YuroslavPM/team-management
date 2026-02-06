@@ -9,6 +9,9 @@ import { useGetAllTeams } from "../api/teams/teamController";
 import { useGetAllTasks } from "../api/tasks/taskController";
 import { userAuthContext } from "../utils/context/UserContext";
 import { TaskTable } from "../components/views/Landing/TaskTable";
+import { TeamsTable } from "../components/views/Landing/TeamsTable";
+import { ProjectTable } from "../components/views/Landing/ProjectTable";
+import { useGetAllUsers } from "../api/userController";
 
 function calculateTasks(userTasks: number, inProgressTasks: number) {
   if (userTasks && inProgressTasks) {
@@ -19,6 +22,7 @@ function calculateTasks(userTasks: number, inProgressTasks: number) {
 
 export const LandingPage = () => {
   const { currentUser } = userAuthContext();
+  const { data: allUsers } = useGetAllUsers();
   const { data: allTeams } = useGetAllTeams();
   const { data: allTasks } = useGetAllTasks();
   const { data: allProjects } = useGetAllProjects();
@@ -75,6 +79,8 @@ export const LandingPage = () => {
         })) ?? [],
   );
 
+  
+
   const stringToColor = (str: string) => {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
@@ -92,10 +98,7 @@ export const LandingPage = () => {
           xs: 12,
         }}
       >
-        <TotalTeams
-          sx={{ height: "100%" }}
-          value={userTeamsLength}
-        />
+        <TotalTeams sx={{ height: "100%" }} value={userTeamsLength} />
       </Grid>
       <Grid
         size={{
@@ -104,10 +107,7 @@ export const LandingPage = () => {
           xs: 12,
         }}
       >
-        <TotalProjects
-          sx={{ height: "100%" }}
-          value={userProjectsLength}
-        />
+        <TotalProjects sx={{ height: "100%" }} value={userProjectsLength} />
       </Grid>
       <Grid
         size={{
@@ -116,10 +116,7 @@ export const LandingPage = () => {
           xs: 12,
         }}
       >
-        <TotalTasks
-          sx={{ height: "100%" }}
-          value={userTasksLength}
-        />
+        <TotalTasks sx={{ height: "100%" }} value={userTasksLength} />
       </Grid>
       <Grid
         size={{
@@ -165,6 +162,43 @@ export const LandingPage = () => {
             updatedAt: task.updatedAt,
           }))}
         ></TaskTable>
+      </Grid>
+      <Grid
+        size={{
+          lg: 4,
+          md: 6,
+          xs: 12,
+        }}
+      >
+        <TeamsTable
+          teams={userTeams?.map((team) => ({
+            id: team.id,
+            name: team.name,
+            updatedAt: team.updatedAt,
+          }))}
+        ></TeamsTable>
+      </Grid>
+      <Grid
+        size={{
+          lg: 8,
+          md: 12,
+          xs: 12,
+        }}
+      >
+        <ProjectTable
+          projects={userProjects?.map((project) => ({
+            id: project.id,
+            status: project.status,
+            name: project.name,
+            admins: project.adminIds
+              .map((id) => allUsers?.find((user) => user.id === id)?.firstName)
+              .join(", "),
+            members: project.memberIds
+              .map((id) => allUsers?.find((user) => user.id === id)?.firstName)
+              .join(", "),
+            updatedAt: project.updatedAt,
+          }))}
+        />
       </Grid>
     </Grid>
   );
