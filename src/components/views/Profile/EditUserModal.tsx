@@ -117,7 +117,11 @@ export const EditUserModal = (props: EditUserModalProps) => {
   }, [open]);
 
   const handleClick = (formData: EditUserForm) => {
-    if (user.id && formData.firstName && formData.lastName) {
+    if (
+      user.id &&
+      (formData.firstName !== user.firstName ||
+        formData.lastName !== user.lastName)
+    ) {
       updateUser(
         {
           id: user?.id,
@@ -163,7 +167,7 @@ export const EditUserModal = (props: EditUserModalProps) => {
       });
     }
 
-    if (formData.projects != userProjects) {
+    if (formData.projects !== userProjects) {
       const selectedProjects = formData.projects ?? [];
       const userProjectIds = new Set(userProjects?.map((p) => p.id));
       const selectedProjectIds = new Set(selectedProjects?.map((p) => p.id));
@@ -197,7 +201,7 @@ export const EditUserModal = (props: EditUserModalProps) => {
       });
     }
 
-    if (formData.tasks != userTasks) {
+    if (formData.tasks !== userTasks) {
       const selectedTasks = formData.tasks ?? [];
       const userTaskIds = new Set(userTasks?.map((p) => p.id));
       const selectedTaskIds = new Set(selectedTasks?.map((p) => p.id));
@@ -208,7 +212,31 @@ export const EditUserModal = (props: EditUserModalProps) => {
         userTasks?.filter((p) => !selectedTaskIds.has(p.id)) ?? [];
 
       taskIn.map((task) => {
-        const updateAssigned = [...task.assignedUserId, user.id];
+        const updateAssigned = [
+          ...(Array.isArray(task.assignedUserId) ? task.assignedUserId : []),
+          user.id,
+        ];
+
+        const taskProjectId = task.projectId;
+
+        const project = allProjects?.find(
+          (project) => project.id === String(taskProjectId),
+        );
+
+        const isMember = project?.memberIds.includes(user.id);
+        const isAdmin = project?.adminIds.includes(user.id);
+
+        if (!isMember && !isAdmin && project) {
+          const updateAdmins = [...project.adminIds, user.id];
+
+          addUserToProject({
+            id: project.id,
+            memberIds: project.memberIds,
+            adminIds: updateAdmins,
+            updatedAt: new Date(),
+          });
+        }
+
         addUserToTask({
           id: task.id,
           assignedUserId: updateAssigned,
@@ -227,6 +255,7 @@ export const EditUserModal = (props: EditUserModalProps) => {
     }
 
     reset();
+    onClose();
   };
 
   return (
