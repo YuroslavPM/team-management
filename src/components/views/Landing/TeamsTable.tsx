@@ -1,4 +1,3 @@
-import React from "react";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -17,26 +16,22 @@ import { useNavigate } from "react-router-dom";
 import { Avatar } from "@mui/material";
 import GroupIcon from "@mui/icons-material/Group";
 
-
-export interface TeamTablePayload {
+export type TeamTablePayload = {
   id: string;
   name: string;
   updatedAt: Date;
-}
+};
 
-export interface LatestTeamsProps {
+export type LatestTeamsProps = {
   teams?: TeamTablePayload[];
   sx?: SxProps;
-}
+};
 
-export function TeamsTable({
-  teams = [],
-  sx,
-}: LatestTeamsProps): React.JSX.Element {
+export const TeamsTable = ({ teams = [], sx }: LatestTeamsProps) => {
   const navigate = useNavigate();
   return (
     <Card sx={sx}>
-      <CardHeader title="Latest products" />
+      <CardHeader title="User teams" />
       <Divider />
       <List>
         {teams.map((team, index) => (
@@ -78,4 +73,4 @@ export function TeamsTable({
       </CardActions>
     </Card>
   );
-}
+};

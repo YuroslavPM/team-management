@@ -33,15 +33,12 @@ type TaskTablePayload = {
   updatedAt: Date;
 };
 
-export interface LatestOrdersProps {
+export type LatestOrdersProps = {
   tasks?: TaskTablePayload[];
   sx?: SxProps;
-}
+};
 
-export function TaskTable({
-  tasks = [],
-  sx,
-}: LatestOrdersProps): React.JSX.Element {
+export const TaskTable = ({ tasks = [], sx }: LatestOrdersProps) => {
   return (
     <Card sx={sx}>
       <CardHeader title="User Tasks" />
@@ -93,4 +90,4 @@ export function TaskTable({
       </CardActions>
     </Card>
   );
-}
+};

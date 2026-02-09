@@ -7,16 +7,12 @@ import type { SxProps } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import GroupIcon from "@mui/icons-material/Group";
 
-export interface TotalTeamsProps {
+export type TotalTeamsProps = {
   sx?: SxProps;
   value: number | undefined;
-}
+};
 
-export function TotalTeams({
-  sx,
-  value,
-}: TotalTeamsProps): React.JSX.Element {
-
+export const TotalTeams = ({ sx, value }: TotalTeamsProps) => {
   return (
     <Card sx={sx}>
       <CardContent>
@@ -46,4 +42,4 @@ export function TotalTeams({
       </CardContent>
     </Card>
   );
-}
+};

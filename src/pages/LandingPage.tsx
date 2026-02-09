@@ -3,7 +3,7 @@ import { TotalTeams } from "../components/views/Landing/TotalTeams";
 import { TotalProjects } from "../components/views/Landing/TotalProjects";
 import { TotalTasks } from "../components/views/Landing/TotalTasks";
 import { TasksProgress } from "../components/views/Landing/TaskProgress";
-import { TaskChart } from "../components/views/Landing/TaskChart";
+import { CommonChart } from "../components/views/Landing/CommonChart";
 import { useGetAllProjects } from "../api/projects/projectController";
 import { useGetAllTeams } from "../api/teams/teamController";
 import { useGetAllTasks } from "../api/tasks/taskController";
@@ -59,6 +59,17 @@ export const LandingPage = () => {
     };
   });
 
+  const allProjectsTaskCounts = allProjects?.map((project) => {
+    const taskCount = allTasks?.filter(
+      (task) => task.projectId === project.id,
+    ).length;
+    return {
+      projectId: project.id,
+      projectName: project.name,
+      taskCount,
+    };
+  });
+
   const userInProgressTasksLength = userTasks?.filter(
     (task) => task.status === "in-progress",
   ).length;
@@ -79,7 +90,32 @@ export const LandingPage = () => {
         })) ?? [],
   );
 
-  
+  const projectUsersCount = allUsers?.map((user) => {
+    const projectUsersCount =
+      allProjects?.filter(
+        (project) =>
+          project.adminIds.includes(user.id) ||
+          project.memberIds.includes(user.id),
+      ).length ?? 0;
+
+    return {
+      userId: user.id,
+      userFirstName: user.firstName,
+      userCountProjects: projectUsersCount,
+    };
+  });
+
+  const userByTask = allUsers?.map((user) => {
+    const taskUsersCount =
+      allTasks?.filter((task) => task?.assignedUserId.includes(user.id))
+        .length ?? 0;
+
+    return {
+      userId: user.id,
+      userFirstName: user.firstName,
+      userTasksCount: taskUsersCount,
+    };
+  });
 
   const stringToColor = (str: string) => {
     let hash = 0;
@@ -137,12 +173,13 @@ export const LandingPage = () => {
           xs: 12,
         }}
       >
-        <TaskChart
+        <CommonChart
           data={projectTaskCounts?.map((project) => ({
             label: project.projectName,
             value: project.taskCount,
             color: stringToColor(project.projectId),
           }))}
+          title="Team tasks"
         />
       </Grid>
       <Grid
@@ -161,7 +198,7 @@ export const LandingPage = () => {
             project: task.project,
             updatedAt: task.updatedAt,
           }))}
-        ></TaskTable>
+        />
       </Grid>
       <Grid
         size={{
@@ -198,6 +235,60 @@ export const LandingPage = () => {
               .join(", "),
             updatedAt: project.updatedAt,
           }))}
+        />
+      </Grid>
+      <Grid
+        size={{
+          lg: 4,
+          md: 6,
+          xs: 12,
+        }}
+      >
+        <CommonChart
+          data={allProjectsTaskCounts
+            ?.map((project) => ({
+              label: project.projectName,
+              value: project.taskCount,
+              color: stringToColor(project.projectId),
+            }))
+            .filter((p) => p.value! > 0)}
+          title="Task in projects"
+        />
+      </Grid>
+      <Grid
+        size={{
+          lg: 4,
+          md: 6,
+          xs: 12,
+        }}
+      >
+        <CommonChart
+          data={projectUsersCount
+            ?.map((users) => ({
+              label: users.userFirstName,
+              value: users.userCountProjects,
+              color: stringToColor(users.userId),
+            }))
+            .filter((p) => p.value! > 0)}
+          title="Users count projects"
+        />
+      </Grid>
+      <Grid
+        size={{
+          lg: 4,
+          md: 6,
+          xs: 12,
+        }}
+      >
+        <CommonChart
+          data={userByTask
+            ?.map((users) => ({
+              label: users.userFirstName,
+              value: users.userTasksCount,
+              color: stringToColor(users.userId),
+            }))
+            .filter((p) => p.value > 0)}
+          title="Users count tasks"
         />
       </Grid>
     </Grid>

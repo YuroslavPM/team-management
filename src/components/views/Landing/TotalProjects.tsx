@@ -1,4 +1,3 @@
-import * as React from "react";
 import Avatar from "@mui/material/Avatar";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -7,15 +6,12 @@ import type { SxProps } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 
-export interface TotalProjectsProps {
+export type TotalProjectsProps = {
   sx?: SxProps;
   value: number | undefined;
-}
+};
 
-export function TotalProjects({
-  sx,
-  value,
-}: TotalProjectsProps): React.JSX.Element {
+export const TotalProjects = ({ sx, value }: TotalProjectsProps) => {
   return (
     <Card sx={sx}>
       <CardContent>
@@ -45,4 +41,4 @@ export function TotalProjects({
       </CardContent>
     </Card>
   );
-}
+};

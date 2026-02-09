@@ -12,8 +12,9 @@ type ReusableDonutChartProps = {
   hideLegend?: boolean;
 };
 
-export const TaskChart: React.FC<ReusableDonutChartProps> = ({
+export const CommonChart: React.FC<ReusableDonutChartProps> = ({
   data,
+  title,
   width = 200,
   height = 200,
   innerRadius = 50,
@@ -25,7 +26,7 @@ export const TaskChart: React.FC<ReusableDonutChartProps> = ({
   return (
     <>
       <Typography color="text.secondary" gutterBottom variant="overline">
-        Tasks per team
+        {title}
       </Typography>
       <PieChart
         series={[{ data, innerRadius, outerRadius, arcLabel: "value" }]}

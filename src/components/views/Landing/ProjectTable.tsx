@@ -1,4 +1,3 @@
-import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -19,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 const statusMap = {
   pending: { label: "todo", color: "warning" },
   delivered: { label: "in-progress", color: "success" },
-} as const satisfies Record<string, { label: string; color: string }>;
+} as Record<string, { label: string; color: string }>;
 
 type ProjectTablePayload = {
   id: string;
@@ -29,15 +28,12 @@ type ProjectTablePayload = {
   members: string;
 };
 
-export interface LatestProjectsProps {
+export type LatestProjectsProps = {
   projects?: ProjectTablePayload[];
   sx?: SxProps;
-}
+};
 
-export function ProjectTable({
-  projects = [],
-  sx,
-}: LatestProjectsProps): React.JSX.Element {
+export const ProjectTable = ({ projects = [], sx }: LatestProjectsProps) => {
   const navigate = useNavigate();
 
   return (
@@ -90,4 +86,4 @@ export function ProjectTable({
       </CardActions>
     </Card>
   );
-}
+};

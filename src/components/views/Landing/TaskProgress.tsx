@@ -1,4 +1,3 @@
-import * as React from "react";
 import Avatar from "@mui/material/Avatar";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -8,15 +7,12 @@ import type { SxProps } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 
-export interface TasksProgressProps {
+export type TasksProgressProps = {
   sx?: SxProps;
-  value: number|undefined;
-}
+  value: number | undefined;
+};
 
-export function TasksProgress({
-  value,
-  sx,
-}: TasksProgressProps): React.JSX.Element {
+export const TasksProgress = ({ sx, value }: TasksProgressProps) => {
   return (
     <Card sx={sx}>
       <CardContent>
@@ -43,14 +39,16 @@ export function TasksProgress({
                 width: "56px",
               }}
             >
-              <FormatListBulletedIcon sx={{ fontSize: 30, backgroundColor: "#ffa600" }} />
+              <FormatListBulletedIcon
+                sx={{ fontSize: 30, backgroundColor: "#ffa600" }}
+              />
             </Avatar>
           </Stack>
           <div>
-            <LinearProgress value={value} variant="determinate"/>
+            <LinearProgress value={value} variant="determinate" />
           </div>
         </Stack>
       </CardContent>
     </Card>
   );
-}
+};

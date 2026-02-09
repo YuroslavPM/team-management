@@ -11,7 +11,7 @@ export interface TotalTasksProps {
   value: number | undefined;
 }
 
-export function TotalTasks({ sx, value }: TotalTasksProps): React.JSX.Element {
+export const TotalTasks = ({ sx, value }: TotalTasksProps): React.JSX.Element => {
   return (
     <Card sx={sx}>
       <CardContent>
