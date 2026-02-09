@@ -15,7 +15,7 @@ import { useGetAllUsers } from "../api/userController";
 
 function calculateTasks(userTasks: number, inProgressTasks: number) {
   if (userTasks && inProgressTasks) {
-    return ((inProgressTasks / userTasks) * 100).toFixed(2);
+    return Number(((inProgressTasks / userTasks) * 100).toFixed(2));
   }
   return Number(0);
 }
@@ -60,9 +60,8 @@ export const LandingPage = () => {
   });
 
   const allProjectsTaskCounts = allProjects?.map((project) => {
-    const taskCount = allTasks?.filter(
-      (task) => task.projectId === project.id,
-    ).length;
+    const taskCount =
+      allTasks?.filter((task) => task.projectId === project.id).length ?? 0;
     return {
       projectId: project.id,
       projectName: project.name,

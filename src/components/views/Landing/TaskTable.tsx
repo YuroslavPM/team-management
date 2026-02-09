@@ -1,10 +1,8 @@
-import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardHeader from "@mui/material/CardHeader";
-import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
 import type { SxProps } from "@mui/material/styles";
 import Table from "@mui/material/Table";
@@ -18,11 +16,6 @@ import type {
   PriorityStatusTypes,
   TaskStatusTypes,
 } from "../../../api/tasks/taskEnum";
-
-const statusMap = {
-  pending: { label: "todo", color: "warning" },
-  delivered: { label: "in-progress", color: "success" },
-} as const satisfies Record<string, { label: string; color: string }>;
 
 type TaskTablePayload = {
   id: string;
@@ -56,15 +49,9 @@ export const TaskTable = ({ tasks = [], sx }: LatestOrdersProps) => {
           </TableHead>
           <TableBody>
             {tasks.map((task) => {
-              const { label, color } = statusMap[task.status] ?? {
-                label: "Unknown",
-                color: "default",
-              };
               return (
                 <TableRow hover key={task.id}>
-                  <TableCell>
-                    <Chip color={color} label={label} size="small" />
-                  </TableCell>
+                  <TableCell>{task.status}</TableCell>
                   <TableCell>{task.title}</TableCell>
                   <TableCell>{task.priority}</TableCell>
                   <TableCell>{task.project}</TableCell>
