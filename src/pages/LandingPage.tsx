@@ -85,7 +85,7 @@ export const LandingPage = () => {
           title: task.title,
           priority: task.priority,
           project: project.name,
-          updatedAt: task.updatedAt,
+          updated_at: task.updated_at,
         })) ?? [],
   );
 
@@ -99,7 +99,7 @@ export const LandingPage = () => {
 
     return {
       userId: user.id,
-      userFirstName: user.firstName,
+      userfirst_name: user.first_name,
       userCountProjects: projectUsersCount,
     };
   });
@@ -111,7 +111,7 @@ export const LandingPage = () => {
 
     return {
       userId: user.id,
-      userFirstName: user.firstName,
+      userfirst_name: user.first_name,
       userTasksCount: taskUsersCount,
     };
   });
@@ -195,7 +195,7 @@ export const LandingPage = () => {
             title: task.title,
             priority: task.priority,
             project: task.project,
-            updatedAt: task.updatedAt,
+            updatedAt: task.updated_at,
           }))}
         />
       </Grid>
@@ -210,7 +210,7 @@ export const LandingPage = () => {
           teams={userTeams?.map((team) => ({
             id: team.id,
             name: team.name,
-            updatedAt: team.updatedAt,
+            updatedAt: team.updated_at,
           }))}
         ></TeamsTable>
       </Grid>
@@ -227,12 +227,12 @@ export const LandingPage = () => {
             status: project.status,
             name: project.name,
             admins: project.adminIds
-              .map((id) => allUsers?.find((user) => user.id === id)?.firstName)
+              .map((id) => allUsers?.find((user) => user.id === id)?.first_name)
               .join(", "),
             members: project.memberIds
-              .map((id) => allUsers?.find((user) => user.id === id)?.firstName)
+              .map((id) => allUsers?.find((user) => user.id === id)?.first_name)
               .join(", "),
-            updatedAt: project.updatedAt,
+            updated_at: project.updated_at,
           }))}
         />
       </Grid>
@@ -264,7 +264,7 @@ export const LandingPage = () => {
         <CommonChart
           data={projectUsersCount
             ?.map((users) => ({
-              label: users.userFirstName,
+              label: users.userfirst_name,
               value: users.userCountProjects,
               color: stringToColor(users.userId),
             }))
@@ -282,7 +282,7 @@ export const LandingPage = () => {
         <CommonChart
           data={userByTask
             ?.map((users) => ({
-              label: users.userFirstName,
+              label: users.userfirst_name,
               value: users.userTasksCount,
               color: stringToColor(users.userId),
             }))

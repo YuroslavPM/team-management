@@ -8,8 +8,8 @@ export type Project = {
   adminIds: string[];
   memberIds: string[];
   teamIds: string[];
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 };
 
 export type ProjectPayload = {
@@ -19,13 +19,13 @@ export type ProjectPayload = {
   adminIds: string[];
   memberIds: string[];
   teamIds: string[];
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 };
 
 export type ActionUserToProject = {
   id: string;
   adminIds: string[];
   memberIds: string[];
-  updatedAt: Date;
+  updated_at: Date;
 };

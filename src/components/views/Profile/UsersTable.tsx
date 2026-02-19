@@ -15,8 +15,8 @@ type UsersTablePayload = {
 
 type UserTableRows = {
   id: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   email: string;
 };
 
@@ -27,13 +27,13 @@ export const UsersTable = (props: UsersTablePayload) => {
   const columns: GridColDef<(typeof rows)[number]>[] = [
     { field: "id", headerName: "ID", width: 90 },
     {
-      field: "firstName",
+      field: "first_name",
       headerName: "First name",
       width: 150,
       editable: true,
     },
     {
-      field: "lastName",
+      field: "last_name",
       headerName: "Last name",
       width: 150,
       editable: true,
@@ -80,8 +80,8 @@ export const UsersTable = (props: UsersTablePayload) => {
   useEffect(() => {
     const data = allUsers.map((user) => ({
       id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      first_name: user.first_name,
+      last_name: user.last_name,
       email: user.email,
     }));
     // eslint-disable-next-line react-hooks/set-state-in-effect

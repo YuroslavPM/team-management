@@ -2,18 +2,18 @@ export type Team = {
   id: string;
   name: string;
   users: string[];
-  updatedAt: Date;
+  updated_at: Date;
 };
 
 export type TeamPayload = {
   name: string;
   users: string[];
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 };
 
 export type ActionUserToTeam = {
   id: string;
   users: string[];
-  updatedAt: Date;
+  updated_at: Date;
 };

@@ -7,8 +7,8 @@ import { Controller, useForm } from "react-hook-form";
 import { userAuthContext } from "../../utils/context/UserContext";
 
 type RegisterForm = {
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   email: string;
   secret: string;
 };
@@ -26,8 +26,8 @@ export default function RegisterPage() {
   } = useForm<RegisterForm>({
     mode: "onChange",
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      first_name: "",
+      last_name: "",
       email: "",
       secret: "",
     },
@@ -35,12 +35,12 @@ export default function RegisterPage() {
 
   const handleClick = (formData: RegisterForm) => {
     createUser({
-      firstName: formData?.firstName,
-      lastName: formData?.lastName,
+      first_name: formData?.first_name,
+      last_name: formData?.last_name,
       email: formData?.email,
       secret: formData?.secret,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      created_at: new Date(),
+      updated_at: new Date(),
     });
 
     const user = data?.find(
@@ -78,7 +78,7 @@ export default function RegisterPage() {
         </Typography>
 
         <Controller
-          name="firstName"
+          name="first_name"
           control={register}
           rules={{
             required: "First name is required!",
@@ -89,16 +89,16 @@ export default function RegisterPage() {
             <TextField
               {...field}
               label="First Name"
-              error={!!errors.firstName}
+              error={!!errors.first_name}
               onChange={(e) => {
                 field.onChange(e);
               }}
-              helperText={errors.firstName?.message}
+              helperText={errors.first_name?.message}
             />
           )}
         />
         <Controller
-          name="lastName"
+          name="last_name"
           control={register}
           rules={{
             required: "Last name is required!",
@@ -109,11 +109,11 @@ export default function RegisterPage() {
             <TextField
               {...field}
               label="Last Name"
-              error={!!errors.lastName}
+              error={!!errors.last_name}
               onChange={(e) => {
                 field.onChange(e);
               }}
-              helperText={errors.lastName?.message}
+              helperText={errors.last_name?.message}
             />
           )}
         />

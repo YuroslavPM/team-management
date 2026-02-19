@@ -99,8 +99,8 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
         projectId: project.id,
         assignedUserId:
           formData.assignedUserId.map((user) => user.id || "") || [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        created_at: new Date(),
+        updated_at: new Date(),
       });
     } else {
       updateTask({
@@ -112,8 +112,8 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
         projectId: project.id,
         assignedUserId:
           formData.assignedUserId.map((user) => user.id || "") || [],
-        createdAt: project.createdAt,
-        updatedAt: new Date(),
+        created_at: project.created_at,
+        updated_at: new Date(),
       });
     }
 
@@ -238,7 +238,7 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
                   project?.adminIds?.includes?.(user.id) ||
                   project?.memberIds?.includes?.(user.id),
               )}
-              getOptionLabel={(option) => option.firstName}
+              getOptionLabel={(option) => option.first_name}
               onChange={(_e, value) => {
                 setValue("assignedUserId", value);
               }}
@@ -246,7 +246,7 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
                 values.map((option, index) => {
                   const { key, ...itemProps } = getItemProps({ index });
                   return (
-                    <Chip key={key} label={option.firstName} {...itemProps} />
+                    <Chip key={key} label={option.first_name} {...itemProps} />
                   );
                 })
               }

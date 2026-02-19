@@ -39,7 +39,7 @@ export const ProfilePage = () => {
             setIsOpenDeleteModal(true);
           }}
         />
-        {currentUser?.isAdmin ? (
+        {currentUser?.is_admin ? (
           <Box
             sx={{ minWidth: 1, marginTop: 15 }}
           >

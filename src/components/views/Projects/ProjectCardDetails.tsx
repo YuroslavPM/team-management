@@ -66,7 +66,7 @@ export const ProjectCardDetails = ({
         subheader={
           <CommonText
             text={"Project created at: "}
-            value={dayjs(project.createdAt).format("DD/MM/YYYY")}
+            value={dayjs(project.created_at).format("DD/MM/YYYY")}
             variant={"body2"}
             style={null}
           />
@@ -83,7 +83,7 @@ export const ProjectCardDetails = ({
           text={"Admins: "}
           value={users
             ?.filter((user) => project.adminIds.includes(user.id))
-            .map((u) => u.firstName)
+            .map((u) => u.first_name)
             .join(", ")}
           variant={"body2"}
           style={{ fontSize: 16, fontWeight: "bold" }}
@@ -92,7 +92,7 @@ export const ProjectCardDetails = ({
           text={"Members: "}
           value={users
             ?.filter((user) => project.memberIds.includes(user.id))
-            .map((u) => u.firstName)
+            .map((u) => u.first_name)
             .join(", ")}
           variant={"body2"}
           style={{ fontSize: 16 }}
@@ -108,7 +108,7 @@ export const ProjectCardDetails = ({
         />
         <CommonText
           text={"Last update: "}
-          value={dayjs(project.updatedAt).format("DD/MM/YYYY")}
+          value={dayjs(project.updated_at).format("DD/MM/YYYY")}
           variant={"body2"}
           style={{ fontSize: 14 }}
         />

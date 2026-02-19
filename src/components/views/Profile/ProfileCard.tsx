@@ -32,11 +32,11 @@ export const ProfileCard = (props: ProfileCardPayload) => {
           gutterBottom
         />
         <Avatar sx={{ bgcolor: deepOrange[500] }}>
-          {user?.firstName.charAt(0)}
+          {user?.first_name.charAt(0)}
         </Avatar>
         <CommonText
           text={""}
-          value={user?.firstName}
+          value={user?.first_name}
           variant={"h5"}
           style={null}
         />
@@ -48,7 +48,7 @@ export const ProfileCard = (props: ProfileCardPayload) => {
         />
         <CommonText
           text={"You are here since: "}
-          value={dayjs(user?.createdAt).format("DD/MM/YYYY")}
+          value={dayjs(user?.created_at).format("DD/MM/YYYY")}
           variant={"body2"}
           style={null}
         />

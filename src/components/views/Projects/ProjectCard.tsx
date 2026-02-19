@@ -53,7 +53,7 @@ export const ProjectCard = ({
           text={"Members: "}
           value={users
             ?.filter((user) => project.memberIds.includes(user.id))
-            .map((u) => u.firstName)
+            .map((u) => u.first_name)
             .join(", ")}
           variant={"body2"}
           style={null}
@@ -63,7 +63,7 @@ export const ProjectCard = ({
           text={"Admins: "}
           value={users
             ?.filter((user) => project.adminIds.includes(user.id))
-            .map((u) => u.firstName)
+            .map((u) => u.first_name)
             .join(", ")}
           variant={"body2"}
           style={null}

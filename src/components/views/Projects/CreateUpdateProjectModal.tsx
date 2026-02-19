@@ -106,8 +106,8 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
         adminIds: formData.admins?.map((user) => user.id || "") || [],
         memberIds: formData.members?.map((user) => user.id || "") || [],
         teamIds: formData.teams?.map((team) => team.id) || [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        created_at: new Date(),
+        updated_at: new Date(),
       });
     } else {
       updateProject({
@@ -118,8 +118,8 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
         adminIds: formData.admins?.map((user) => user.id || "") || [],
         memberIds: formData.members?.map((user) => user.id || "") || [],
         teamIds: formData.teams?.map((team) => team.id) || [],
-        createdAt: project.createdAt,
-        updatedAt: new Date(),
+        created_at: project.created_at,
+        updated_at: new Date(),
       });
     }
 
@@ -213,13 +213,13 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
               {...field}
               multiple
               options={users?.filter((user) => !members?.includes(user))}
-              getOptionLabel={(option) => option.firstName}
+              getOptionLabel={(option) => option.first_name}
               onChange={(_e, value) => {
                 setValue("admins", value);
               }}
               renderValue={(values) =>
                 values.map((option) => {
-                  return <Chip key={option.id} label={option.firstName} />;
+                  return <Chip key={option.id} label={option.first_name} />;
                 })
               }
               renderInput={(params) => (
@@ -240,7 +240,7 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
               {...field}
               multiple
               options={users?.filter((user) => !admins?.includes(user))}
-              getOptionLabel={(option) => option.firstName}
+              getOptionLabel={(option) => option.first_name}
               onChange={(_e, value) => {
                 setValue("members", value);
               }}
@@ -248,7 +248,7 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
                 values.map((option, index) => {
                   const { key, ...itemProps } = getItemProps({ index });
                   return (
-                    <Chip key={key} label={option?.firstName} {...itemProps} />
+                    <Chip key={key} label={option?.first_name} {...itemProps} />
                   );
                 })
               }

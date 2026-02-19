@@ -49,7 +49,7 @@ export const TaskTable = ({ tasks, onEditClick, onDelete }: TaskTableProps) => {
       description: task.description,
       priority: task.priority,
       assignedUserId: task.assignedUserId,
-      created_at: task.createdAt,
+      created_at: task.created_at,
     }));
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setRows(data);
@@ -106,7 +106,7 @@ export const TaskTable = ({ tasks, onEditClick, onDelete }: TaskTableProps) => {
               <TableCell align="center" style={rowStyle}>
                 {users
                   ?.filter((user) => row.assignedUserId.includes(user.id))
-                  .map((u) => u.firstName)
+                  .map((u) => u.first_name)
                   .join(", ")}
               </TableCell>
               <TableCell align="center" sx={{ gap: 1, display: "flex" }}>

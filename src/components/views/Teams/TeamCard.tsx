@@ -47,7 +47,7 @@ export const TeamCard = ({
           text={"Mates:"}
           value={users
             ?.filter((user) => team.users.includes(user.id))
-            .map((u) => u.firstName)
+            .map((u) => u.first_name)
             .join(", ")}
           variant={"body2"}
           style={null}

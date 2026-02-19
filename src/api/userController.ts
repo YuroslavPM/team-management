@@ -41,6 +41,23 @@ export const useCreateUser = () => {
   });
 };
 
+export const useLogin = () => {
+  return useMutation({
+    mutationFn: async (data: { email: string; secret: string }) => {
+      const response = await axiosClient.post("/login", {
+        username: data.email,
+        password: data.secret,
+      });
+
+      return response.data;
+    },
+    onSuccess: (data) => {
+      localStorage.setItem("authToken", data.token);
+      axiosClient.defaults.headers.common["Authorization"] = `Token ${data.token}`;
+    },
+  });
+};
+
 export const useGetUserById = (id: number) => {
   return useQuery<User>({
     queryKey: userKeys.userDetails(id),
@@ -54,7 +71,7 @@ export const useGetUserById = (id: number) => {
 export const useUpdateUser = () => {
   return useMutation({
     mutationFn: async (data: EditUser) => {
-      const response = await axiosClient.patch(`users/${data.id}`, data);
+      const response = await axiosClient.patch(`/users/${data.id}`, data);
 
       return response.data;
     },
@@ -70,7 +87,7 @@ export const useUpdateUser = () => {
 export const useDeleteUser = () => {
   return useMutation({
     mutationFn: async (userId: string) => {
-      const response = await axiosClient.delete(`users/${userId}`);
+      const response = await axiosClient.delete(`/users/${userId}`);
       return response.data;
     },
     onSuccess: (user) => {

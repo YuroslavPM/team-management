@@ -40,9 +40,9 @@ type EditUserModalProps = {
 };
 
 type EditUserForm = {
-  firstName: string;
-  lastName: string;
-  isAdmin: boolean;
+  first_name: string;
+  last_name: string;
+  is_admin: boolean;
   teams: Team[] | undefined;
   projects: Project[] | undefined;
   tasks: Task[] | undefined;
@@ -97,18 +97,18 @@ export const EditUserModal = (props: EditUserModalProps) => {
     if (!open) return;
     if (user) {
       reset({
-        firstName: user?.firstName ?? "",
-        lastName: user?.lastName ?? "",
-        isAdmin: user?.isAdmin ?? false,
+        first_name: user?.first_name ?? "",
+        last_name: user?.last_name ?? "",
+        is_admin: user?.is_admin ?? false,
         teams: userTeams ?? [],
         projects: userProjects ?? [],
         tasks: userTasks ?? [],
       });
     } else {
       reset({
-        firstName: "",
-        lastName: "",
-        isAdmin: false,
+        first_name: "",
+        last_name: "",
+        is_admin: false,
         teams: [],
         projects: [],
         tasks: [],
@@ -119,16 +119,16 @@ export const EditUserModal = (props: EditUserModalProps) => {
   const handleClick = (formData: EditUserForm) => {
     if (
       user.id &&
-      (formData.firstName !== user.firstName ||
-        formData.lastName !== user.lastName)
+      (formData.first_name !== user.first_name ||
+        formData.last_name !== user.last_name)
     ) {
       updateUser(
         {
           id: user?.id,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          isAdmin: formData.isAdmin,
-          updatedAt: new Date(),
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          is_admin: formData.is_admin,
+          updated_at: new Date(),
         },
         {
           onSuccess: () => {
@@ -152,7 +152,7 @@ export const EditUserModal = (props: EditUserModalProps) => {
         addUserToTeam({
           id: team.id,
           users: updatedUsers,
-          updatedAt: new Date(),
+          updated_at: new Date(),
         });
       });
 
@@ -162,7 +162,7 @@ export const EditUserModal = (props: EditUserModalProps) => {
         removeUserToTeam({
           id: team.id,
           users: updatedUsers,
-          updatedAt: new Date(),
+          updated_at: new Date(),
         });
       });
     }
@@ -185,7 +185,7 @@ export const EditUserModal = (props: EditUserModalProps) => {
           id: project.id,
           adminIds: updateAdmins,
           memberIds: project.memberIds,
-          updatedAt: new Date(),
+          updated_at: new Date(),
         });
       });
 
@@ -196,7 +196,7 @@ export const EditUserModal = (props: EditUserModalProps) => {
           id: project.id,
           adminIds: updateAdmins,
           memberIds: updateMembers,
-          updatedAt: new Date(),
+          updated_at: new Date(),
         });
       });
     }
@@ -224,23 +224,23 @@ export const EditUserModal = (props: EditUserModalProps) => {
         );
 
         const isMember = project?.memberIds.includes(user.id);
-        const isAdmin = project?.adminIds.includes(user.id);
+        const is_admin = project?.adminIds.includes(user.id);
 
-        if (!isMember && !isAdmin && project) {
+        if (!isMember && !is_admin && project) {
           const updateAdmins = [...project.adminIds, user.id];
 
           addUserToProject({
             id: project.id,
             memberIds: project.memberIds,
             adminIds: updateAdmins,
-            updatedAt: new Date(),
+            updated_at: new Date(),
           });
         }
 
         addUserToTask({
           id: task.id,
           assignedUserId: updateAssigned,
-          updatedAt: new Date(),
+          updated_at: new Date(),
         });
       });
 
@@ -249,7 +249,7 @@ export const EditUserModal = (props: EditUserModalProps) => {
         removeUserToTask({
           id: task.id,
           assignedUserId: updateAssigned,
-          updatedAt: new Date(),
+          updated_at: new Date(),
         });
       });
     }
@@ -289,7 +289,7 @@ export const EditUserModal = (props: EditUserModalProps) => {
           Edit Profile
         </Typography>
         <Controller
-          name="firstName"
+          name="first_name"
           control={control}
           rules={{
             validate: (value) =>
@@ -300,17 +300,17 @@ export const EditUserModal = (props: EditUserModalProps) => {
               {...field}
               required
               placeholder="First name"
-              defaultValue={user?.firstName}
-              error={!!errors.firstName}
+              defaultValue={user?.first_name}
+              error={!!errors.first_name}
               onChange={(e) => {
                 field.onChange(e);
               }}
-              helperText={errors.firstName?.message}
+              helperText={errors.first_name?.message}
             />
           )}
         />
         <Controller
-          name="lastName"
+          name="last_name"
           control={control}
           rules={{
             validate: (value) =>
@@ -321,17 +321,17 @@ export const EditUserModal = (props: EditUserModalProps) => {
               {...field}
               required
               placeholder="Last name"
-              defaultValue={user?.lastName}
-              error={!!errors.lastName}
+              defaultValue={user?.last_name}
+              error={!!errors.last_name}
               onChange={(e) => {
                 field.onChange(e);
               }}
-              helperText={errors.lastName?.message}
+              helperText={errors.last_name?.message}
             />
           )}
         />
         <Controller
-          name="isAdmin"
+          name="is_admin"
           control={control}
           render={({ field }) => (
             <FormControlLabel
