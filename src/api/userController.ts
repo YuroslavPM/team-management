@@ -13,7 +13,7 @@ export const useGetAllUsers = () => {
   return useQuery<User[]>({
     queryKey: userKeys.allUsers,
     queryFn: async () => {
-      const response = await axiosClient.get(`/users`);
+      const response = await axiosClient.get(`/users/`);
 
       return response.data;
     },
@@ -31,7 +31,7 @@ export const useCreateUser = () => {
         throw new Error("Email already exists!");
       }
 
-      const response = await axiosClient.post("/users", data);
+      const response = await axiosClient.post("/users/", data);
 
       return response.data;
     },

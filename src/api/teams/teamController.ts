@@ -12,7 +12,7 @@ export const useGetAllTeams = () => {
   return useQuery<Team[]>({
     queryKey: teamKeys.allTeams,
     queryFn: async () => {
-      const response = await axiosClient.get("/teams");
+      const response = await axiosClient.get("/teams/");
       return response.data;
     },
   });
@@ -21,7 +21,7 @@ export const useGetAllTeams = () => {
 export const useCreateTeam = () => {
   return useMutation({
     mutationFn: async (data: TeamPayload) => {
-      const response = await axiosClient.post("/teams",data);
+      const response = await axiosClient.post("/teams/",data);
       return response;
     },
     onSuccess: () => {
