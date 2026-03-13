@@ -1,9 +1,8 @@
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import { useGetAllUsers } from "../../api/userController";
+import { useLogin } from "../../api/userController";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Button, Typography } from "@mui/material";
-import { userAuthContext } from "../../utils/context/UserContext";
 import { CommonText } from "../../components/common/CommonText";
 import { Controller, useForm } from "react-hook-form";
 
@@ -13,24 +12,25 @@ type LoginForm = {
 };
 
 export default function LoginPage() {
-  const { setCurrentUser } = userAuthContext();
   const navigate = useNavigate();
-  const { data } = useGetAllUsers();
+  const {
+    mutate: login,
+    isError,
+    error,
+  } = useLogin(() => {
+    navigate("/");
+  });
 
   const onSubmit = (formData: LoginForm) => {
-    const user = data?.find(
-      (x) => x.email === formData.email && x.secret === formData.secret,
-    );
-
-    if (user) {
-      setCurrentUser(user);
-      navigate("/");
-    }
+    login({
+      email: formData.email,
+      secret: formData.secret,
+    });
     reset();
   };
 
   const {
-    control: login,
+    control: control,
     handleSubmit,
     reset,
     formState: { errors, isValid },
@@ -66,10 +66,7 @@ export default function LoginPage() {
         />
         <Controller
           name="email"
-          control={login}
-          rules={{
-            validate: (value) => value.includes("@") || "Invalid email address",
-          }}
+          control={control}
           render={({ field }) => (
             <TextField
               {...field}
@@ -84,7 +81,7 @@ export default function LoginPage() {
         />
         <Controller
           name="secret"
-          control={login}
+          control={control}
           rules={{
             required: "Password is required!",
           }}
@@ -101,6 +98,11 @@ export default function LoginPage() {
             />
           )}
         />
+        {isError && (
+          <Typography color="error">
+            {(error as Error).message || "Login failed"}
+          </Typography>
+        )}
         <Button variant="contained" disabled={!isValid} type="submit">
           Login
         </Button>

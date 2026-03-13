@@ -33,7 +33,7 @@ export const useCreateTeam = () => {
 export const useUpdateTeam = () => {
   return useMutation({
     mutationFn: async (data: Team) => {
-      const response = await axiosClient.patch(`/teams/${data.id}`, data);
+      const response = await axiosClient.patch(`/teams/${data.id}/`, data);
       return response.data;
     },
     onSuccess: () => {

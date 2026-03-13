@@ -1,14 +1,28 @@
 import { axiosClient } from "../config/axios.config";
 import { queryClient } from "../config/queryClient.config";
-import type { RegisterPayload } from "./authTypes";
+import type { Login, RegisterPayload } from "./authTypes";
 import type { EditUser, User } from "./userTypes";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const userKeys = {
   allUsers: ["allUsers"],
+  me: ["me"],
   userDetails: (userId: number) => [userKeys.allUsers, `userDetails-${userId}`],
 };
+export const useMe = () => {
+  const hasToken = !!localStorage.getItem("authToken");
 
+  return useQuery<User>({
+    queryKey: userKeys.me,
+    queryFn: async () => {
+      const response = await axiosClient.get("/me/");
+      return response.data;
+    },
+    enabled: hasToken,
+    retry: false,
+    staleTime: Infinity,
+  });
+};
 export const useGetAllUsers = () => {
   return useQuery<User[]>({
     queryKey: userKeys.allUsers,
@@ -41,19 +55,28 @@ export const useCreateUser = () => {
   });
 };
 
-export const useLogin = () => {
+export const useLogin = (onSuccessCallback?: (data: Login) => void) => {
   return useMutation({
     mutationFn: async (data: { email: string; secret: string }) => {
-      const response = await axiosClient.post("/login", {
+      const response = await axiosClient.post("/login/", {
         username: data.email,
         password: data.secret,
       });
-
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       localStorage.setItem("authToken", data.token);
-      axiosClient.defaults.headers.common["Authorization"] = `Token ${data.token}`;
+      axiosClient.defaults.headers.common["Authorization"] =
+        `Token ${data.token}`;
+
+      await queryClient.fetchQuery({
+        queryKey: userKeys.me,
+        queryFn: async () => {
+          const response = await axiosClient.get("/me/");
+          return response.data;
+        },
+      });
+      if (onSuccessCallback) onSuccessCallback(data);
     },
   });
 };
