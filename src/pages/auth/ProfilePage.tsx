@@ -9,21 +9,26 @@ import { UsersTable } from "../../components/views/Profile/UsersTable";
 import type { User } from "../../api/userTypes";
 
 export const ProfilePage = () => {
-  const { currentUser, setCurrentUser } = userAuthContext();
+  const { currentUser, handleLogout } = userAuthContext();
   const { mutate } = useDeleteUser();
   const { data: allUsers } = useGetAllUsers();
 
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<User| undefined>();
   const [isOpenEditModal, setIsOpenEditModal] = useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
 
   const handleDeleteUser = () => {
-    if (user?.id) {
-      mutate(user.id);
-    }
-    if (user?.id === currentUser?.id) {
-      setCurrentUser(undefined);
-    }
+    if(!user?.id) return;
+
+    mutate(String(user.id), {
+      onSuccess: () => {
+        setIsOpenDeleteModal(false);
+
+        if(user.id === currentUser?.id) {
+          handleLogout();
+        }
+      }
+    });
   };
 
   return (
@@ -39,7 +44,7 @@ export const ProfilePage = () => {
             setIsOpenDeleteModal(true);
           }}
         />
-        {currentUser?.is_admin ? (
+        {currentUser?.is_admin && (
           <Box
             sx={{ minWidth: 1, marginTop: 15 }}
           >
@@ -56,7 +61,7 @@ export const ProfilePage = () => {
               }}
             />
           </Box>
-        ) : null}
+        )}
       </Box>
 
       <EditUserModal

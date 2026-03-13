@@ -34,23 +34,16 @@ export const useGetAllUsers = () => {
   });
 };
 
-export const useCreateUser = () => {
+export const useCreateUser = (onSuccessCallback?: () => void) => {
   return useMutation({
     mutationFn: async (data: RegisterPayload) => {
-      const fetchedUsers = queryClient.getQueryData<User[]>(userKeys.allUsers);
-
-      const duplicatedEmail = fetchedUsers?.find((u) => u.email === data.email);
-
-      if (duplicatedEmail) {
-        throw new Error("Email already exists!");
-      }
 
       const response = await axiosClient.post("/users/", data);
-
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.allUsers });
+      if (onSuccessCallback) onSuccessCallback();
     },
   });
 };
@@ -94,15 +87,21 @@ export const useGetUserById = (id: number) => {
 export const useUpdateUser = () => {
   return useMutation({
     mutationFn: async (data: EditUser) => {
-      const response = await axiosClient.patch(`/users/${data.id}`, data);
+      const response = await axiosClient.patch(`/users/${data.id}/`, data);
 
       return response.data;
     },
 
-    onSuccess: () => {
+    onSuccess: (updatedUser: User) => {
       queryClient.invalidateQueries({
         queryKey: userKeys.allUsers,
       });
+      const me = queryClient.getQueryData<User>(userKeys.me);
+      if(me?.id === updatedUser.id) {
+        queryClient.invalidateQueries({
+          queryKey: userKeys.me,
+        });
+      }
     },
   });
 };
@@ -110,12 +109,12 @@ export const useUpdateUser = () => {
 export const useDeleteUser = () => {
   return useMutation({
     mutationFn: async (userId: string) => {
-      const response = await axiosClient.delete(`/users/${userId}`);
-      return response.data;
+      await axiosClient.delete(`/users/${userId}/`);
+      return userId;
     },
-    onSuccess: (user) => {
+    onSuccess: (deletedId: string) => {
       queryClient.invalidateQueries({
-        queryKey: userKeys.userDetails(user.id),
+        queryKey: userKeys.userDetails(Number(deletedId)),
       });
       queryClient.invalidateQueries({
         queryKey: userKeys.allUsers,

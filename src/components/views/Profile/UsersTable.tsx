@@ -104,7 +104,7 @@ export const UsersTable = (props: UsersTablePayload) => {
           }}
           onRowClick={(params) => {
             const userId = params.row.id;
-            const userById = allUsers?.find((user)=>user.id.includes(userId))
+            const userById = allUsers?.find((user)=>user.id === userId)
             user(userById!);
           }}
           pageSizeOptions={[7]}

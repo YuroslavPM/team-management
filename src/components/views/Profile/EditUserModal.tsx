@@ -120,7 +120,8 @@ export const EditUserModal = (props: EditUserModalProps) => {
     if (
       user.id &&
       (formData.first_name !== user.first_name ||
-        formData.last_name !== user.last_name)
+        formData.last_name !== user.last_name ||
+        formData.is_admin !== user.is_admin)
     ) {
       updateUser(
         {

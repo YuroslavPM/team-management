@@ -1,10 +1,10 @@
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import { NavLink } from "react-router-dom";
-import { useCreateUser, useGetAllUsers } from "../../api/userController";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useCreateUser } from "../../api/userController";
 import { Button, Typography } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
-import { userAuthContext } from "../../utils/context/UserContext";
+import { getApiError } from "../../utils/helpers/genericAxiosHelper";
 
 type RegisterForm = {
   first_name: string;
@@ -14,9 +14,14 @@ type RegisterForm = {
 };
 
 export default function RegisterPage() {
-  const { data } = useGetAllUsers();
-  const { mutate: createUser } = useCreateUser();
-  const { setCurrentUser } = userAuthContext();
+  const navigate = useNavigate();
+  const {
+    mutate: createUser,
+    error,
+    isError,
+  } = useCreateUser(() => {
+    navigate("/login");
+  });
 
   const {
     control: register,
@@ -42,13 +47,7 @@ export default function RegisterPage() {
       created_at: new Date(),
       updated_at: new Date(),
     });
-
-    const user = data?.find(
-      (x) => x.email === formData.email && x.secret === formData.secret,
-    );
-    if (user) {
-      setCurrentUser(user);
-    }
+    
     reset();
   };
 
@@ -158,6 +157,11 @@ export default function RegisterPage() {
             />
           )}
         />
+        {isError && (
+          <Typography color="error">
+            {getApiError(error) || "Registration failed"}
+          </Typography>
+        )}
         <Button variant="contained" type="submit" disabled={!isValid}>
           Register
         </Button>
