@@ -19,7 +19,7 @@ export const useGetAllProjects = () => {
   return useQuery<Project[]>({
     queryKey: projectKeys.allProjects,
     queryFn: async () => {
-      const response = await axiosClient.get("projects");
+      const response = await axiosClient.get("/projects/");
       return response.data;
     },
   });
@@ -28,7 +28,7 @@ export const useGetAllProjects = () => {
 export const useCreateProject = () => {
   return useMutation({
     mutationFn: async (data: ProjectPayload) => {
-      const response = await axiosClient.post("projects", data);
+      const response = await axiosClient.post("/projects/", data);
       return response.data;
     },
     onSuccess: () => {
@@ -40,7 +40,7 @@ export const useCreateProject = () => {
 export const useUpdateProject = () => {
   return useMutation({
     mutationFn: async (data: Project) => {
-      const response = await axiosClient.patch(`projects/${data.id}`, data);
+      const response = await axiosClient.patch(`/projects/${data.id}/`, data);
       return response.data;
     },
     onSuccess: (project) => {
@@ -57,7 +57,7 @@ export const useUpdateProject = () => {
 export const useAddUserToProject = () => {
   return useMutation({
     mutationFn: async (data: ActionUserToProject) => {
-      const response = await axiosClient.patch(`projects/${data.id}`, data);
+      const response = await axiosClient.patch(`/projects/${data.id}/`, data);
 
       return response.data;
     },
@@ -72,7 +72,7 @@ export const useAddUserToProject = () => {
 export const useRemoveUserToProject = () => {
   return useMutation({
     mutationFn: async (data: ActionUserToProject) => {
-      const response = await axiosClient.patch(`projects/${data.id}`, data);
+      const response = await axiosClient.patch(`/projects/${data.id}/`, data);
 
       return response.data;
     },
@@ -87,7 +87,7 @@ export const useRemoveUserToProject = () => {
 export const useDeleteProject = () => {
   return useMutation({
     mutationFn: async (projectId: string) => {
-      const response = await axiosClient.delete(`projects/${projectId}`);
+      const response = await axiosClient.delete(`/projects/${projectId}/`);
       return response.data;
     },
     onSuccess: (project) => {
