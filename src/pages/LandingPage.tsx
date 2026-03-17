@@ -34,8 +34,8 @@ export const LandingPage = () => {
 
   const userProjects = allProjects?.filter(
     (project) =>
-      project.adminIds.find((admin) => admin === currentUser?.id) ||
-      project.memberIds.find((member) => member === currentUser?.id),
+      project?.adminIds?.find((admin) => admin === currentUser?.id) ||
+      project?.memberIds?.find((member) => member === currentUser?.id),
   );
 
   const userProjectsLength = userProjects?.length;
@@ -93,8 +93,8 @@ export const LandingPage = () => {
     const projectUsersCount =
       allProjects?.filter(
         (project) =>
-          project.adminIds.includes(user.id) ||
-          project.memberIds.includes(user.id),
+          project?.adminIds?.includes(user.id) ||
+          project?.memberIds?.includes(user?.id),
       ).length ?? 0;
 
     return {
