@@ -15,7 +15,7 @@ export const useMe = () => {
   return useQuery<User>({
     queryKey: userKeys.me,
     queryFn: async () => {
-      const response = await axiosClient.get("/me/");
+      const response = await axiosClient.get("/users/me/");
       return response.data;
     },
     enabled: hasToken,
@@ -65,7 +65,7 @@ export const useLogin = (onSuccessCallback?: (data: Login) => void) => {
       await queryClient.fetchQuery({
         queryKey: userKeys.me,
         queryFn: async () => {
-          const response = await axiosClient.get("/me/");
+          const response = await axiosClient.get("/users/me/");
           return response.data;
         },
       });
