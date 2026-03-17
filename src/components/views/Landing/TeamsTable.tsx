@@ -17,7 +17,7 @@ import { Avatar } from "@mui/material";
 import GroupIcon from "@mui/icons-material/Group";
 
 export type TeamTablePayload = {
-  id: string;
+  id: number;
   name: string;
   updatedAt: Date;
 };

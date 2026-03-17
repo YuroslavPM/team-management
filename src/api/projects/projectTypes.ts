@@ -5,8 +5,8 @@ export type Project = {
   name: string;
   description: string;
   status: ProjectStatusTypes;
-  adminIds: string[];
-  memberIds: string[];
+  adminIds: number[];
+  memberIds: number[];
   teamIds: string[];
   created_at: Date;
   updated_at: Date;
@@ -16,8 +16,8 @@ export type ProjectPayload = {
   name: string;
   description: string;
   status: ProjectStatusTypes;
-  adminIds: string[];
-  memberIds: string[];
+  adminIds: number[];
+  memberIds: number[];
   teamIds: string[];
   created_at: Date;
   updated_at: Date;

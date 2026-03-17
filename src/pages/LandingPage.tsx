@@ -27,9 +27,9 @@ export const LandingPage = () => {
   const { data: allTasks } = useGetAllTasks();
   const { data: allProjects } = useGetAllProjects();
 
-  const userTeams = allTeams?.filter(
-    (team) => currentUser && team.users.includes(currentUser.id),
-  );
+ const userTeams = allTeams?.filter((team) => {
+    return currentUser && team.users.some((user) => user.id === currentUser.id);
+  });
   const userTeamsLength = userTeams?.length;
 
   const userProjects = allProjects?.filter(
