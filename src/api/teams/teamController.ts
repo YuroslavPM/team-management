@@ -32,8 +32,8 @@ export const useCreateTeam = () => {
 
 export const useUpdateTeam = () => {
   return useMutation({
-    mutationFn: async (data: Team) => {
-      const response = await axiosClient.patch(`/teams/${data.id}/`, data);
+    mutationFn: async ({id, ...payload}: TeamPayload& {id:number}) => {
+      const response = await axiosClient.patch(`/teams/${id}/`, payload);
       return response.data;
     },
     onSuccess: () => {
@@ -75,8 +75,8 @@ export const useRemoveUserToTeam = () => {
 
 export const useDeleteTeam = () => {
   return useMutation({
-    mutationFn: async (teamId: string) => {
-      const response = await axiosClient.delete(`/teams/${teamId}`);
+    mutationFn: async (teamId: number) => {
+      const response = await axiosClient.delete(`/teams/${teamId}/`);
       return response.data;
     },
     onSuccess: (team) => {

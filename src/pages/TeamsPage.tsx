@@ -14,18 +14,18 @@ export const TeamsPage = () => {
   const { data: teams } = useGetAllTeams();
   const { mutate: deleteTeam } = useDeleteTeam();
 
-  const [teamId, setTeamId] = useState("");
+  const [teamId, setTeamId] = useState<number>();
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [team, setTeam] = useState<Team>();
 
   const handleTeamDelete = () => {
-    deleteTeam(teamId);
+    deleteTeam(teamId!);
   };
 
-  const userTeams = teams?.filter(
-    (team) => currentUser && team.users.includes(currentUser.id),
-  );
+  const userTeams = teams?.filter((team) => {
+    return currentUser && team.users.some((user) => user.id === currentUser.id);
+  });
 
   return (
     <>
@@ -52,7 +52,7 @@ export const TeamsPage = () => {
               setTeam(team);
             }}
             onDeleteClick={() => {
-              setTeamId(team.id);
+              setTeamId(Number(team.id));
               setIsOpenDeleteModal(true);
             }}
           />

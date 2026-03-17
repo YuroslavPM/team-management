@@ -46,7 +46,7 @@ export const TeamCard = ({
         <CommonText
           text={"Mates:"}
           value={users
-            ?.filter((user) => team.users.includes(user.id))
+            ?.filter((user) => team.users.some((teamUsers)=> teamUsers.id === user.id))
             .map((u) => u.first_name)
             .join(", ")}
           variant={"body2"}

@@ -1,19 +1,20 @@
+import type { User } from "../userTypes";
+
 export type Team = {
-  id: string;
+  id: number;
   name: string;
-  users: string[];
+  users: User[];
   updated_at: Date;
 };
 
 export type TeamPayload = {
   name: string;
-  users: string[];
-  created_at: Date;
+  users: number[];
   updated_at: Date;
 };
 
 export type ActionUserToTeam = {
   id: string;
-  users: string[];
+  users: User[];
   updated_at: Date;
 };

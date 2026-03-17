@@ -47,7 +47,7 @@ export const CreateUpdateTeamModal = (props: CreateTeamModalProps) => {
     mode: "onChange",
     defaultValues: {
       teamName: team?.name || "",
-      teamUsers: team?.users?.map((user) => users.find((u) => u.id === user)),
+      teamUsers: team?.users || [],
     },
   });
 
@@ -55,7 +55,7 @@ export const CreateUpdateTeamModal = (props: CreateTeamModalProps) => {
     if (team) {
       reset({
         teamName: team?.name || "",
-        teamUsers: team?.users?.map((user) => users.find((u) => u.id === user)),
+        teamUsers: team?.users || [],
       });
     } else {
       reset({
@@ -66,18 +66,18 @@ export const CreateUpdateTeamModal = (props: CreateTeamModalProps) => {
   }, [open, reset, team, team?.users, users]);
 
   const handleClick = (formData: CreateUpdateTeamForm) => {
+    const userIds = formData.teamUsers.map((user) => user.id);
     if (!team) {
       createTeam({
         name: formData.teamName,
-        users: formData.teamUsers?.map((user) => user.id || "") || [],
-        created_at: new Date(),
+        users: userIds || [],
         updated_at: new Date(),
       });
     } else {
       updateTeam({
         id: team.id,
         name: formData.teamName,
-        users: formData.teamUsers?.map((user) => user.id || "") || [],
+        users: userIds || [],
         updated_at: new Date(),
       });
     }
@@ -143,7 +143,10 @@ export const CreateUpdateTeamModal = (props: CreateTeamModalProps) => {
               {...field}
               multiple
               onChange={(_e, value) => {
-                setValue("teamUsers", value);
+                setValue("teamUsers", value, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
               }}
               options={users}
               getOptionLabel={(option) => option.first_name}

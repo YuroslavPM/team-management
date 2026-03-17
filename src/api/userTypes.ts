@@ -1,5 +1,5 @@
 export type User = {
-  id: string;
+  id: number;
   display_name: string;
   email: string;
   secret: string;
@@ -11,7 +11,7 @@ export type User = {
 };
 
 export type EditUser = {
-  id: string;
+  id: number;
   first_name: string;
   last_name: string;
   is_admin: boolean;
