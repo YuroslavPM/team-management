@@ -116,14 +116,10 @@ export const LandingPage = () => {
     };
   });
 
-  const stringToColor = (input: string | number) => {
-    const str = String(input);
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return `hsl(${hash % 360}, 70%, 55%)`;
-  };
+  const numberToColor = (num: number) => {
+  const hue = ((num * 137.508) % 360 + 360) % 360;
+  return `hsl(${hue}, 70%, 55%)`;
+};
 
   return (
     <Grid container spacing={3} sx={{ minWidth: "100%" }}>
@@ -177,7 +173,7 @@ export const LandingPage = () => {
           data={projectTaskCounts?.map((project) => ({
             label: project.projectName,
             value: project.taskCount,
-            color: stringToColor(project.projectId),
+            color: numberToColor(project.projectId),
           }))}
           title="Team tasks"
         />
@@ -249,7 +245,7 @@ export const LandingPage = () => {
             ?.map((project) => ({
               label: project.projectName,
               value: project.taskCount,
-              color: stringToColor(project.projectId),
+              color: numberToColor(project.projectId),
             }))
             .filter((p) => p.value! > 0)}
           title="Task in projects"
@@ -267,7 +263,7 @@ export const LandingPage = () => {
             ?.map((users) => ({
               label: users.userfirst_name,
               value: users.userCountProjects,
-              color: stringToColor(users.userId),
+              color: numberToColor(users.userId),
             }))
             .filter((p) => p.value! > 0)}
           title="Users count projects"
@@ -285,7 +281,7 @@ export const LandingPage = () => {
             ?.map((users) => ({
               label: users.userfirst_name,
               value: users.userTasksCount,
-              color: stringToColor(users.userId),
+              color: numberToColor(users.userId),
             }))
             .filter((p) => p.value > 0)}
           title="Users count tasks"
