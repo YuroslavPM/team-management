@@ -1,12 +1,12 @@
 import type { PriorityStatusTypes, TaskStatusTypes } from "./taskEnum";
 
 export type Task = {
-  id: string;
+  id: number;
   title: string;
   description: string;
   status: TaskStatusTypes;
   priority: PriorityStatusTypes;
-  projectId: string;
+  projectId: number;
   assignedUserId: number[];
   created_at: Date;
   updated_at: Date;
@@ -17,14 +17,14 @@ export type TaskPayload = {
   description: string;
   status: TaskStatusTypes;
   priority: PriorityStatusTypes;
-  projectId: string;
+  projectId: number;
   assignedUserId: number[];
   created_at: Date;
   updated_at: Date;
 };
 
 export type ActionUserToTask = {
-  id: string;
+  id: number;
   assignedUserId: string[];
   updated_at: Date;
 };

@@ -15,7 +15,7 @@ import type { ProjectStatusTypes } from "../../../api/projects/projectEnum";
 import { useNavigate } from "react-router-dom";
 
 type ProjectTablePayload = {
-  id: string;
+  id: number;
   status: ProjectStatusTypes;
   name: string;
   admins: string;

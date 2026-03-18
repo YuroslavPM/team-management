@@ -12,7 +12,7 @@ export const useGetAllTasks = () => {
   return useQuery<Task[]>({
     queryKey: taskKeys.allTasks,
     queryFn: async () => {
-      const response = await axiosClient.get("/tasks");
+      const response = await axiosClient.get("/tasks/");
       return response.data;
     },
   });
@@ -21,7 +21,7 @@ export const useGetAllTasks = () => {
 export const useCreateTask = () => {
   return useMutation({
     mutationFn: async (data: TaskPayload) => {
-      const response = await axiosClient.post("tasks", data);
+      const response = await axiosClient.post("/tasks/", data);
       return response.data;
     },
     onSuccess: () => {
@@ -33,7 +33,7 @@ export const useCreateTask = () => {
 export const useUpdateTask = () => {
   return useMutation({
     mutationFn: async (data: Task) => {
-      const response = await axiosClient.patch(`tasks/${data.id}`, data);
+      const response = await axiosClient.patch(`/tasks/${data.id}/`, data);
       return response.data;
     },
     onSuccess: (task) => {
@@ -50,7 +50,7 @@ export const useUpdateTask = () => {
 export const useAddUserToTask = () => {
   return useMutation({
     mutationFn: async (data: ActionUserToTask) => {
-      const response = await axiosClient.patch(`tasks/${data.id}`, data);
+      const response = await axiosClient.patch(`/tasks/${data.id}/`, data);
 
       return response.data;
     },
@@ -65,7 +65,7 @@ export const useAddUserToTask = () => {
 export const useRemoveUserToTask = () => {
   return useMutation({
     mutationFn: async (data: ActionUserToTask) => {
-      const response = await axiosClient.patch(`tasks/${data.id}`, data);
+      const response = await axiosClient.patch(`/tasks/${data.id}/`, data);
       return response.data;
     },
     onSuccess: () => {
@@ -79,7 +79,7 @@ export const useRemoveUserToTask = () => {
 export const useDeleteTask = () => {
   return useMutation({
     mutationFn: async (taskId: string) => {
-      const response = await axiosClient.delete(`tasks/${taskId}`);
+      const response = await axiosClient.delete(`/tasks/${taskId}/`);
       return response.data;
     },
     onSuccess: (task) => {

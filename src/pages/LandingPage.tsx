@@ -34,8 +34,8 @@ export const LandingPage = () => {
 
   const userProjects = allProjects?.filter(
     (project) =>
-      project?.adminIds?.find((admin) => admin === currentUser?.id) ||
-      project?.memberIds?.find((member) => member === currentUser?.id),
+      project?.admins?.find((admin) => admin === currentUser?.id) ||
+      project?.members?.find((member) => member === currentUser?.id),
   );
 
   const userProjectsLength = userProjects?.length;
@@ -93,8 +93,8 @@ export const LandingPage = () => {
     const projectUsersCount =
       allProjects?.filter(
         (project) =>
-          project?.adminIds?.includes(user.id) ||
-          project?.memberIds?.includes(user?.id),
+          project?.admins?.includes(user.id) ||
+          project?.members?.includes(user?.id),
       ).length ?? 0;
 
     return {
@@ -116,7 +116,9 @@ export const LandingPage = () => {
     };
   });
 
-  const stringToColor = (str: string) => {
+  const stringToColor = (input: string|number) => {
+    
+    const str = String(input)
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       hash = str.charCodeAt(i) + ((hash << 5) - hash);
@@ -226,10 +228,10 @@ export const LandingPage = () => {
             id: project.id,
             status: project.status,
             name: project.name,
-            admins: project.adminIds
+            admins: project.admins
               .map((id) => allUsers?.find((user) => user.id === id)?.first_name)
               .join(", "),
-            members: project.memberIds
+            members: project.members
               .map((id) => allUsers?.find((user) => user.id === id)?.first_name)
               .join(", "),
             updated_at: project.updated_at,

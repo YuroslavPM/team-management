@@ -18,7 +18,7 @@ import type {
 } from "../../../api/tasks/taskEnum";
 
 type TaskTablePayload = {
-  id: string;
+  id: number;
   status: TaskStatusTypes;
   title: string;
   priority: PriorityStatusTypes;
