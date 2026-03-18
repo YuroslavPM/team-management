@@ -27,7 +27,7 @@ export const LandingPage = () => {
   const { data: allTasks } = useGetAllTasks();
   const { data: allProjects } = useGetAllProjects();
 
- const userTeams = allTeams?.filter((team) => {
+  const userTeams = allTeams?.filter((team) => {
     return currentUser && team.users.some((user) => user.id === currentUser.id);
   });
   const userTeamsLength = userTeams?.length;
@@ -41,7 +41,7 @@ export const LandingPage = () => {
   const userProjectsLength = userProjects?.length;
 
   const userTasks = allTasks?.filter((task) => {
-    const assigned = task.assignedUserId;
+    const assigned = task.assigned_user;
     if (Array.isArray(assigned)) {
       return assigned.includes(currentUser!.id);
     }
@@ -50,7 +50,7 @@ export const LandingPage = () => {
 
   const projectTaskCounts = userProjects?.map((project) => {
     const taskCount =
-      userTasks?.filter((task) => task.projectId === project.id).length ?? 0;
+      userTasks?.filter((task) => task.project === project.id).length ?? 0;
 
     return {
       projectId: project.id,
@@ -61,7 +61,7 @@ export const LandingPage = () => {
 
   const allProjectsTaskCounts = allProjects?.map((project) => {
     const taskCount =
-      allTasks?.filter((task) => task.projectId === project.id).length ?? 0;
+      allTasks?.filter((task) => task.project === project.id).length ?? 0;
     return {
       projectId: project.id,
       projectName: project.name,
@@ -78,7 +78,7 @@ export const LandingPage = () => {
   const projectTaskTable = userProjects?.flatMap(
     (project) =>
       userTasks
-        ?.filter((task) => task.projectId === project.id)
+        ?.filter((task) => task.project === project.id)
         .map((task) => ({
           id: task.id,
           status: task.status,
@@ -106,7 +106,7 @@ export const LandingPage = () => {
 
   const userByTask = allUsers?.map((user) => {
     const taskUsersCount =
-      allTasks?.filter((task) => task?.assignedUserId.includes(user.id))
+      allTasks?.filter((task) => task?.assigned_user.includes(user.id))
         .length ?? 0;
 
     return {
@@ -116,9 +116,8 @@ export const LandingPage = () => {
     };
   });
 
-  const stringToColor = (input: string|number) => {
-    
-    const str = String(input)
+  const stringToColor = (input: string | number) => {
+    const str = String(input);
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       hash = str.charCodeAt(i) + ((hash << 5) - hash);

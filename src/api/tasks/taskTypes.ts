@@ -6,8 +6,8 @@ export type Task = {
   description: string;
   status: TaskStatusTypes;
   priority: PriorityStatusTypes;
-  projectId: number;
-  assignedUserId: number[];
+  project: number;
+  assigned_user: number[];
   created_at: Date;
   updated_at: Date;
 };
@@ -17,8 +17,8 @@ export type TaskPayload = {
   description: string;
   status: TaskStatusTypes;
   priority: PriorityStatusTypes;
-  projectId: number;
-  assignedUserId: number[];
+  project: number;
+  assigned_user: number[];
   created_at: Date;
   updated_at: Date;
 };

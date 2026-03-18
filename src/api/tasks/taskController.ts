@@ -78,7 +78,7 @@ export const useRemoveUserToTask = () => {
 
 export const useDeleteTask = () => {
   return useMutation({
-    mutationFn: async (taskId: string) => {
+    mutationFn: async (taskId: number) => {
       const response = await axiosClient.delete(`/tasks/${taskId}/`);
       return response.data;
     },

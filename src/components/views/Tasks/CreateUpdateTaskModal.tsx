@@ -42,8 +42,8 @@ type TaskForm = {
   description: string;
   status: TaskStatusTypes;
   priority: PriorityStatusTypes;
-  projectId: string;
-  assignedUserId: User[];
+  project: number;
+  assigned_user: User[];
 };
 
 export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
@@ -69,8 +69,8 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
         description: task.description,
         status: task.status,
         priority: task.priority,
-        projectId: project?.id,
-        assignedUserId: task.assignedUserId.map((user) =>
+        project: project?.id,
+        assigned_user: task.assigned_user.map((user) =>
           users.find((x) => x.id === user),
         ),
       });
@@ -80,8 +80,8 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
         description: "",
         status: undefined,
         priority: undefined,
-        projectId: project?.id,
-        assignedUserId: undefined,
+        project: project?.id,
+        assigned_user: undefined,
       });
     }
   }, [users, task, project, reset]);
@@ -96,9 +96,9 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
         description: formData.description,
         status: formData.status,
         priority: formData.priority,
-        projectId: project.id,
-        assignedUserId:
-          formData.assignedUserId.map((user) => user.id || "") || [],
+        project: project.id,
+        assigned_user:
+          formData.assigned_user.map((user) => user.id ) || [],
         created_at: new Date(),
         updated_at: new Date(),
       });
@@ -109,9 +109,9 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
         description: formData.description,
         status: formData.status,
         priority: formData.priority,
-        projectId: project.id,
-        assignedUserId:
-          formData.assignedUserId.map((user) => user.id || "") || [],
+        project: project.id,
+        assigned_user:
+          formData.assigned_user.map((user) => user.id ) || [],
         created_at: project.created_at,
         updated_at: new Date(),
       });
@@ -227,7 +227,7 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
           )}
         />
         <Controller
-          name="assignedUserId"
+          name="assigned_user"
           control={control}
           render={({ field }) => (
             <Autocomplete
@@ -240,7 +240,7 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
               )}
               getOptionLabel={(option) => option.first_name}
               onChange={(_e, value) => {
-                setValue("assignedUserId", value);
+                setValue("assigned_user", value);
               }}
               renderValue={(values, getItemProps) =>
                 values.map((option, index) => {

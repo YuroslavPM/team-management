@@ -73,7 +73,7 @@ export const EditUserModal = (props: EditUserModalProps) => {
   );
 
   const userTasks = allTasks?.filter((task) => {
-    const assigned = task.assignedUserId;
+    const assigned = task.assigned_user;
     if (Array.isArray(assigned)) {
       return assigned.includes(user?.id);
     }
@@ -214,11 +214,11 @@ export const EditUserModal = (props: EditUserModalProps) => {
 
       taskIn.map((task) => {
         const updateAssigned = [
-          ...(Array.isArray(task.assignedUserId) ? task.assignedUserId : []),
+          ...(Array.isArray(task.assigned_user) ? task.assigned_user : []),
           user.id,
         ];
 
-        const taskProjectId = task.projectId;
+        const taskProjectId = task.project;
 
         const project = allProjects?.find(
           (project) => project.id === String(taskProjectId),
@@ -246,7 +246,7 @@ export const EditUserModal = (props: EditUserModalProps) => {
       });
 
       taskOut.map((task) => {
-        const updateAssigned = task.assignedUserId.filter((u) => u !== user.id);
+        const updateAssigned = task.assigned_user.filter((u) => u !== user.id);
         removeUserToTask({
           id: task.id,
           assignedUserId: updateAssigned,

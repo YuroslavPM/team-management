@@ -22,9 +22,9 @@ export const ProjectDetailPage = () => {
   const { mutate: deleteTask } = useDeleteTask();
 
   const { id } = useParams();
-  const [taskId, setTaskId] = useState("");
+  const [taskId, setTaskId] = useState<number>();
   const [task, setTask] = useState<Task>();
-  const userTasks = tasks?.filter((task) => task.projectId === id);
+  const userTasks = tasks?.filter((task) => task.project === Number(id));
   const [isOpenProjectModal, setIsOpen] = useState(false);
   const [isOpenTaskModal, setIsOpenTaskModal] = useState(false);
   const [isOpenProjectDeleteModal, setIsOpenProjectDeleteModal] =
@@ -40,7 +40,7 @@ export const ProjectDetailPage = () => {
   };
 
   const handleTaskDelete = () => {
-    deleteTask(taskId);
+    deleteTask(taskId!);
   };
 
   return (
@@ -91,11 +91,11 @@ export const ProjectDetailPage = () => {
         <Box sx={{ minWidth: 1 }}>
           <TaskTable
             tasks={userTasks}
-            onEditClick={() => {
-              setIsOpenTaskModal(true);
+            onEditClick={(task) => {
               setTask(task);
+              setIsOpenTaskModal(true);
             }}
-            onDelete={() => {
+            onDelete={(task) => {
               setTaskId(task!.id);
               setIsOpenTaskDeleteModal(true);
             }}
