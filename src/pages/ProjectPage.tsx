@@ -18,20 +18,22 @@ export const ProjectPage = () => {
   const { data: projects } = useGetAllProjects();
   const { mutate: deleteProject } = useDeleteProject();
 
-  const [projectId, setProjectId] = useState("");
+  const [projectId, setProjectId] = useState<number>();
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [project, setProject] = useState<Project>();
 
   const handleTeamDelete = () => {
-    deleteProject(projectId);
+    deleteProject(projectId!);
   };
 
-  const userProjects = projects?.filter(
-    (project) =>
-      (currentUser && project.adminIds.includes(currentUser.id)) ||
-      project.memberIds.includes(currentUser!.id),
-  );
+  const userProjects = projects?.filter((project) => {
+    return (
+      (currentUser &&
+        project.admins.some((adminId) => adminId === currentUser.id)) ||
+      project.members.some((memberId) => memberId === currentUser?.id)
+    );
+  });
 
   return (
     <Box sx={{ display: "flex", gap: 2, flexDirection: "column" }}>

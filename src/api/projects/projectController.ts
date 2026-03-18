@@ -86,7 +86,7 @@ export const useRemoveUserToProject = () => {
 
 export const useDeleteProject = () => {
   return useMutation({
-    mutationFn: async (projectId: string) => {
+    mutationFn: async (projectId: number) => {
       const response = await axiosClient.delete(`/projects/${projectId}/`);
       return response.data;
     },

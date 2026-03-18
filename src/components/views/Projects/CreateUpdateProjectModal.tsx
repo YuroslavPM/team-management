@@ -63,39 +63,43 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
   } = useForm<ProjectForm>();
 
   useEffect(() => {
-    if (project) {
+    if (!project) {
       reset({
-        name: project?.name || "",
-        description: project?.description || "",
-        status: project?.status,
+        name: "",
+        description: "",
+        status: ProjectStatus.Active,
+        admins: [],
+        members: [],
+        teams: [],
       });
     }
 
-    if (project && allTeams && users) {
-      reset({
-        admins: project?.adminIds
-          ?.map((user) => users.find((x) => x.id === user))
-          ?.filter(Boolean),
-        members: project?.memberIds?.map((user) =>
-          users.find((x) => x.id === user),
-        ),
-        teams: project?.teamIds?.map((team) =>
-          allTeams.find((x) => x.id === team),
-        ),
-      });
-    } else {
-      reset({
-        admins: undefined,
-        members: undefined,
-        teams: undefined,
-      });
-    }
+    const adminObjects =
+      project?.admins
+        ?.map((id) => users.find((u) => u.id === id))
+        .filter(Boolean) || [];
+    const memberObjects =
+      project?.members
+        ?.map((id) => users.find((u) => u.id === id))
+        .filter(Boolean) || [];
+    const teamObjects =
+      project?.teams
+        ?.map((id) => allTeams.find((t) => t.id === id))
+        .filter(Boolean) || [];
+
+    reset({
+      name: project?.name,
+      description: project?.description,
+      status: project?.status as ProjectStatusTypes,
+      admins: adminObjects as User[],
+      members: memberObjects as User[],
+      teams: teamObjects as Team[],
+    });
   }, [users, allTeams, project, reset]);
 
   const admins = watch("admins") || [];
   const teams = watch("teams") || [];
   const members = watch("members") || [];
-  const status = watch("status") || [];
 
   const handleClick = (formData: ProjectForm) => {
     if (!project) {
@@ -103,9 +107,9 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
         name: formData.name,
         description: formData.description,
         status: formData.status,
-        adminIds: formData.admins?.map((user) => user.id || "") || [],
-        memberIds: formData.members?.map((user) => user.id || "") || [],
-        teamIds: formData.teams?.map((team) => team.id) || [],
+        admins: formData.admins?.map((user) => user.id) || [],
+        members: formData.members?.map((user) => user.id) || [],
+        teams: formData.teams?.map((team) => team.id) || [],
         created_at: new Date(),
         updated_at: new Date(),
       });
@@ -115,9 +119,9 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
         name: formData.name,
         description: formData.description,
         status: formData.status,
-        adminIds: formData.admins?.map((user) => user.id || "") || [],
-        memberIds: formData.members?.map((user) => user.id || "") || [],
-        teamIds: formData.teams?.map((team) => team.id) || [],
+        admins: formData.admins?.map((user) => user.id) || [],
+        members: formData.members?.map((user) => user.id) || [],
+        teams: formData.teams?.map((team) => team.id) || [],
         created_at: project.created_at,
         updated_at: new Date(),
       });
@@ -192,7 +196,6 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
               <InputLabel id="status-select-label">Status</InputLabel>
               <Select
                 {...field}
-                value={status}
                 label="Status"
                 onChange={(event: SelectChangeEvent) => {
                   setValue("status", event.target.value as ProjectStatusTypes);
@@ -212,7 +215,7 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
             <Autocomplete
               {...field}
               multiple
-              options={users?.filter((user) => !members?.includes(user))}
+              options={users?.filter((user) => members?.some((member)=> member.id === user.id))}
               getOptionLabel={(option) => option.first_name}
               onChange={(_e, value) => {
                 setValue("admins", value);
@@ -239,7 +242,7 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
             <Autocomplete
               {...field}
               multiple
-              options={users?.filter((user) => !admins?.includes(user))}
+              options={users?.filter((user) => admins?.some((admin)=> admin.id === user.id))}
               getOptionLabel={(option) => option.first_name}
               onChange={(_e, value) => {
                 setValue("members", value);

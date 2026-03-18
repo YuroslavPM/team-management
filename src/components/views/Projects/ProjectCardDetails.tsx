@@ -39,7 +39,7 @@ export const ProjectCardDetails = ({
         boxShadow: 3,
         fontFamily: "Arial",
       }}
-      key={project.id}
+      key={project?.id}
     >
       <CardHeader
         avatar={
@@ -58,7 +58,7 @@ export const ProjectCardDetails = ({
         title={
           <CommonText
             text={""}
-            value={project.name}
+            value={project?.name}
             variant={"h5"}
             style={{ fontWeight: "bold" }}
           />
@@ -66,7 +66,7 @@ export const ProjectCardDetails = ({
         subheader={
           <CommonText
             text={"Project created at: "}
-            value={dayjs(project.created_at).format("DD/MM/YYYY")}
+            value={dayjs(project?.created_at).format("DD/MM/YYYY")}
             variant={"body2"}
             style={null}
           />
@@ -75,14 +75,14 @@ export const ProjectCardDetails = ({
       <CardContent>
         <CommonText
           text={"Status: "}
-          value={project.status}
+          value={project?.status}
           variant={"h5"}
           style={{ fontSize: 18 }}
         />
         <CommonText
           text={"Admins: "}
           value={users
-            ?.filter((user) => project.adminIds.includes(user.id))
+            ?.filter((user) => project?.admins?.includes(user.id))
             .map((u) => u.first_name)
             .join(", ")}
           variant={"body2"}
@@ -91,7 +91,7 @@ export const ProjectCardDetails = ({
         <CommonText
           text={"Members: "}
           value={users
-            ?.filter((user) => project.memberIds.includes(user.id))
+            ?.filter((user) => project?.members?.includes(user.id))
             .map((u) => u.first_name)
             .join(", ")}
           variant={"body2"}
@@ -100,7 +100,7 @@ export const ProjectCardDetails = ({
         <CommonText
           text={"Teams: "}
           value={teams
-            ?.filter((team) => project.teamIds.includes(team.id))
+            ?.filter((team) => project?.teams?.includes(team.id))
             .map((t) => t.name)
             .join(", ")}
           variant={"body2"}
@@ -108,7 +108,7 @@ export const ProjectCardDetails = ({
         />
         <CommonText
           text={"Last update: "}
-          value={dayjs(project.updated_at).format("DD/MM/YYYY")}
+          value={dayjs(project?.updated_at).format("DD/MM/YYYY")}
           variant={"body2"}
           style={{ fontSize: 14 }}
         />

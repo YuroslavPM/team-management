@@ -3,7 +3,6 @@ import {
   useDeleteProject,
   useGetAllProjects,
 } from "../api/projects/projectController";
-import type { Project } from "../api/projects/projectTypes";
 import { Box } from "@mui/material";
 import { CreateUpdateProjectModal } from "../components/views/Projects/CreateUpdateProjectModal";
 import { ProjectCardDetails } from "../components/views/Projects/ProjectCardDetails";
@@ -31,13 +30,13 @@ export const ProjectDetailPage = () => {
   const [isOpenProjectDeleteModal, setIsOpenProjectDeleteModal] =
     useState(false);
   const [isOpenTaskDeleteModal, setIsOpenTaskDeleteModal] = useState(false);
-  const [project, setProject] = useState<Project | undefined>(
-    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-    getProjects?.find((project) => project.id === id)!,
+
+  const currentProject = getProjects?.find(
+    (project) => project.id === Number(id),
   );
 
   const handleTeamDelete = () => {
-    deleteProject(id!);
+    deleteProject(Number(id));
   };
 
   const handleTaskDelete = () => {
@@ -61,10 +60,9 @@ export const ProjectDetailPage = () => {
         />
       </Box>
       <ProjectCardDetails
-        project={project!}
+        project={currentProject!}
         onEditClick={() => {
           setIsOpen(true);
-          setProject(project);
         }}
         onDelete={() => {
           setIsOpenProjectDeleteModal(true);
@@ -108,9 +106,8 @@ export const ProjectDetailPage = () => {
         open={isOpenProjectModal}
         onClose={() => {
           setIsOpen(false);
-          setProject(undefined);
         }}
-        project={project}
+        project={currentProject}
       />
       <CreateUpdateTaskModal
         open={isOpenTaskModal}
@@ -119,7 +116,7 @@ export const ProjectDetailPage = () => {
           setTask(undefined);
         }}
         task={task}
-        project={project!}
+        project={currentProject!}
       />
       <AlertDialog
         title={isOpenProjectDeleteModal ? "Delete Project!" : "Delete Task!"}

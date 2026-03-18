@@ -69,7 +69,7 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
         description: task.description,
         status: task.status,
         priority: task.priority,
-        projectId: project.id,
+        projectId: project?.id,
         assignedUserId: task.assignedUserId.map((user) =>
           users.find((x) => x.id === user),
         ),
@@ -80,7 +80,7 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
         description: "",
         status: undefined,
         priority: undefined,
-        projectId: project.id,
+        projectId: project?.id,
         assignedUserId: undefined,
       });
     }
@@ -235,8 +235,8 @@ export const CreateUpdateTaskModal = (props: CreateUpdateTaskProps) => {
               multiple
               options={users.filter(
                 (user) =>
-                  project?.adminIds?.includes?.(user.id) ||
-                  project?.memberIds?.includes?.(user.id),
+                  project?.admins?.includes?.(user.id) ||
+                  project?.members?.includes?.(user.id),
               )}
               getOptionLabel={(option) => option.first_name}
               onChange={(_e, value) => {

@@ -52,7 +52,7 @@ export const ProjectCard = ({
         <CommonText
           text={"Members: "}
           value={users
-            ?.filter((user) => project.memberIds.includes(user.id))
+            ?.filter((user) => project.members?.includes(user.id))
             .map((u) => u.first_name)
             .join(", ")}
           variant={"body2"}
@@ -62,7 +62,7 @@ export const ProjectCard = ({
         <CommonText
           text={"Admins: "}
           value={users
-            ?.filter((user) => project.adminIds.includes(user.id))
+            ?.filter((user) => project.admins?.includes(user.id))
             .map((u) => u.first_name)
             .join(", ")}
           variant={"body2"}
@@ -71,7 +71,7 @@ export const ProjectCard = ({
         <CommonText
           text={"Teams: "}
           value={teams
-            ?.filter((team) => project.teamIds.includes(team.id))
+            ?.filter((team) => project.teams?.includes(team.id))
             .map((t) => t.name)
             .join(", ")}
           variant={"body2"}
