@@ -5,8 +5,8 @@ export const getDisplayName = (user?:User) =>{
         return;
     }
 
-    const firstName = user.firstName.trim();
-    const lastName = user.lastName.trim();
+    const firstName = user.first_name.trim();
+    const lastName = user.last_name.trim();
 
     const displayName = [firstName, lastName].join(' ');
     

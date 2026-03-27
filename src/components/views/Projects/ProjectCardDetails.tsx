@@ -2,9 +2,7 @@ import {
   Card,
   CardContent,
   Avatar,
-  Typography,
   CardActions,
-  Button,
   CardHeader,
 } from "@mui/material";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
@@ -14,6 +12,8 @@ import { useGetAllUsers } from "../../../api/userController";
 import { useGetAllTeams } from "../../../api/teams/teamController";
 import type { Project } from "../../../api/projects/projectTypes";
 import dayjs from "dayjs";
+import { CommonButton } from "../../common/CommonButton";
+import { CommonText } from "../../common/CommonText";
 
 export type ProjectCardProps = {
   project: Project;
@@ -35,11 +35,11 @@ export const ProjectCardDetails = ({
         minWidth: 500,
         minHeight: 280,
         bgcolor: "#e7e9ee",
-        width: "round(11px, 1px)",
+        width: 1,
         boxShadow: 3,
         fontFamily: "Arial",
       }}
-      key={project.id}
+      key={project?.id}
     >
       <CardHeader
         avatar={
@@ -56,45 +56,60 @@ export const ProjectCardDetails = ({
           </Avatar>
         }
         title={
-          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-            {project.name}
-          </Typography>
+          <CommonText
+            value={project?.name}
+            variant={"h5"}
+            style={{ fontWeight: "bold" }}
+          />
         }
         subheader={
-          <Typography variant="body2">
-            Project created at: {dayjs(project.createdAt).format("DD/MM/YYYY")}
-          </Typography>
+          <CommonText
+            text={"Project created at: "}
+            value={dayjs(project?.created_at).format("DD/MM/YYYY")}
+            variant={"body2"}
+          />
         }
       ></CardHeader>
       <CardContent>
-        <Typography variant="body2" sx={{ fontSize: 18 }}>
-          Status: {project.status}
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: 16, fontWeight: "bold" }}>
-          Admins:{" "}
-          {users
-            ?.filter((user) => project.adminIds.includes(user.id))
-            .map((u) => u.firstName)
+        <CommonText
+          text={"Status: "}
+          value={project?.status}
+          variant={"h5"}
+          style={{ fontSize: 18 }}
+        />
+        <CommonText
+          text={"Admins: "}
+          value={users
+            ?.filter((user) => project?.admins?.includes(user.id))
+            .map((u) => u.first_name)
             .join(", ")}
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: 16 }}>
-          Members:{" "}
-          {users
-            ?.filter((user) => project.memberIds.includes(user.id))
-            .map((u) => u.firstName)
+          variant={"body2"}
+          style={{ fontSize: 16, fontWeight: "bold" }}
+        />
+        <CommonText
+          text={"Members: "}
+          value={users
+            ?.filter((user) => project?.members?.includes(user.id))
+            .map((u) => u.first_name)
             .join(", ")}
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: 16 }}>
-          {project.teamIds
-            ? `Teams: ${teams
-                ?.filter((team) => project.teamIds.includes(team.id))
-                .map((t) => t.name)
-                .join(", ")}`
-            : ""}
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: 14 }}>
-          Last update: {dayjs(project.updatedAt).format("DD/MM/YYYY")}
-        </Typography>
+          variant={"body2"}
+          style={{ fontSize: 16 }}
+        />
+        <CommonText
+          text={"Teams: "}
+          value={teams
+            ?.filter((team) => project?.teams?.includes(team.id))
+            .map((t) => t.name)
+            .join(", ")}
+          variant={"body2"}
+          style={{ fontSize: 16 }}
+        />
+        <CommonText
+          text={"Last update: "}
+          value={dayjs(project?.updated_at).format("DD/MM/YYYY")}
+          variant={"body2"}
+          style={{ fontSize: 14 }}
+        />
       </CardContent>
       <CardActions
         sx={{
@@ -104,30 +119,36 @@ export const ProjectCardDetails = ({
           gap: 1,
         }}
       >
-        <Button
-          size="small"
-          onClick={onEditClick}
-          startIcon={<ModeEditIcon />}
-          sx={{
+        <CommonButton
+          text={"Edit"}
+          style={{
             bgcolor: "#87CEEB",
             color: "white",
+            width: 100,
+            height: 45,
+            fontSize: 16,
+            fontWeight: "bold",
             boxShadow: 2,
           }}
-        >
-          Edit
-        </Button>
-        <Button
+          icon={<ModeEditIcon />}
           size="small"
-          startIcon={<DeleteIcon />}
-          sx={{
+          onClick={onEditClick}
+        />
+        <CommonButton
+          text={"Delete"}
+          style={{
             bgcolor: "red",
             color: "white",
+            width: 100,
+            height: 45,
+            fontSize: 16,
+            fontWeight: "bold",
             boxShadow: 2,
           }}
+          size="small"
+          icon={<DeleteIcon />}
           onClick={onDelete}
-        >
-          Delete
-        </Button>
+        />
       </CardActions>
     </Card>
   );

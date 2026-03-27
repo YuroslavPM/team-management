@@ -12,15 +12,22 @@ import {
   useCreateTeam,
   useUpdateTeam,
 } from "../../../api/teams/teamController";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useGetAllUsers } from "../../../api/userController";
 import type { User } from "../../../api/userTypes";
 import type { Team } from "../../../api/teams/teamTypes";
+import { CommonButton } from "../../common/CommonButton";
+import { Controller, useForm } from "react-hook-form";
 
 type CreateTeamModalProps = {
   open: boolean;
   team?: Team;
   onClose: () => void;
+};
+
+type CreateUpdateTeamForm = {
+  teamName: string;
+  teamUsers: User[];
 };
 
 export const CreateUpdateTeamModal = (props: CreateTeamModalProps) => {
@@ -30,36 +37,57 @@ export const CreateUpdateTeamModal = (props: CreateTeamModalProps) => {
   const { mutate: updateTeam } = useUpdateTeam();
   const { data: users = [] } = useGetAllUsers();
 
-  const [teamName, setTeamName] = useState(team?.name || "");
-  const [selectedUsers, setSelectedUsers] = useState<User[]>();
+  const {
+    control: createUpdateTeam,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors, isValid },
+  } = useForm<CreateUpdateTeamForm>({
+    mode: "onChange",
+    defaultValues: {
+      teamName: team?.name || "",
+      teamUsers: team?.users || [],
+    },
+  });
 
   useEffect(() => {
-    if (team?.users) {
-      setSelectedUsers(users.filter((user) => team?.users.includes(user.id)));
+    if (team) {
+      reset({
+        teamName: team?.name || "",
+        teamUsers: team?.users || [],
+      });
+    } else {
+      reset({
+        teamName: "",
+        teamUsers: undefined,
+      });
     }
-  }, [open, team?.users, users]);
+  }, [open, reset, team, team?.users, users]);
 
-  const handleClick = () => {
+  const handleClick = (formData: CreateUpdateTeamForm) => {
+    const userIds = formData.teamUsers.map((user) => user.id);
     if (!team) {
       createTeam({
-        name: teamName,
-        users: selectedUsers?.map((user) => user.id || "") || [],
+        name: formData.teamName,
+        users: userIds || [],
       });
     } else {
       updateTeam({
         id: team.id,
-        name: teamName,
-        users: selectedUsers?.map((user) => user.id || "") || [],
+        name: formData.teamName,
+        users: userIds || [],
       });
     }
-
-    setSelectedUsers(undefined);
+    reset();
     onClose();
   };
 
   return (
     <Modal open={open} onClose={onClose}>
       <Box
+        component={"form"}
+        onSubmit={handleSubmit((data) => handleClick(data))}
         sx={{
           position: "absolute",
           top: "50%",
@@ -79,46 +107,75 @@ export const CreateUpdateTeamModal = (props: CreateTeamModalProps) => {
           {!team ? "Create Team" : "Edit Team"}
         </Typography>
 
-        <TextField
-          required
-          id="filled-basic"
-          label="Team name"
-          placeholder="Fill name"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setTeamName(event.target.value);
+        <Controller
+          name="teamName"
+          control={createUpdateTeam}
+          rules={{
+            required: "Team name is required!",
+            validate: (value) =>
+              value.length >= 3 || "First name must be at least 3 characters",
           }}
-          defaultValue={team?.name}
-        />
-
-        <Autocomplete
-          multiple
-          id="fixed-tags-demo"
-          value={selectedUsers}
-          onChange={(event, newValue) => {
-            setSelectedUsers(newValue);
-          }}
-          options={users}
-          getOptionLabel={(option) => option.firstName}
-          renderValue={(values, getItemProps) =>
-            values.map((option, index) => {
-              const { key, ...itemProps } = getItemProps({ index });
-              return <Chip key={key} label={option.firstName} {...itemProps} />;
-            })
-          }
-          renderInput={(params) => (
+          render={({ field }) => (
             <TextField
-              {...params}
-              label="Team users"
-              placeholder="Team mates"
+              {...field}
+              required
+              error={!!errors.teamName}
+              label="Team name"
+              placeholder="Fill name"
+              onChange={(e) => {
+                field.onChange(e);
+              }}
+              defaultValue={team?.name}
+              helperText={errors.teamName?.message}
             />
           )}
         />
-        <Button variant="contained" onClick={handleClick} disabled={Boolean(!teamName || !selectedUsers)}>
+        <Controller
+          name="teamUsers"
+          control={createUpdateTeam}
+          rules={{
+            required: "Team users is required!",
+          }}
+          render={({ field }) => (
+            <Autocomplete
+              {...field}
+              multiple
+              onChange={(_e, value) => {
+                setValue("teamUsers", value, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+              }}
+              options={users}
+              getOptionLabel={(option) => option.display_name}
+              renderValue={(values, getItemProps) =>
+                values.map((option, index) => {
+                  const { key, ...itemProps } = getItemProps({ index });
+                  return (
+                    <Chip key={key} label={option.display_name} {...itemProps} />
+                  );
+                })
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Team users"
+                  placeholder="Team mates"
+                  helperText={errors.teamUsers?.message}
+                />
+              )}
+            />
+          )}
+        />
+        <Button variant="contained" type="submit" disabled={!isValid}>
           {!team ? "Create" : "Edit"}
         </Button>
-        <Button variant="contained" onClick={onClose}>
-          Close
-        </Button>
+        <CommonButton
+          text={"Close"}
+          style={{ bgcolor: "#2a70f3", color: "white" }}
+          variant="contained"
+          onClick={onClose}
+        />
       </Box>
     </Modal>
   );

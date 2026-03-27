@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import type { Team, TeamPayload } from "./teamTypes";
+import type { ActionUserToTeam, Team, TeamPayload } from "./teamTypes";
 import { axiosClient } from "../../config/axios.config";
 import { queryClient } from "../../config/queryClient.config";
 
@@ -21,11 +21,7 @@ export const useGetAllTeams = () => {
 export const useCreateTeam = () => {
   return useMutation({
     mutationFn: async (data: TeamPayload) => {
-      const response = await axiosClient.post("/teams", {
-        ...data,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      const response = await axiosClient.post("/teams",data);
       return response;
     },
     onSuccess: () => {
@@ -36,28 +32,51 @@ export const useCreateTeam = () => {
 
 export const useUpdateTeam = () => {
   return useMutation({
-    mutationFn: async (data: TeamPayload & { id: string }) => {
-      const response = await axiosClient.patch(`teams/${data.id}`, {
-        ...data,
-        updatedAt: new Date().getTime(),
-      });
+    mutationFn: async ({id, ...payload}: TeamPayload& {id:number}) => {
+      const response = await axiosClient.patch(`/teams/${id}`, payload);
       return response.data;
     },
-    onSuccess: (team) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: teamKeys.teamDetails(team.data.id),
+        queryKey: teamKeys.allTeams,
       });
-       queryClient.invalidateQueries({
-         queryKey: teamKeys.allTeams,
-       });
+    },
+  });
+};
+
+export const useAddUserToTeam = () => {
+  return useMutation({
+    mutationFn: async (data: ActionUserToTeam) => {
+      const response = await axiosClient.patch(`/teams/${data.id}`, data);
+
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.allTeams,
+      });
+    },
+  });
+};
+
+export const useRemoveUserToTeam = () => {
+  return useMutation({
+    mutationFn: async (data: ActionUserToTeam) => {
+      const response = await axiosClient.patch(`/teams/${data.id}`, data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.allTeams,
+      });
     },
   });
 };
 
 export const useDeleteTeam = () => {
   return useMutation({
-    mutationFn: async (teamId: string) => {
-      const response = await axiosClient.delete(`teams/${teamId}`);
+    mutationFn: async (teamId: number) => {
+      const response = await axiosClient.delete(`/teams/${teamId}`);
       return response.data;
     },
     onSuccess: (team) => {

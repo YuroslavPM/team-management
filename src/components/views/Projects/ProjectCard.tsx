@@ -1,16 +1,11 @@
-import {
-  Card,
-  CardContent,
-  Avatar,
-  Typography,
-  CardActions,
-  Button,
-} from "@mui/material";
+import { Card, CardContent, Avatar, CardActions } from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
 import { useGetAllUsers } from "../../../api/userController";
 import { useGetAllTeams } from "../../../api/teams/teamController";
 import type { Project } from "../../../api/projects/projectTypes";
 import { useNavigate } from "react-router-dom";
+import { CommonText } from "../../common/CommonText";
+import { CommonButton } from "../../common/CommonButton";
 
 export type ProjectCardProps = {
   project: Project;
@@ -26,6 +21,7 @@ export const ProjectCard = ({
   const { data: users } = useGetAllUsers();
   const { data: teams } = useGetAllTeams();
   const navigate = useNavigate();
+
   return (
     <Card
       sx={{
@@ -40,66 +36,63 @@ export const ProjectCard = ({
         <Avatar sx={{ bgcolor: deepOrange[500] }}>
           {project?.name.charAt(0).toUpperCase()}
         </Avatar>
-        <Typography variant="h5" component="div">
-          {project.name}
-        </Typography>
-        <Typography variant="body2">Status: {project.status}</Typography>
-        <Typography variant="body2">
-          Admins:{" "}
-          {users
-            ?.filter((user) => project.adminIds.includes(user.id))
-            .map((u) => u.firstName)
+
+        <CommonText
+          value={project.name}
+          variant={"h5"}
+        />
+        <CommonText
+          text={"Status: "}
+          variant={"body2"}
+          value={project.status}
+        />
+        <CommonText
+          text={"Members: "}
+          value={users
+            ?.filter((user) => project.members?.includes(user.id))
+            .map((u) => u.first_name)
             .join(", ")}
-        </Typography>
-        <Typography variant="body2">
-          Members:{" "}
-          {users
-            ?.filter((user) => project.memberIds.includes(user.id))
-            .map((u) => u.firstName)
+          variant={"body2"}
+        />
+
+        <CommonText
+          text={"Admins: "}
+          value={users
+            ?.filter((user) => project.admins?.includes(user.id))
+            .map((u) => u.first_name)
             .join(", ")}
-        </Typography>
-        <Typography variant="body2">
-          {project.teamIds
-            ? `Teams: ${teams
-                ?.filter((team) => project.teamIds.includes(team.id))
-                .map((t) => t.name)
-                .join(", ")}`
-            : ""}
-        </Typography>
+          variant={"body2"}
+        />
+        <CommonText
+          text={"Teams: "}
+          value={teams
+            ?.filter((team) => project.teams?.includes(team.id))
+            .map((t) => t.name)
+            .join(", ")}
+          variant={"body2"}
+        />
       </CardContent>
       <CardActions>
-        <Button
+        <CommonButton
+          text={"Edit"}
+          style={{ bgcolor: "#87CEEB", color: "white" }}
           size="small"
           onClick={onEditClick}
-          sx={{
-            bgcolor: "#87CEEB",
-            color: "white",
-          }}
-        >
-          Edit
-        </Button>
-        <Button
+        />
+        <CommonButton
+          text={"Details"}
+          style={{ bgcolor: "orange", color: "white" }}
           size="small"
-          sx={{
-            bgcolor: "orange",
-            color: "white",
-          }}
           onClick={() => {
             navigate(`${project.id}`);
           }}
-        >
-          Details
-        </Button>
-        <Button
+        />
+        <CommonButton
+          text={"Delete"}
+          style={{ bgcolor: "red", color: "white" }}
           size="small"
-          sx={{
-            bgcolor: "red",
-            color: "white",
-          }}
           onClick={onDelete}
-        >
-          Delete
-        </Button>
+        />
       </CardActions>
     </Card>
   );

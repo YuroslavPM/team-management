@@ -1,67 +1,58 @@
-import * as React from "react";
-import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { useCreateUser } from "../../api/userController";
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
+import { Controller, useForm } from "react-hook-form";
+import { getApiError } from "../../utils/helpers/genericAxiosHelper";
+
+type RegisterForm = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  secret: string;
+};
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const {
+    mutate: createUser,
+    error,
+    isError,
+  } = useCreateUser(() => {
+    navigate("/login");
+  });
 
-  const [firstName, setFirstName] = useState("");
-  const [firstNameError, setFirstNameError] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [lastNameError, setLastNameError] = useState("");
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [secret, setSecret] = useState("");
-  const [secretError, setSecretError] = useState("");
+  const {
+    control: register,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid },
+  } = useForm<RegisterForm>({
+    mode: "onChange",
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      email: "",
+      secret: "",
+    },
+  });
 
-  const { mutate } = useCreateUser();
-
-  const handleClick = () => {
-    mutate(
-      { email, firstName, lastName, secret },
-      {
-        onSuccess: () => {
-          navigate("/login");
-        },
-      },
-    );
+  const handleClick = (formData: RegisterForm) => {
+    createUser({
+      first_name: formData?.first_name,
+      last_name: formData?.last_name,
+      email: formData?.email,
+      secret: formData?.secret
+    });
+    
+    reset();
   };
-
-  const validate = () => {
-    let isValid = true;
-
-    if (!firstName) {
-      setFirstNameError("First name is required!");
-      isValid = false;
-    }
-    if (!lastName) {
-      setLastNameError("Last name is required!");
-      isValid = false;
-    }
-    if (!email) {
-      setEmailError("Email is required!");
-      isValid = false;
-    }
-    if (!secret) {
-      setSecretError("Password is required!");
-      isValid = false;
-    }
-
-    return isValid;
-  };
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    validate();
-  }, [firstName, lastName, email, secret]);
 
   return (
     <Box
+      component={"form"}
+      onSubmit={handleSubmit((data) => handleClick(data))}
       sx={{
         display: "flex",
         position: "fixed",
@@ -83,75 +74,93 @@ export default function RegisterPage() {
           Register
         </Typography>
 
-        <TextField
-          id="outlined-controlled"
-          label="First Name"
-          value={firstName}
-          error={!!firstNameError}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            if (event.target.value) {
-              setFirstNameError("");
-            } else {
-              setFirstNameError("Name is required!");
-            }
-            setFirstName(event.target.value);
+        <Controller
+          name="first_name"
+          control={register}
+          rules={{
+            required: "First name is required!",
+            validate: (value) =>
+              value.length > 2 || "First name must be at least 3 characters",
           }}
-          helperText={firstNameError}
-        />
-        <TextField
-          id="outlined-controlled"
-          label="Last Name"
-          value={lastName}
-          error={!!lastNameError}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            if (event.target.value) {
-              setLastNameError("");
-            } else {
-              setLastNameError("Last name is required!");
-            }
-            setLastName(event.target.value);
-          }}
-          helperText={lastNameError}
-        />
-        <TextField
-          id="outlined-controlled"
-          label="Email"
-          type="email"
-          value={email}
-          error={!!emailError}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            if (event.target.value) {
-              setEmailError("");
-            } else {
-              setEmailError("Email is required!");
-            }
-            setEmail(event.target.value);
-          }}
-          helperText={emailError}
-        />
-        <TextField
-          id="outlined-controlled"
-          label="Password"
-          type="password"
-          value={secret}
-          error={!!secretError}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            if (event.target.value) {
-              setSecretError("");
-            } else {
-              setSecretError("Password is required!");
-            }
-            setSecret(event.target.value);
-          }}
-          helperText={secretError}
-        />
-        <Button
-          variant="contained"
-          onClick={handleClick}
-          disabled={Boolean(
-            firstNameError || lastNameError || emailError || secretError,
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="First Name"
+              error={!!errors.first_name}
+              onChange={(e) => {
+                field.onChange(e);
+              }}
+              helperText={errors.first_name?.message}
+            />
           )}
-        >
+        />
+        <Controller
+          name="last_name"
+          control={register}
+          rules={{
+            required: "Last name is required!",
+            validate: (value) =>
+              value.length > 3 || "Last name must be at least 3 characters",
+          }}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="Last Name"
+              error={!!errors.last_name}
+              onChange={(e) => {
+                field.onChange(e);
+              }}
+              helperText={errors.last_name?.message}
+            />
+          )}
+        />
+        <Controller
+          name="email"
+          control={register}
+          rules={{
+            required: "Email is required!",
+            validate: (value) => value.includes("@") || "Invalid email address",
+          }}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="Email"
+              type="email"
+              error={!!errors.email}
+              onChange={(e) => {
+                field.onChange(e);
+              }}
+              helperText={errors.email?.message}
+            />
+          )}
+        />
+        <Controller
+          name="secret"
+          control={register}
+          rules={{
+            required: "Password is required!",
+            validate: (value) =>
+              value.length >= 6 || "Password must be at least 6 characters",
+          }}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="Password"
+              type="password"
+              error={!!errors.secret}
+              onChange={(e) => {
+                field.onChange(e);
+              }}
+              helperText={errors.secret?.message}
+            />
+          )}
+        />
+        {isError && (
+          <Typography color="error">
+            {getApiError(error) || "Registration failed"}
+          </Typography>
+        )}
+        <Button variant="contained" type="submit" disabled={!isValid}>
           Register
         </Button>
         <Typography gutterBottom sx={{ color: "text.secondary", fontSize: 16 }}>

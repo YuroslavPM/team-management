@@ -1,16 +1,16 @@
 export type User = {
-  id: string;
-  displayName: string;
+  id: number;
+  display_name: string;
   email: string;
   secret: string;
-  firstName: string;
-  lastName: string;
-  createdAt: Date;
-  updatedAt: Date;
+  first_name: string;
+  last_name: string;
+  is_admin: boolean;
 };
 
 export type EditUser = {
-  id: string;
-  firstName: string;
-  lastName: string;
-}
+  id: number;
+  first_name: string;
+  last_name: string;
+  is_admin: boolean;
+};

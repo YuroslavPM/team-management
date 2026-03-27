@@ -1,17 +1,33 @@
 import { axiosClient } from "../config/axios.config";
 import { queryClient } from "../config/queryClient.config";
-import type { RegisterPayload } from "./authTypes";
+import type { Login, RegisterPayload } from "./authTypes";
 import type { EditUser, User } from "./userTypes";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const userKeys = {
   allUsers: ["allUsers"],
+  currentUser: ["currentUser"],
   userDetails: (userId: number) => [userKeys.allUsers, `userDetails-${userId}`],
+};
+
+export const useCurrentUser = () => {
+  const hasToken = !!localStorage.getItem("authToken");
+
+  return useQuery<User>({
+    queryKey: userKeys.currentUser,
+    queryFn: async () => {
+      const response = await axiosClient.get("/users/me");
+      return response.data;
+    },
+    enabled: hasToken,
+    retry: false,
+    staleTime: 0,
+  });
 };
 
 export const useGetAllUsers = () => {
   return useQuery<User[]>({
-    queryKey: [userKeys.allUsers],
+    queryKey: userKeys.allUsers,
     queryFn: async () => {
       const response = await axiosClient.get(`/users`);
 
@@ -20,27 +36,41 @@ export const useGetAllUsers = () => {
   });
 };
 
-export const useCreateUser = () => {
+export const useCreateUser = (onSuccessCallback?: () => void) => {
   return useMutation({
     mutationFn: async (data: RegisterPayload) => {
-      const fetchedUsers = queryClient.getQueryData<User[]>(userKeys.allUsers);
-
-      const duplicatedEmail = fetchedUsers?.find((u) => u.email === data.email);
-
-      if (duplicatedEmail) {
-        throw new Error("Email already exists!");
-      }
-
-      const response = await axiosClient.post("/users", {
-        ...data,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
+      const response = await axiosClient.post("/users", data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.allUsers });
+      if (onSuccessCallback) onSuccessCallback();
+    },
+  });
+};
+
+export const useLogin = (onSuccessCallback?: (data: Login) => void) => {
+  return useMutation({
+    mutationFn: async (data: { email: string; secret: string }) => {
+      const response = await axiosClient.post("/login", {
+        username: data.email,
+        password: data.secret,
+      });
+      return response.data;
+    },
+    onSuccess: async (data) => {
+      localStorage.setItem("authToken", data.token);
+      axiosClient.defaults.headers.common["Authorization"] =
+        `Token ${data.token}`;
+
+      await queryClient.fetchQuery({
+        queryKey: userKeys.currentUser,
+        queryFn: async () => {
+          const response = await axiosClient.get("/users/me");
+          return response.data;
+        },
+      });
+      if (onSuccessCallback) onSuccessCallback(data);
     },
   });
 };
@@ -58,17 +88,21 @@ export const useGetUserById = (id: number) => {
 export const useUpdateUser = () => {
   return useMutation({
     mutationFn: async (data: EditUser) => {
-      const response = await axiosClient.patch(`users/${data.id}`, {
-        ...data,
-        updatedAt: new Date(),
-      });
+      const response = await axiosClient.patch(`/users/${data.id}`, data);
 
       return response.data;
     },
-    onSuccess: (user) => {
+
+    onSuccess: (updatedUser: User) => {
       queryClient.invalidateQueries({
-        queryKey: userKeys.userDetails(user.id),
+        queryKey: userKeys.allUsers,
       });
+      const me = queryClient.getQueryData<User>(userKeys.currentUser);
+      if (me?.id === updatedUser.id) {
+        queryClient.invalidateQueries({
+          queryKey: userKeys.currentUser,
+        });
+      }
     },
   });
 };
@@ -76,12 +110,15 @@ export const useUpdateUser = () => {
 export const useDeleteUser = () => {
   return useMutation({
     mutationFn: async (userId: string) => {
-      const response = await axiosClient.delete(`users/${userId}`);
-      return response.data;
+      await axiosClient.delete(`/users/${userId}`);
+      return userId;
     },
-    onSuccess: (user) => {
+    onSuccess: (deletedId: string) => {
       queryClient.invalidateQueries({
-        queryKey: userKeys.userDetails(user.id),
+        queryKey: userKeys.userDetails(Number(deletedId)),
+      });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.allUsers,
       });
     },
   });

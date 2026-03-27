@@ -2,13 +2,13 @@ import {
   Card,
   CardContent,
   Avatar,
-  Typography,
   CardActions,
-  Button,
 } from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
 import type { Team } from "../../../api/teams/teamTypes";
 import { useGetAllUsers } from "../../../api/userController";
+import { CommonText } from "../../common/CommonText";
+import { CommonButton } from "../../common/CommonButton";
 
 type TeamCardProps = {
   team: Team;
@@ -37,38 +37,32 @@ export const TeamCard = ({
         <Avatar sx={{ bgcolor: deepOrange[500] }}>
           {team?.name.charAt(0).toUpperCase()}
         </Avatar>
-        <Typography variant="h5" component="div">
-          {team.name}
-        </Typography>
-        <Typography variant="body2">
-          Mates:{" "}
-          {users
-            ?.filter((user) => team.users.includes(user.id))
-            .map((u) => u.firstName)
+        <CommonText
+          value={team.name}
+          variant={"h5"}
+        />
+        <CommonText
+          text={"Mates:"}
+          value={users
+            ?.filter((user) => team.users.some((teamUsers)=> teamUsers.id === user.id))
+            .map((u) => u.first_name)
             .join(", ")}
-        </Typography>
+          variant={"body2"}
+        />
       </CardContent>
       <CardActions>
-        <Button
+        <CommonButton
+          text={"Edit"}
+          style={{ bgcolor: "#87CEEB", color: "white" }}
           size="small"
           onClick={onEditClick}
-          sx={{
-            bgcolor: "#87CEEB",
-            color: "white",
-          }}
-        >
-          Edit
-        </Button>
-        <Button
+        />
+        <CommonButton
+          text={"Delete"}
+          style={{ bgcolor: "red", color: "white" }}
           size="small"
-          sx={{
-            bgcolor: "red",
-            color: "white",
-          }}
           onClick={onDeleteClick}
-        >
-          Delete
-        </Button>
+        />
       </CardActions>
     </Card>
   );

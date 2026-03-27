@@ -1,23 +1,20 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import type { User } from "../../api/userTypes";
-import { useGetAllUsers } from "../../api/userController";
+import { useCurrentUser, userKeys } from "../../api/userController";
+import { useQueryClient } from "@tanstack/react-query";
 
 type AuthContextProps = {
-  currentUser: User | undefined;
-  setCurrentUser: React.Dispatch<React.SetStateAction<User | undefined>>;
+  currentUser?: User;
+  isAuthenticated: boolean;
+  isLoading: boolean;
   handleLogout: () => void;
 };
 
 const initialValues: AuthContextProps = {
   currentUser: undefined,
-  setCurrentUser: () => null,
+  isAuthenticated: false,
+  isLoading: true,
   handleLogout: () => null,
 };
 
@@ -25,49 +22,25 @@ const initialValues: AuthContextProps = {
 export const UserContext = createContext<AuthContextProps>(initialValues);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [currentUser, setCurrentUser] = useState<User | undefined>(
-    initialValues.currentUser,
-  );
-
-  const { data: users } = useGetAllUsers();
-
-  useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem("user", JSON.stringify(currentUser));
-    }
-  }, [currentUser]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("user");
-    if (!saved) {
-      return;
-    }
-
-    const parsed = JSON.parse(saved || "") as User;
-
-    if (parsed) {
-      const validUser = users?.find(
-        (x) =>
-          x.id === parsed.id &&
-          x.email === parsed.email &&
-          x.secret === parsed.secret,
-      );
-
-      if (validUser) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setCurrentUser(validUser);
-      }
-    }
-  }, [users]);
+  const queryClient = useQueryClient();
+  const { data: currentUser, isLoading } = useCurrentUser();
+  const hasToken = !!localStorage.getItem("authToken");
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-
-    setCurrentUser(undefined);
+    localStorage.removeItem("authToken");
+    queryClient.removeQueries({ queryKey: userKeys.currentUser });
+    window.location.href = "/login";
   };
 
   return (
-    <UserContext.Provider value={{ currentUser, setCurrentUser, handleLogout }}>
+    <UserContext.Provider
+      value={{
+        currentUser,
+        isAuthenticated: !!currentUser,
+        isLoading: hasToken && isLoading,
+        handleLogout,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );

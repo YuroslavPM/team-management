@@ -1,49 +1,255 @@
-import * as React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-import { Button, TextField } from "@mui/material";
-import { useState } from "react";
-import { userAuthContext } from "../../../utils/context/UserContext";
-import { useNavigate } from "react-router-dom";
+import {
+  Autocomplete,
+  Button,
+  Checkbox,
+  Chip,
+  FormControlLabel,
+  TextField,
+} from "@mui/material";
+import { useEffect } from "react";
 import { useUpdateUser } from "../../../api/userController";
+import { CommonButton } from "../../common/CommonButton";
+import type { User } from "../../../api/userTypes";
+import { Controller, useForm } from "react-hook-form";
+import type { Team } from "../../../api/teams/teamTypes";
+import {
+  useAddUserToTeam,
+  useGetAllTeams,
+  useRemoveUserToTeam,
+} from "../../../api/teams/teamController";
+import {
+  useAddUserToProject,
+  useGetAllProjects,
+  useRemoveUserToProject,
+} from "../../../api/projects/projectController";
+import {
+  useAddUserToTask,
+  useGetAllTasks,
+  useRemoveUserToTask,
+} from "../../../api/tasks/taskController";
+import type { Project } from "../../../api/projects/projectTypes";
+import type { Task } from "../../../api/tasks/taskTypes";
 
 type EditUserModalProps = {
   open: boolean;
   onClose: () => void;
+  user: User;
+};
+
+type EditUserForm = {
+  first_name: string;
+  last_name: string;
+  is_admin: boolean;
+  teams: Team[] | undefined;
+  projects: Project[] | undefined;
+  tasks: Task[] | undefined;
 };
 
 export const EditUserModal = (props: EditUserModalProps) => {
-  const { onClose, open } = props;
+  const { onClose, open, user } = props;
 
-  const { currentUser, setCurrentUser } = userAuthContext();
-  const [firstName, setFirstName] = useState(currentUser?.firstName);
-  const [lastName, setLastName] = useState(currentUser?.lastName);
+  const { mutate: updateUser } = useUpdateUser();
+  const { mutate: addUserToTeam } = useAddUserToTeam();
+  const { mutate: removeUserToTeam } = useRemoveUserToTeam();
+  const { mutate: addUserToProject } = useAddUserToProject();
+  const { mutate: removeUserToProject } = useRemoveUserToProject();
+  const { mutate: addUserToTask } = useAddUserToTask();
+  const { mutate: removeUserToTask } = useRemoveUserToTask();
+  const { data: allTeams } = useGetAllTeams();
+  const { data: allProjects } = useGetAllProjects();
+  const { data: allTasks } = useGetAllTasks();
 
-  const navigate = useNavigate();
-  const { mutate } = useUpdateUser();
+  const userTeams = allTeams?.filter((team) =>
+    team.users.find((x) => x.id === user?.id),
+  );
 
-  const handleClick = () => {
-    if (currentUser?.id && currentUser?.firstName && currentUser?.lastName) {
-      mutate(
+  const userProjects = allProjects?.filter(
+    (project) =>
+      project.admins.find((admin) => admin === user?.id) ||
+      project.members.find((member) => member === user?.id),
+  );
+
+  const userTasks = allTasks?.filter((task) => {
+    const assigned = task.assigned_user;
+    if (Array.isArray(assigned)) {
+      return assigned.includes(user?.id);
+    }
+    return assigned === user?.id;
+  });
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors, isValid },
+  } = useForm<EditUserForm>();
+
+  const teams = watch("teams") || [];
+  const projects = watch("projects") || [];
+  const tasks = watch("tasks") || [];
+
+  useEffect(() => {
+    if (!open) return;
+    if (user) {
+      reset({
+        first_name: user?.first_name ?? "",
+        last_name: user?.last_name ?? "",
+        is_admin: user?.is_admin ?? false,
+        teams: userTeams ?? [],
+        projects: userProjects ?? [],
+        tasks: userTasks ?? [],
+      });
+    } else {
+      reset({
+        first_name: "",
+        last_name: "",
+        is_admin: false,
+        teams: [],
+        projects: [],
+        tasks: [],
+      });
+    }
+  }, [open]);
+
+  const handleClick = (formData: EditUserForm) => {
+    if (
+      user.id &&
+      (formData.first_name !== user.first_name ||
+        formData.last_name !== user.last_name ||
+        formData.is_admin !== user.is_admin)
+    ) {
+      updateUser(
         {
-          id: currentUser?.id,
-          firstName: firstName!,
-          lastName: lastName!,
+          id: user?.id,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          is_admin: formData.is_admin,
         },
         {
-          onSuccess: (data) => {
-            setCurrentUser(data.data);
+          onSuccess: () => {
             onClose();
           },
         },
       );
     }
-  };
+    if (formData.teams !== userTeams) {
+      const selectedTeams = formData.teams ?? [];
+      const userTeamIds = new Set(userTeams?.map((t) => t.id));
+      const selectedTeamIds = new Set(selectedTeams.map((t) => t.id));
 
-  if (!currentUser) {
-    navigate("/login");
-  }
+      const teamIn = selectedTeams.filter((t) => !userTeamIds.has(t.id));
+      const teamOut =
+        userTeams?.filter((t) => !selectedTeamIds.has(t.id)) ?? [];
+
+      teamIn.map((team) => {
+        const updatedUsers = [...team.users, user.id];
+
+        addUserToTeam({
+          id: team.id,
+          users: updatedUsers,
+        });
+      });
+
+      teamOut.map((team) => {
+        const updatedUsers = team.users.filter((u) => u.id !== user.id);
+
+        removeUserToTeam({
+          id: team.id,
+          users: updatedUsers,
+        });
+      });
+    }
+
+    if (formData.projects !== userProjects) {
+      const selectedProjects = formData.projects ?? [];
+      const userProjectIds = new Set(userProjects?.map((p) => p.id));
+      const selectedProjectIds = new Set(selectedProjects?.map((p) => p.id));
+
+      const projectIn = selectedProjects.filter(
+        (p) => !userProjectIds.has(p.id),
+      );
+
+      const projectOut =
+        userProjects?.filter((p) => !selectedProjectIds.has(p.id)) ?? [];
+
+      projectIn.map((project) => {
+        const updateAdmins = [...project.admins, user.id];
+        addUserToProject({
+          id: project.id,
+          admins: updateAdmins,
+          members: project.members,
+        });
+      });
+
+      projectOut.map((project) => {
+        const updateAdmins = project.admins.filter((u) => u !== user.id);
+        const updateMembers = project.members.filter((u) => u !== user.id);
+        removeUserToProject({
+          id: project.id,
+          admins: updateAdmins,
+          members: updateMembers,
+        });
+      });
+    }
+
+    if (formData.tasks !== userTasks) {
+      const selectedTasks = formData.tasks ?? [];
+      const userTaskIds = new Set(userTasks?.map((p) => p.id));
+      const selectedTaskIds = new Set(selectedTasks?.map((p) => p.id));
+
+      const taskIn = selectedTasks.filter((p) => !userTaskIds.has(p.id));
+
+      const taskOut =
+        userTasks?.filter((p) => !selectedTaskIds.has(p.id)) ?? [];
+
+      taskIn.map((task) => {
+        const updateAssigned = [
+          ...(Array.isArray(task.assigned_user) ? task.assigned_user : []),
+          user.id,
+        ];
+
+        const taskProjectId = task.project;
+
+        const project = allProjects?.find(
+          (project) => project.id === taskProjectId,
+        );
+
+        const isMember = project?.members.includes(user.id);
+        const is_admin = project?.admins.includes(user.id);
+
+        if (!isMember && !is_admin && project) {
+          const updateAdmins = [...project.admins, user.id];
+
+          addUserToProject({
+            id: project.id,
+            members: project.members,
+            admins: updateAdmins,
+          });
+        }
+
+        addUserToTask({
+          id: task.id,
+          assigned_user: updateAssigned,
+        });
+      });
+
+      taskOut.map((task) => {
+        const updateAssigned = task.assigned_user.filter((u) => u !== user.id);
+        removeUserToTask({
+          id: task.id,
+          assigned_user: updateAssigned,
+        });
+      });
+    }
+
+    reset();
+    onClose();
+  };
 
   return (
     <Modal
@@ -52,51 +258,184 @@ export const EditUserModal = (props: EditUserModalProps) => {
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
-      <Box sx={{
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        width: 400,
-        bgcolor: "background.paper",
-        border: "2px solid #000",
-        boxShadow: 24,
-        p: 4,
-        display: "flex",
-        flexDirection: "column",
-        gap: 1,}
-        }>
+      <Box
+        component={"form"}
+        onSubmit={handleSubmit((data) => {
+          handleClick(data);
+        })}
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 400,
+          bgcolor: "background.paper",
+          border: "2px solid #000",
+          boxShadow: 24,
+          p: 4,
+          display: "flex",
+          flexDirection: "column",
+          gap: 1,
+        }}
+      >
         <Typography id="modal-modal-title" variant="h6" component="h2">
           Edit Profile
         </Typography>
-        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          First Name
-        </Typography>
-        <TextField
-          required
-          id="filled-basic"
-          defaultValue={currentUser?.firstName}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setFirstName(event.target.value);
+        <Controller
+          name="first_name"
+          control={control}
+          rules={{
+            validate: (value) =>
+              value.length >= 3 || "First name must be at least 3 characters",
           }}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              required
+              placeholder="First name"
+              defaultValue={user?.first_name}
+              error={!!errors.first_name}
+              onChange={(e) => {
+                field.onChange(e);
+              }}
+              helperText={errors.first_name?.message}
+            />
+          )}
         />
-        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          Last Name
-        </Typography>
-        <TextField
-          required
-          id="filled-basic"
-          defaultValue={currentUser?.lastName}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setLastName(event.target.value);
+        <Controller
+          name="last_name"
+          control={control}
+          rules={{
+            validate: (value) =>
+              value.length >= 3 || "Last name must be at least 3 characters",
           }}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              required
+              placeholder="Last name"
+              defaultValue={user?.last_name}
+              error={!!errors.last_name}
+              onChange={(e) => {
+                field.onChange(e);
+              }}
+              helperText={errors.last_name?.message}
+            />
+          )}
         />
-        <Button variant="contained" onClick={handleClick}>
+        <Controller
+          name="is_admin"
+          control={control}
+          render={({ field }) => (
+            <FormControlLabel
+              {...field}
+              control={
+                <Checkbox
+                  checked={!!field.value}
+                  onChange={(e) => {
+                    field.onChange(e.target.checked);
+                  }}
+                />
+              }
+              label="Admin"
+            />
+          )}
+        />
+        <Controller
+          name="teams"
+          control={control}
+          render={({ field }) => (
+            <Autocomplete
+              {...field}
+              multiple
+              options={allTeams?.filter((x) => !teams.includes(x)) || []}
+              getOptionLabel={(option) => option.name}
+              onChange={(_e, value) => {
+                setValue("teams", value);
+              }}
+              renderValue={(values, getItemProps) =>
+                values.map((option, index) => {
+                  const { key, ...itemProps } = getItemProps({ index });
+                  return <Chip key={key} label={option?.name} {...itemProps} />;
+                })
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Assign team"
+                  placeholder="Assign team"
+                />
+              )}
+            />
+          )}
+        />
+        <Controller
+          name="projects"
+          control={control}
+          render={({ field }) => (
+            <Autocomplete
+              {...field}
+              multiple
+              options={allProjects?.filter((x) => !projects.includes(x)) || []}
+              getOptionLabel={(option) => option.name}
+              onChange={(_e, value) => {
+                setValue("projects", value);
+              }}
+              renderValue={(values, getItemProps) =>
+                values.map((option, index) => {
+                  const { key, ...itemProps } = getItemProps({ index });
+                  return <Chip key={key} label={option?.name} {...itemProps} />;
+                })
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Assign project"
+                  placeholder="Assign project"
+                />
+              )}
+            />
+          )}
+        />
+        <Controller
+          name="tasks"
+          control={control}
+          render={({ field }) => (
+            <Autocomplete
+              {...field}
+              multiple
+              options={allTasks?.filter((x) => !tasks.includes(x)) || []}
+              getOptionLabel={(option) => option.title}
+              onChange={(_e, value) => {
+                setValue("tasks", value);
+              }}
+              renderValue={(values, getItemProps) =>
+                values.map((option, index) => {
+                  const { key, ...itemProps } = getItemProps({ index });
+                  return (
+                    <Chip key={key} label={option?.title} {...itemProps} />
+                  );
+                })
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Assign task"
+                  placeholder="Assign task"
+                />
+              )}
+            />
+          )}
+        />
+        <Button type="submit" variant="contained" disabled={!isValid}>
           Redact
         </Button>
-        <Button variant="contained" onClick={onClose}>
-          Close
-        </Button>
+        <CommonButton
+          text={"Close"}
+          style={{ bgcolor: "#2a70f3", color: "white" }}
+          variant="contained"
+          onClick={onClose}
+        />
       </Box>
     </Modal>
   );
