@@ -7,6 +7,7 @@ import {
   Avatar,
   Box,
 } from "@mui/material";
+import { getRandomColorByString } from "../../../../utils/helpers/randomColor";
 
 export type TotalTeamsProps = {
   sx?: SxProps;
@@ -21,15 +22,6 @@ export const TotalCard = ({
   title,
   icon,
 }: TotalTeamsProps) => {
-
-const stringToColor = (input: string ) => {
-
-    let hash = 0;
-    for (let i = 0; i < input.length; i++) {
-      hash = input.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return `hsl(${hash % 360}, 70%, 55%)`;
-  };
 
   return (
     <Card sx={sx}>
@@ -48,7 +40,7 @@ const stringToColor = (input: string ) => {
             </Stack>
             <Avatar
               sx={{
-                bgcolor: stringToColor(title),
+                bgcolor: getRandomColorByString(title),
                 height: 56,
                 width: 56,
               }}
