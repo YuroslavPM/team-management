@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { createContext, useContext, type ReactNode } from "react";
 import type { User } from "../../api/userTypes";
-import { useMe, userKeys } from "../../api/userController";
+import { useCurrentUser, userKeys } from "../../api/userController";
 import { useQueryClient } from "@tanstack/react-query";
 
 type AuthContextProps = {
-  currentUser: User | undefined;
+  currentUser?: User;
   isAuthenticated: boolean;
   isLoading: boolean;
   handleLogout: () => void;
@@ -23,12 +23,12 @@ export const UserContext = createContext<AuthContextProps>(initialValues);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
-  const { data: currentUser, isLoading } = useMe();
+  const { data: currentUser, isLoading } = useCurrentUser();
   const hasToken = !!localStorage.getItem("authToken");
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
-    queryClient.removeQueries({ queryKey: userKeys.me });
+    queryClient.removeQueries({ queryKey: userKeys.currentUser });
     window.location.href = "/login";
   };
 

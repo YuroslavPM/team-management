@@ -1,19 +1,36 @@
-import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Stack from "@mui/material/Stack";
-import type { SxProps } from "@mui/material/styles";
-import Typography from "@mui/material/Typography";
-import TaskIcon from "@mui/icons-material/Task";
+import {
+  type SxProps,
+  Card,
+  CardContent,
+  Stack,
+  Typography,
+  Avatar,
+  Box,
+} from "@mui/material";
 
-export interface TotalTasksProps {
+export type TotalTeamsProps = {
   sx?: SxProps;
   value?: number;
-}
+  title: string;
+  icon: React.ReactElement;
+  };
 
-export const TotalTasks = ({ sx, value }: TotalTasksProps): React.JSX.Element => {
-  
+export const TotalCard = ({
+  sx,
+  value,
+  title,
+  icon,
+}: TotalTeamsProps) => {
+
+const stringToColor = (input: string ) => {
+
+    let hash = 0;
+    for (let i = 0; i < input.length; i++) {
+      hash = input.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return `hsl(${hash % 360}, 70%, 55%)`;
+  };
+
   return (
     <Card sx={sx}>
       <CardContent>
@@ -25,22 +42,22 @@ export const TotalTasks = ({ sx, value }: TotalTasksProps): React.JSX.Element =>
           >
             <Stack spacing={1}>
               <Typography color="text.secondary" variant="overline">
-                Total Tasks
+                {title}
               </Typography>
               <Typography variant="h4">{value}</Typography>
             </Stack>
             <Avatar
               sx={{
-                bgcolor: "#b436fd",
+                bgcolor: stringToColor(title),
                 height: 56,
                 width: 56,
               }}
             >
-              <TaskIcon fontSize="large" />
+              <Box>{icon}</Box>
             </Avatar>
           </Stack>
         </Stack>
       </CardContent>
     </Card>
   );
-}
+};

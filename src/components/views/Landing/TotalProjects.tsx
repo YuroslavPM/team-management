@@ -8,10 +8,11 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 
 export type TotalProjectsProps = {
   sx?: SxProps;
-  value: number | undefined;
+  value?: number;
 };
 
 export const TotalProjects = ({ sx, value }: TotalProjectsProps) => {
+  
   return (
     <Card sx={sx}>
       <CardContent>

@@ -12,7 +12,7 @@ export const useGetAllTeams = () => {
   return useQuery<Team[]>({
     queryKey: teamKeys.allTeams,
     queryFn: async () => {
-      const response = await axiosClient.get("/teams/");
+      const response = await axiosClient.get("/teams");
       return response.data;
     },
   });
@@ -21,7 +21,7 @@ export const useGetAllTeams = () => {
 export const useCreateTeam = () => {
   return useMutation({
     mutationFn: async (data: TeamPayload) => {
-      const response = await axiosClient.post("/teams/",data);
+      const response = await axiosClient.post("/teams",data);
       return response;
     },
     onSuccess: () => {
@@ -33,7 +33,7 @@ export const useCreateTeam = () => {
 export const useUpdateTeam = () => {
   return useMutation({
     mutationFn: async ({id, ...payload}: TeamPayload& {id:number}) => {
-      const response = await axiosClient.patch(`/teams/${id}/`, payload);
+      const response = await axiosClient.patch(`/teams/${id}`, payload);
       return response.data;
     },
     onSuccess: () => {
@@ -76,7 +76,7 @@ export const useRemoveUserToTeam = () => {
 export const useDeleteTeam = () => {
   return useMutation({
     mutationFn: async (teamId: number) => {
-      const response = await axiosClient.delete(`/teams/${teamId}/`);
+      const response = await axiosClient.delete(`/teams/${teamId}`);
       return response.data;
     },
     onSuccess: (team) => {

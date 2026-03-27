@@ -63,13 +63,13 @@ export const EditUserModal = (props: EditUserModalProps) => {
   const { data: allTasks } = useGetAllTasks();
 
   const userTeams = allTeams?.filter((team) =>
-    team.users.find((x) => x === user?.id),
+    team.users.find((x) => x.id === user?.id),
   );
 
   const userProjects = allProjects?.filter(
     (project) =>
-      project.adminIds.find((admin) => admin === user?.id) ||
-      project.memberIds.find((member) => member === user?.id),
+      project.admins.find((admin) => admin === user?.id) ||
+      project.members.find((member) => member === user?.id),
   );
 
   const userTasks = allTasks?.filter((task) => {
@@ -129,7 +129,6 @@ export const EditUserModal = (props: EditUserModalProps) => {
           first_name: formData.first_name,
           last_name: formData.last_name,
           is_admin: formData.is_admin,
-          updated_at: new Date(),
         },
         {
           onSuccess: () => {
@@ -153,17 +152,15 @@ export const EditUserModal = (props: EditUserModalProps) => {
         addUserToTeam({
           id: team.id,
           users: updatedUsers,
-          updated_at: new Date(),
         });
       });
 
       teamOut.map((team) => {
-        const updatedUsers = team.users.filter((u) => u !== user.id);
+        const updatedUsers = team.users.filter((u) => u.id !== user.id);
 
         removeUserToTeam({
           id: team.id,
           users: updatedUsers,
-          updated_at: new Date(),
         });
       });
     }
@@ -181,23 +178,21 @@ export const EditUserModal = (props: EditUserModalProps) => {
         userProjects?.filter((p) => !selectedProjectIds.has(p.id)) ?? [];
 
       projectIn.map((project) => {
-        const updateAdmins = [...project.adminIds, user.id];
+        const updateAdmins = [...project.admins, user.id];
         addUserToProject({
           id: project.id,
-          adminIds: updateAdmins,
-          memberIds: project.memberIds,
-          updated_at: new Date(),
+          admins: updateAdmins,
+          members: project.members,
         });
       });
 
       projectOut.map((project) => {
-        const updateAdmins = project.adminIds.filter((u) => u !== user.id);
-        const updateMembers = project.memberIds.filter((u) => u !== user.id);
+        const updateAdmins = project.admins.filter((u) => u !== user.id);
+        const updateMembers = project.members.filter((u) => u !== user.id);
         removeUserToProject({
           id: project.id,
-          adminIds: updateAdmins,
-          memberIds: updateMembers,
-          updated_at: new Date(),
+          admins: updateAdmins,
+          members: updateMembers,
         });
       });
     }
@@ -221,27 +216,25 @@ export const EditUserModal = (props: EditUserModalProps) => {
         const taskProjectId = task.project;
 
         const project = allProjects?.find(
-          (project) => project.id === String(taskProjectId),
+          (project) => project.id === taskProjectId,
         );
 
-        const isMember = project?.memberIds.includes(user.id);
-        const is_admin = project?.adminIds.includes(user.id);
+        const isMember = project?.members.includes(user.id);
+        const is_admin = project?.admins.includes(user.id);
 
         if (!isMember && !is_admin && project) {
-          const updateAdmins = [...project.adminIds, user.id];
+          const updateAdmins = [...project.admins, user.id];
 
           addUserToProject({
             id: project.id,
-            memberIds: project.memberIds,
-            adminIds: updateAdmins,
-            updated_at: new Date(),
+            members: project.members,
+            admins: updateAdmins,
           });
         }
 
         addUserToTask({
           id: task.id,
-          assignedUserId: updateAssigned,
-          updated_at: new Date(),
+          assigned_user: updateAssigned,
         });
       });
 
@@ -249,8 +242,7 @@ export const EditUserModal = (props: EditUserModalProps) => {
         const updateAssigned = task.assigned_user.filter((u) => u !== user.id);
         removeUserToTask({
           id: task.id,
-          assignedUserId: updateAssigned,
-          updated_at: new Date(),
+          assigned_user: updateAssigned,
         });
       });
     }

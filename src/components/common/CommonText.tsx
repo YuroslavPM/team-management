@@ -2,10 +2,10 @@ import { Box, Typography, type SxProps, type Theme, type TypographyPropsVariantO
 import type { OverridableStringUnion } from "@mui/types";
 
 type CommonTextPayload = {
-  text: string;
+  text?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value: any;
-  style: SxProps<Theme>;
+  value?: any;
+  style?: SxProps<Theme>;
   gutterBottom?: boolean;
   variant?: OverridableStringUnion<
     TypographyVariant | "inherit",

@@ -109,9 +109,7 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
         status: formData.status,
         admins: formData.admins?.map((user) => user.id) || [],
         members: formData.members?.map((user) => user.id) || [],
-        teams: formData.teams?.map((team) => team.id) || [],
-        created_at: new Date(),
-        updated_at: new Date(),
+        teams: formData.teams?.map((team) => team.id) || []
       });
     } else {
       updateProject({
@@ -121,9 +119,7 @@ export const CreateUpdateProjectModal = (props: CreateUpdateProjectProps) => {
         status: formData.status,
         admins: formData.admins?.map((user) => user.id) || [],
         members: formData.members?.map((user) => user.id) || [],
-        teams: formData.teams?.map((team) => team.id) || [],
-        created_at: project.created_at,
-        updated_at: new Date(),
+        teams: formData.teams?.map((team) => team.id) || []
       });
     }
 

@@ -6,10 +6,11 @@ import Stack from "@mui/material/Stack";
 import type { SxProps } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import { Box } from "@mui/material";
 
 export type TasksProgressProps = {
   sx?: SxProps;
-  value: number | undefined;
+  value?: number;
 };
 
 export const TasksProgress = ({ sx, value }: TasksProgressProps) => {
@@ -44,9 +45,9 @@ export const TasksProgress = ({ sx, value }: TasksProgressProps) => {
               />
             </Avatar>
           </Stack>
-          <div>
+          <Box>
             <LinearProgress value={value} variant="determinate" />
-          </div>
+          </Box>
         </Stack>
       </CardContent>
     </Card>

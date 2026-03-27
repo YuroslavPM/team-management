@@ -6,8 +6,6 @@ export type User = {
   first_name: string;
   last_name: string;
   is_admin: boolean;
-  created_at: Date;
-  updated_at: Date;
 };
 
 export type EditUser = {
@@ -15,5 +13,4 @@ export type EditUser = {
   first_name: string;
   last_name: string;
   is_admin: boolean;
-  updated_at: Date;
 };

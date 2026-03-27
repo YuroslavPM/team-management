@@ -1,4 +1,3 @@
-import * as React from "react";
 import Avatar from "@mui/material/Avatar";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -9,10 +8,11 @@ import GroupIcon from "@mui/icons-material/Group";
 
 export type TotalTeamsProps = {
   sx?: SxProps;
-  value: number | undefined;
+  value?: number;
 };
 
 export const TotalTeams = ({ sx, value }: TotalTeamsProps) => {
+  
   return (
     <Card sx={sx}>
       <CardContent>

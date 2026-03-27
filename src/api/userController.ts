@@ -6,28 +6,30 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const userKeys = {
   allUsers: ["allUsers"],
-  me: ["me"],
+  currentUser: ["currentUser"],
   userDetails: (userId: number) => [userKeys.allUsers, `userDetails-${userId}`],
 };
-export const useMe = () => {
+
+export const useCurrentUser = () => {
   const hasToken = !!localStorage.getItem("authToken");
 
   return useQuery<User>({
-    queryKey: userKeys.me,
+    queryKey: userKeys.currentUser,
     queryFn: async () => {
-      const response = await axiosClient.get("/users/me/");
+      const response = await axiosClient.get("/users/me");
       return response.data;
     },
     enabled: hasToken,
     retry: false,
-    staleTime: Infinity,
+    staleTime: 0,
   });
 };
+
 export const useGetAllUsers = () => {
   return useQuery<User[]>({
     queryKey: userKeys.allUsers,
     queryFn: async () => {
-      const response = await axiosClient.get(`/users/`);
+      const response = await axiosClient.get(`/users`);
 
       return response.data;
     },
@@ -37,8 +39,7 @@ export const useGetAllUsers = () => {
 export const useCreateUser = (onSuccessCallback?: () => void) => {
   return useMutation({
     mutationFn: async (data: RegisterPayload) => {
-
-      const response = await axiosClient.post("/users/", data);
+      const response = await axiosClient.post("/users", data);
       return response.data;
     },
     onSuccess: () => {
@@ -51,7 +52,7 @@ export const useCreateUser = (onSuccessCallback?: () => void) => {
 export const useLogin = (onSuccessCallback?: (data: Login) => void) => {
   return useMutation({
     mutationFn: async (data: { email: string; secret: string }) => {
-      const response = await axiosClient.post("/login/", {
+      const response = await axiosClient.post("/login", {
         username: data.email,
         password: data.secret,
       });
@@ -63,9 +64,9 @@ export const useLogin = (onSuccessCallback?: (data: Login) => void) => {
         `Token ${data.token}`;
 
       await queryClient.fetchQuery({
-        queryKey: userKeys.me,
+        queryKey: userKeys.currentUser,
         queryFn: async () => {
-          const response = await axiosClient.get("/users/me/");
+          const response = await axiosClient.get("/users/me");
           return response.data;
         },
       });
@@ -87,7 +88,7 @@ export const useGetUserById = (id: number) => {
 export const useUpdateUser = () => {
   return useMutation({
     mutationFn: async (data: EditUser) => {
-      const response = await axiosClient.patch(`/users/${data.id}/`, data);
+      const response = await axiosClient.patch(`/users/${data.id}`, data);
 
       return response.data;
     },
@@ -96,10 +97,10 @@ export const useUpdateUser = () => {
       queryClient.invalidateQueries({
         queryKey: userKeys.allUsers,
       });
-      const me = queryClient.getQueryData<User>(userKeys.me);
-      if(me?.id === updatedUser.id) {
+      const me = queryClient.getQueryData<User>(userKeys.currentUser);
+      if (me?.id === updatedUser.id) {
         queryClient.invalidateQueries({
-          queryKey: userKeys.me,
+          queryKey: userKeys.currentUser,
         });
       }
     },
@@ -109,7 +110,7 @@ export const useUpdateUser = () => {
 export const useDeleteUser = () => {
   return useMutation({
     mutationFn: async (userId: string) => {
-      await axiosClient.delete(`/users/${userId}/`);
+      await axiosClient.delete(`/users/${userId}`);
       return userId;
     },
     onSuccess: (deletedId: string) => {

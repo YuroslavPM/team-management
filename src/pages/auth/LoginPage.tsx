@@ -61,8 +61,6 @@ export default function LoginPage() {
           text={"Login"}
           variant="h2"
           gutterBottom
-          value={undefined}
-          style={null}
         />
         <Controller
           name="email"

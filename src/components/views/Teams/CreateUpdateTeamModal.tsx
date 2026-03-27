@@ -71,14 +71,12 @@ export const CreateUpdateTeamModal = (props: CreateTeamModalProps) => {
       createTeam({
         name: formData.teamName,
         users: userIds || [],
-        updated_at: new Date(),
       });
     } else {
       updateTeam({
         id: team.id,
         name: formData.teamName,
         users: userIds || [],
-        updated_at: new Date(),
       });
     }
     reset();
@@ -149,12 +147,12 @@ export const CreateUpdateTeamModal = (props: CreateTeamModalProps) => {
                 });
               }}
               options={users}
-              getOptionLabel={(option) => option.first_name}
+              getOptionLabel={(option) => option.display_name}
               renderValue={(values, getItemProps) =>
                 values.map((option, index) => {
                   const { key, ...itemProps } = getItemProps({ index });
                   return (
-                    <Chip key={key} label={option.first_name} {...itemProps} />
+                    <Chip key={key} label={option.display_name} {...itemProps} />
                   );
                 })
               }

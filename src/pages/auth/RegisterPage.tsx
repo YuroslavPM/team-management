@@ -43,9 +43,7 @@ export default function RegisterPage() {
       first_name: formData?.first_name,
       last_name: formData?.last_name,
       email: formData?.email,
-      secret: formData?.secret,
-      created_at: new Date(),
-      updated_at: new Date(),
+      secret: formData?.secret
     });
     
     reset();

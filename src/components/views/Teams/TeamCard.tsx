@@ -38,10 +38,8 @@ export const TeamCard = ({
           {team?.name.charAt(0).toUpperCase()}
         </Avatar>
         <CommonText
-          text={""}
           value={team.name}
           variant={"h5"}
-          style={null}
         />
         <CommonText
           text={"Mates:"}
@@ -50,7 +48,6 @@ export const TeamCard = ({
             .map((u) => u.first_name)
             .join(", ")}
           variant={"body2"}
-          style={null}
         />
       </CardContent>
       <CardActions>

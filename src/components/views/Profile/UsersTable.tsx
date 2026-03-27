@@ -90,7 +90,7 @@ export const UsersTable = (props: UsersTablePayload) => {
 
   return (
     <>
-      <CommonText text={"All users"} value={undefined} style={null} />
+      <CommonText text={"All users"} />
       <Box sx={{ height: 400, width: "100%", display: "flex" }}>
         <DataGrid
           rows={rows}

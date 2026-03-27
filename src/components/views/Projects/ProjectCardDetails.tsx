@@ -57,7 +57,6 @@ export const ProjectCardDetails = ({
         }
         title={
           <CommonText
-            text={""}
             value={project?.name}
             variant={"h5"}
             style={{ fontWeight: "bold" }}
@@ -68,7 +67,6 @@ export const ProjectCardDetails = ({
             text={"Project created at: "}
             value={dayjs(project?.created_at).format("DD/MM/YYYY")}
             variant={"body2"}
-            style={null}
           />
         }
       ></CardHeader>

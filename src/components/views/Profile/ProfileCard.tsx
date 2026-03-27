@@ -7,7 +7,7 @@ import { CommonText } from "../../common/CommonText";
 import type { User } from "../../../api/userTypes";
 
 type ProfileCardPayload = {
-  user: User | undefined;
+  user?: User;
   onEditClick: () => void;
   onDeleteClick: () => void;
 };

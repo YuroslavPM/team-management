@@ -38,14 +38,11 @@ export const ProjectCard = ({
         </Avatar>
 
         <CommonText
-          text={""}
           value={project.name}
           variant={"h5"}
-          style={null}
         />
         <CommonText
           text={"Status: "}
-          style={null}
           variant={"body2"}
           value={project.status}
         />
@@ -56,7 +53,6 @@ export const ProjectCard = ({
             .map((u) => u.first_name)
             .join(", ")}
           variant={"body2"}
-          style={null}
         />
 
         <CommonText
@@ -66,7 +62,6 @@ export const ProjectCard = ({
             .map((u) => u.first_name)
             .join(", ")}
           variant={"body2"}
-          style={null}
         />
         <CommonText
           text={"Teams: "}
@@ -75,7 +70,6 @@ export const ProjectCard = ({
             .map((t) => t.name)
             .join(", ")}
           variant={"body2"}
-          style={null}
         />
       </CardContent>
       <CardActions>

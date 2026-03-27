@@ -10,11 +10,9 @@ export type Team = {
 export type TeamPayload = {
   name: string;
   users: number[];
-  updated_at: Date;
 };
 
 export type ActionUserToTeam = {
-  id: string;
-  users: User[];
-  updated_at: Date;
+  id: number;
+  users: number[];
 };

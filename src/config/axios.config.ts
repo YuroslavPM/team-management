@@ -1,12 +1,11 @@
 import axios from "axios";
-import { envConfig } from "./env.config";
+import { authToken, envConfig } from "./env.config";
 
 export const axiosClient = axios.create({
   baseURL: envConfig.apiUrl,
   timeout: 1000 * 20,
 });
 
-const token = localStorage.getItem("authToken");
-if (token) {
-  axiosClient.defaults.headers.common["Authorization"] = `Token ${token}`;
+if (authToken) {
+  axiosClient.defaults.headers.common["Authorization"] = `Bearer ${authToken}`;
 }

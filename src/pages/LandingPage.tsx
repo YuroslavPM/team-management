@@ -1,7 +1,4 @@
 import Grid from "@mui/material/Grid";
-import { TotalTeams } from "../components/views/Landing/TotalTeams";
-import { TotalProjects } from "../components/views/Landing/TotalProjects";
-import { TotalTasks } from "../components/views/Landing/TotalTasks";
 import { TasksProgress } from "../components/views/Landing/TaskProgress";
 import { CommonChart } from "../components/views/Landing/CommonChart";
 import { useGetAllProjects } from "../api/projects/projectController";
@@ -12,6 +9,12 @@ import { TaskTable } from "../components/views/Landing/TaskTable";
 import { TeamsTable } from "../components/views/Landing/TeamsTable";
 import { ProjectTable } from "../components/views/Landing/ProjectTable";
 import { useGetAllUsers } from "../api/userController";
+import { TotalCard } from "../components/views/Landing/components/TotalCard";
+import GroupIcon from "@mui/icons-material/Group";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import TaskIcon from "@mui/icons-material/Task";
+
+
 
 function calculateTasks(userTasks: number, inProgressTasks: number) {
   if (userTasks && inProgressTasks) {
@@ -117,9 +120,9 @@ export const LandingPage = () => {
   });
 
   const numberToColor = (num: number) => {
-  const hue = ((num * 137.508) % 360 + 360) % 360;
-  return `hsl(${hue}, 70%, 55%)`;
-};
+    const hue = (((num * 137.508) % 360) + 360) % 360;
+    return `hsl(${hue}, 70%, 55%)`;
+  };
 
   return (
     <Grid container spacing={3} sx={{ minWidth: "100%" }}>
@@ -130,7 +133,12 @@ export const LandingPage = () => {
           xs: 12,
         }}
       >
-        <TotalTeams sx={{ height: "100%" }} value={userTeamsLength} />
+        <TotalCard
+          sx={{ height: "100%" }}
+          value={userTeamsLength}
+          title={"Total teams"}
+          icon={<GroupIcon fontSize="large" />}
+        />
       </Grid>
       <Grid
         size={{
@@ -139,7 +147,12 @@ export const LandingPage = () => {
           xs: 12,
         }}
       >
-        <TotalProjects sx={{ height: "100%" }} value={userProjectsLength} />
+        <TotalCard
+          sx={{ height: "100%" }}
+          value={userProjectsLength}
+          title={"Total projects"}
+          icon={<AssignmentIcon fontSize="large" />}
+        />
       </Grid>
       <Grid
         size={{
@@ -148,7 +161,12 @@ export const LandingPage = () => {
           xs: 12,
         }}
       >
-        <TotalTasks sx={{ height: "100%" }} value={userTasksLength} />
+        <TotalCard
+          sx={{ height: "100%" }}
+          value={userTasksLength}
+          title={"Total tasks"}
+          icon={<TaskIcon fontSize="large" />}
+        />
       </Grid>
       <Grid
         size={{
@@ -207,7 +225,7 @@ export const LandingPage = () => {
           teams={userTeams?.map((team) => ({
             id: team.id,
             name: team.name,
-            updatedAt: team.updated_at,
+            updatedAt: team.updated_at
           }))}
         ></TeamsTable>
       </Grid>
@@ -229,7 +247,6 @@ export const LandingPage = () => {
             members: project.members
               .map((id) => allUsers?.find((user) => user.id === id)?.first_name)
               .join(", "),
-            updated_at: project.updated_at,
           }))}
         />
       </Grid>
