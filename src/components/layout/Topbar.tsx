@@ -52,7 +52,7 @@ export const Topbar = ({ title = "Team Management" }: TopbarProps) => {
 
         {currentUser ? (
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Typography>{currentUser.firstName}</Typography>
+            <Typography>{currentUser.first_name}</Typography>
             <IconButton
               size="large"
               aria-label="account of current user"
