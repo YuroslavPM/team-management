@@ -63,7 +63,7 @@ export const UsersPage = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {data.items.map((user) => (
+              {data?.items?.map((user) => (
                 <tr key={user.id}>
                   <td className="px-4 py-3 font-medium text-slate-900">{user.displayName}</td>
                   <td className="px-4 py-3 text-slate-600">{user.email}</td>
@@ -72,7 +72,7 @@ export const UsersPage = () => {
                   </td>
                 </tr>
               ))}
-              {data.items.length === 0 && (
+              {data?.items?.length === 0 && (
                 <tr>
                   <td colSpan={3} className="px-4 py-8 text-center text-slate-500">
                     No users match “{search}”.

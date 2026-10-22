@@ -19,7 +19,10 @@ export const TeamDetailPage = () => {
 
   return (
     <>
-      <Link to="/teams" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800">
+      <Link
+        to="/teams"
+        className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800"
+      >
         <ArrowLeft className="size-4" aria-hidden />
         All teams
       </Link>
@@ -36,7 +39,8 @@ function TeamDetail({ team }: { team: Team }) {
   const [adding, setAdding] = useState(false);
 
   const canManage =
-    user?.role === "admin" || team.members.some((m) => m.userId === user?.id && m.role === "lead");
+    user?.role === "admin" ||
+    team.members.some((m) => m.userId === user?.id && m.role === "lead");
 
   return (
     <>
@@ -56,14 +60,25 @@ function TeamDetail({ team }: { team: Team }) {
       {removeMember.error && <Alert>{errorMessage(removeMember.error)}</Alert>}
 
       <section className="rounded-lg border border-slate-200 bg-white">
-        <h2 id="members-heading" className="border-b border-slate-100 px-5 py-3 text-sm font-semibold text-slate-700">
+        <h2
+          id="members-heading"
+          className="border-b border-slate-100 px-5 py-3 text-sm font-semibold text-slate-700"
+        >
           Members
         </h2>
-        <ul aria-labelledby="members-heading" className="divide-y divide-slate-100">
+        <ul
+          aria-labelledby="members-heading"
+          className="divide-y divide-slate-100"
+        >
           {team.members.map((member) => (
-            <li key={member.userId} className="flex items-center justify-between px-5 py-3">
+            <li
+              key={member.userId}
+              className="flex items-center justify-between px-5 py-3"
+            >
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-slate-900">{member.displayName}</span>
+                <span className="text-sm font-medium text-slate-900">
+                  {member.displayName}
+                </span>
                 {member.role === "lead" && <Badge tone="brand">lead</Badge>}
               </div>
               {canManage && (
@@ -77,11 +92,20 @@ function TeamDetail({ team }: { team: Team }) {
               )}
             </li>
           ))}
-          {team.members.length === 0 && <li className="px-5 py-6 text-sm text-slate-500">No members yet.</li>}
+          {team.members.length === 0 && (
+            <li className="px-5 py-6 text-sm text-slate-500">
+              No members yet.
+            </li>
+          )}
         </ul>
       </section>
 
-      {adding && <AddMemberDialog team={team} onClose={() => setAdding(false)} />}
+      {adding && (
+        <AddMemberDialog
+          team={team}
+          onClose={() => setAdding(false)}
+        />
+      )}
     </>
   );
 }

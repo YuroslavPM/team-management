@@ -1,3 +1,5 @@
+import type { ComboboxOption } from "../components/ui/Combobox";
+
 /** Mirrors contracts/openapi.yaml. */
 export type UserRole = "admin" | "member";
 export type TeamRole = "lead" | "member";
@@ -24,6 +26,39 @@ export type Team = {
   name: string;
   description: string;
   members: TeamMember[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type StatusFilter = ProjectStatusType | "all";
+
+
+export const ProjectStatus = {
+  planned: "Planned",
+  active: "Active",
+  on_hold: "On hold",
+  done: "Done",
+} as const;
+
+export type ProjectStatusType = keyof typeof ProjectStatus;
+
+export const statusOptions: ComboboxOption<ProjectStatusType>[] =
+  Object.entries(ProjectStatus).map(([value, label]) => ({
+    value: value as ProjectStatusType,
+    label,
+  }));
+
+export type ProjectMember = {
+  userId: number;
+  role: string;
+};
+
+export type Project = {
+  id: number;
+  name: string;
+  description: string;
+  status: ProjectStatusType;
+  members: ProjectMember[];
   createdAt: string;
   updatedAt: string;
 };
