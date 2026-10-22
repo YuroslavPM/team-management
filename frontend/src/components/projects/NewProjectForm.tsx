@@ -1,0 +1,67 @@
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+
+import { errorMessage } from "../../api/errors";
+import { useCreateProject } from "../../api/projects";
+import { Alert } from "../ui/Alert";
+import { Button } from "../ui/Button";
+import { Field } from "../ui/Field";
+
+type PropsNewProjectForm = {
+  onClose: () => void;
+};
+
+export function NewProjectForm(props: PropsNewProjectForm) {
+  const { onClose } = props;
+
+  const createProject = useCreateProject();
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{ name: string; description: string }>();
+
+  const onSubmit = handleSubmit(async (values) => {
+    try {
+      await createProject.mutateAsync(values);
+      onClose();
+    } catch {
+      // shown via createTeam.error
+    }
+  });
+
+  return (
+    <form
+      onSubmit={onSubmit}
+      aria-label="New project"
+      className="mb-6 space-y-4 rounded-lg border border-slate-200 bg-white p-5"
+    >
+      {createProject.error && (
+        <Alert>{errorMessage(createProject.error)}</Alert>
+      )}
+      <Field
+        label="Name"
+        error={errors.name?.message}
+        {...register("name", { required: "Name is required" })}
+      />
+      <Field label="Description" {...register("description")} />
+      <div className="flex gap-2">
+        <Button type="submit" disabled={createProject.isPending}>
+          Create project
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            navigate("/projects");
+            onClose();
+          }}
+        >
+          Cancel
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+export default NewProjectForm;
