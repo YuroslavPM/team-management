@@ -25,6 +25,7 @@ export function NewProjectForm(props: PropsNewProjectForm) {
   const onSubmit = handleSubmit(async (values) => {
     try {
       await createProject.mutateAsync(values);
+      navigate("/projects")
       onClose();
     } catch {
       // shown via createTeam.error

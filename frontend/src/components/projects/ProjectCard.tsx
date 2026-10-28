@@ -30,7 +30,14 @@ export const ProjectCard = (props: ProjectCardProps) => {
         {project.description || "No description"}
       </p>
       <p className="mt-4 text-xs text-slate-500">
-        Last update: {project.updatedAt}
+        Last update:{" "}
+        {new Date(project.updatedAt).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
       </p>
     </li>
   );

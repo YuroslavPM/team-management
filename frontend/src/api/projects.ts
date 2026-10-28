@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { axiosClient } from "../config/axios.config";
-import type { Page, Project, TeamRole } from "./types";
+import type { Page, Project, ProjectRole, ProjectUpdate } from "./types";
 
 export const projectKeys = {
   all: ["projects"] as const,
@@ -37,10 +37,32 @@ export const useCreateProject = () => {
   });
 };
 
+export const useEditProject = (projectId: number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: ProjectUpdate) =>
+      (await axiosClient.patch<ProjectUpdate>(`/projects/${projectId}`, body)).data,
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: projectKeys.detail(projectId),
+      }),
+  });
+};
+
+export const useDeleteProject = (projectId: number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () =>
+      (await axiosClient.delete<Project>(`/projects/${projectId}`)).data,
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: projectKeys.all }),
+  });
+};
+
 export const useAddProjectMember = (projectId: number) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (body: { userId: number; role: TeamRole }) =>
+    mutationFn: async (body: { userId: number; role: ProjectRole }) =>
       (await axiosClient.post<Project>(`/projects/${projectId}/members`, body))
         .data,
     onSuccess: (team) => {
@@ -58,11 +80,18 @@ export const useRemoveProjectMember = (projectId: number) => {
     },
     // Optimistic: drop the member from the cached project right away.
     onMutate: (userId) => {
-      queryClient.setQueryData<Project>(projectKeys.detail(projectId), (project) =>
-        project ? { ...project, members: project.members.filter((m) => m.userId !== userId) } : project,
+      queryClient.setQueryData<Project>(
+        projectKeys.detail(projectId),
+        (project) =>
+          project
+            ? {
+                ...project,
+                members: project.members.filter((m) => m.userId !== userId),
+              }
+            : project,
       );
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: projectKeys.list() }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: projectKeys.list() }),
   });
 };
-
