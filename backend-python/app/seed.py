@@ -92,10 +92,7 @@ def load_small(db: Session) -> None:
     )
     db.execute(
         insert(ProjectTeams),
-        [
-            {"project_id": pt["projectId"], "team_id": pt["teamId"]}
-            for pt in seed["projectTeams"]
-        ],
+        [{"project_id": pt["projectId"], "team_id": pt["teamId"]} for pt in seed["projectTeams"]],
     )
     db.execute(
         insert(ProjectMember),

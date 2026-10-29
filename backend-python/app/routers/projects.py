@@ -6,7 +6,14 @@ from app.auth import current_user
 from app.db import get_db
 from app.errors import ApiError
 from app.models import Project, ProjectMember, ProjectStatus, ProjectTeams, Team, User
-from app.schemas import Page, ProjectCreate, ProjectMemberIn, ProjectMemberOut, ProjectOut, ProjectUpdate
+from app.schemas import (
+    Page,
+    ProjectCreate,
+    ProjectMemberIn,
+    ProjectMemberOut,
+    ProjectOut,
+    ProjectUpdate,
+)
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 

@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
+from enum import StrEnum
 from typing import Annotated, Literal
-from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, PlainSerializer
 from pydantic.alias_generators import to_camel
@@ -112,11 +112,13 @@ class TeamMemberIn(ApiModel):
 
 # --- projects ------------------------------------------------------------------
 
-class ProjectStatus(str,Enum):
+
+class ProjectStatus(StrEnum):
     PLANNED = "planned"
     ACTIVE = "active"
     ON_HOLD = "on_hold"
     DONE = "done"
+
 
 class ProjectMemberOut(ApiModel):
     user_id: int
