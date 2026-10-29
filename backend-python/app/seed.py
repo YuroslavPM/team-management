@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.auth import hash_password
 from app.db import Base
-from app.models import Team, TeamMember, User
+from app.models import Project, ProjectMember, ProjectTeams, Team, TeamMember, User
 
 SEED_FILE = Path(__file__).resolve().parents[2] / "contracts" / "seed.json"
 
@@ -74,6 +74,38 @@ def load_small(db: Session) -> None:
         [
             {"team_id": m["teamId"], "user_id": m["userId"], "role": m["role"]}
             for m in seed["teamMembers"]
+        ],
+    )
+    db.execute(
+        insert(Project),
+        [
+            {
+                "id": p["id"],
+                "name": p["name"],
+                "description": p["description"],
+                "status": p["status"],
+                "created_at": _ts(p["createdAt"]),
+                "updated_at": _ts(p["updatedAt"]),
+            }
+            for p in seed["projects"]
+        ],
+    )
+    db.execute(
+        insert(ProjectTeams),
+        [
+            {"project_id": pt["projectId"], "team_id": pt["teamId"]}
+            for pt in seed["projectTeams"]
+        ],
+    )
+    db.execute(
+        insert(ProjectMember),
+        [
+            {
+                "project_id": m["projectId"],
+                "user_id": m["userId"],
+                "role": m["role"],
+            }
+            for m in seed["projectMembers"]
         ],
     )
     db.flush()

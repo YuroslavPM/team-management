@@ -2,7 +2,8 @@ from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
+from enum import Enum
+from sqlalchemy import Enum as SQLEnum
 from app.db import Base
 
 
@@ -61,3 +62,58 @@ class TeamMember(Base):
 
     team: Mapped[Team] = relationship(back_populates="memberships")
     user: Mapped[User] = relationship()
+
+class ProjectStatus(str,Enum):
+    PLANNED = "planned"
+    ACTIVE = "active"
+    ON_HOLD = "on_hold"
+    DONE = "done"
+
+class Project(Base):
+    __tablename__ = "projects"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(120), unique=True)
+    description: Mapped[str] = mapped_column(Text, default="")
+    status: Mapped["ProjectStatus"] = mapped_column(
+        SQLEnum(ProjectStatus, name="project_status"),
+        default = ProjectStatus.PLANNED,
+        nullable = False
+    )
+    members: Mapped[list["ProjectMember"]] = relationship(
+        back_populates="project", cascade="all, delete-orphan", order_by="ProjectMember.user_id"
+    )
+    team_links: Mapped[list["ProjectTeams"]] = relationship(
+            back_populates="project", cascade="all, delete-orphan"
+        )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, onupdate=utcnow
+    )
+    
+    
+
+class ProjectMember(Base):
+    __tablename__ = "project_members"
+    __table_args__ = (UniqueConstraint("project_id", "user_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    role: Mapped[str] = mapped_column(String(16), default="member")
+
+    project: Mapped["Project"] = relationship(back_populates="members")
+    user: Mapped["User"] = relationship()
+
+
+class ProjectTeams(Base):
+    __tablename__ = "project_teams"
+    __table_args__ = (UniqueConstraint("project_id", "team_id"),)
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"))
+    team_id: Mapped[int] = mapped_column(ForeignKey("teams.id", ondelete="CASCADE"))    
+
+    project: Mapped["Project"] = relationship(back_populates= "team_links")
+
+

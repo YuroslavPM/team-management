@@ -7,7 +7,7 @@ from app import config
 from app.db import Base, SessionLocal, engine, query_count
 from app.errors import install_error_handlers
 from app.models import User
-from app.routers import auth, system, teams, users
+from app.routers import auth, system, teams, users, projects
 from app.seed import reset
 
 
@@ -44,7 +44,7 @@ def create_app() -> FastAPI:
         return response
 
     install_error_handlers(app)
-    for router in (system.router, auth.router, users.router, teams.router):
+    for router in (system.router, auth.router, users.router, teams.router, projects.router):
         app.include_router(router)
     return app
 
