@@ -81,8 +81,12 @@ function ProjectDetail({ project }: { project: Project }) {
     };
   });
 
-  const error =
-    teamError ?? removeMember.error ?? editProject.error ?? deleteProject.error;
+  const errors = [
+    teamError,
+    removeMember.error,
+    editProject.error,
+    deleteProject.error,
+  ].filter((e) => e !== null);
 
   return (
     <>
@@ -105,12 +109,14 @@ function ProjectDetail({ project }: { project: Project }) {
         }
       />
 
-      {error && <ErrorAlert error={error} />}
+      {errors.map((error, index) => {
+        <ErrorAlert key={index} error={error} />;
+      })}
       <div className="mb-4 w-48">
         <Combobox<ProjectStatusType>
           options={statusOptions}
           value={project.status}
-          disabled={editProject.isPending}
+          disabled={editProject.isPending && !canManage}
           onChange={(value) => {
             if (value != null) {
               editProject.mutate({ status: value });

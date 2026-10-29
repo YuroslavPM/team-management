@@ -6,13 +6,7 @@ import { Button } from "../ui/Button";
 import { ErrorAlert } from "../ui/ErrorAlert";
 import { Field } from "../ui/Field";
 
-type PropsNewProjectForm = {
-  onClose: () => void;
-};
-
-export function NewProjectForm(props: PropsNewProjectForm) {
-  const { onClose } = props;
-
+export function NewProjectForm() {
   const createProject = useCreateProject();
   const navigate = useNavigate();
   const {
@@ -25,7 +19,6 @@ export function NewProjectForm(props: PropsNewProjectForm) {
     try {
       await createProject.mutateAsync(values);
       navigate("/projects");
-      onClose();
     } catch {
       // shown via createTeam.error
     }
@@ -52,7 +45,6 @@ export function NewProjectForm(props: PropsNewProjectForm) {
           variant="secondary"
           onClick={() => {
             navigate("/projects");
-            onClose();
           }}
         >
           Cancel

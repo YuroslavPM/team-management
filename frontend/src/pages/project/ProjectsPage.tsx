@@ -1,24 +1,25 @@
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { errorMessage } from "../../api/errors";
 import { useProjects } from "../../api/projects";
-import { type ProjectStatusType, type StatusFilter, statusOptions } from "../../api/types";
+import {
+  type ProjectStatusType,
+  type StatusFilter,
+  statusOptions,
+} from "../../api/types";
 import { useAuth } from "../../auth/authContext";
-import { NewProjectForm } from "../../components/projects/NewProjectForm";
 import { ProjectCard } from "../../components/projects/ProjectCard";
 import { Alert } from "../../components/ui/Alert";
-import { Button } from "../../components/ui/Button";
 import { Combobox, type ComboboxOption } from "../../components/ui/Combobox";
 import { PageHeader } from "../../components/ui/PageHeader";
 import { Spinner } from "../../components/ui/Spinner";
 
 export const ProjectsPage = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const { data, isPending, error } = useProjects();
-  const [creating, setCreating] = useState(false);
+
   const [selectedStatus, setSelectedStatus] = useState<
     ProjectStatusType | "all"
   >("all");
@@ -39,15 +40,13 @@ export const ProjectsPage = () => {
         subtitle={data ? `${data.total} projects` : undefined}
         actions={
           user?.role === "admin" && (
-            <Button
-              onClick={() => {
-                navigate("/projects/new");
-                setCreating(true);
-              }}
+            <Link
+              to="/projects/new"
+              className="inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 disabled:cursor-not-allowed bg-brand-600 text-white hover:bg-brand-700 disabled:bg-brand-600/60"
             >
               <Plus className="size-4" aria-hidden />
               New project
-            </Button>
+            </Link>
           )
         }
       />
@@ -65,7 +64,6 @@ export const ProjectsPage = () => {
         />
       </div>
 
-      {creating && <NewProjectForm onClose={() => setCreating(false)} />}
       {error && <Alert>{errorMessage(error)}</Alert>}
       {isPending && <Spinner label="Loading projects" />}
 
@@ -78,7 +76,7 @@ export const ProjectsPage = () => {
       )}
       {filteredProjects?.length === 0 && (
         <>
-          <p className="text-sm text-slate-600">No projects...</p>
+          <Spinner label={"No projects..."}/>
           <Link
             to="/projects/new"
             className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800"
