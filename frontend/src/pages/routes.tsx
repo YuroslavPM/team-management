@@ -5,6 +5,9 @@ import { Layout } from "../components/layout/Layout";
 import ErrorPage from "./ErrorPage";
 import { LoginPage } from "./LoginPage";
 import { NotBuiltPage } from "./NotBuiltPage";
+import { CreateProjectPage } from "./project/CreateProjectPage";
+import { ProjectDetailPage } from "./project/ProjectDetailPage";
+import ProjectsPage from "./project/ProjectsPage";
 import { TeamDetailPage } from "./TeamDetailPage";
 import { TeamsPage } from "./TeamsPage";
 import { UsersPage } from "./UsersPage";
@@ -22,11 +25,25 @@ export const routes: RouteObject[] = [
           { index: true, element: <Navigate to="/teams" replace /> },
           { path: "teams", element: <TeamsPage /> },
           { path: "teams/:teamId", element: <TeamDetailPage /> },
-          { path: "teams/:teamId/chat", element: <NotBuiltPage title="Team chat" task="fe-chat-room" /> },
+          {
+            path: "teams/:teamId/chat",
+            element: <NotBuiltPage title="Team chat" task="fe-chat-room" />,
+          },
           { path: "users", element: <UsersPage /> },
-          { path: "projects", element: <NotBuiltPage title="Projects" task="fe-component" /> },
-          { path: "activity", element: <NotBuiltPage title="Activity log" task="fe-virtualization" /> },
-          { path: "dashboard", element: <NotBuiltPage title="Dashboard" task="fe-code-split" /> },
+          { path: "projects", element: <ProjectsPage /> },
+          { path: "projects/new", element: <CreateProjectPage /> },
+          { path: "projects/:projectId", element: <ProjectDetailPage /> },
+
+          {
+            path: "activity",
+            element: (
+              <NotBuiltPage title="Activity log" task="fe-virtualization" />
+            ),
+          },
+          {
+            path: "dashboard",
+            element: <NotBuiltPage title="Dashboard" task="fe-code-split" />,
+          },
         ],
       },
     ],
