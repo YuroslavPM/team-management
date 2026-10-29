@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
-import { errorMessage } from "../../api/errors";
 import { useEditProject } from "../../api/projects";
 import { useTeams } from "../../api/teams";
 import type { Project } from "../../api/types";
-import { Alert } from "../ui/Alert";
+import { useDialogAccessibility } from "../../utils/hooks/useDialogAccessibility";
 import { Button } from "../ui/Button";
+import { ErrorAlert } from "../ui/ErrorAlert";
 
 type Props = {
   project: Project;
@@ -34,65 +34,7 @@ export function AddTeamDialog({ project, onClose }: Props) {
     );
   };
 
-  useEffect(() => {
-    const dialog = dialogRef.current;
-
-    if (!dialog) return;
-
-    const previousFocus = document.activeElement as HTMLElement | null;
-
-    const getFocusableElements = () =>
-      Array.from(
-        dialog.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), select:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
-        ),
-      );
-
-    const focusableElements = getFocusableElements();
-
-    if (focusableElements.length > 0) {
-      focusableElements[0].focus();
-    }
-
-    const handleKeyDown = (е: KeyboardEvent) => {
-      if (е.key === "Escape") {
-        е.preventDefault();
-        onClose();
-        return;
-      }
-
-      if (е.key !== "Tab") {
-        return;
-      }
-
-      const elements = getFocusableElements();
-
-      if (elements.length === 0) {
-        е.preventDefault();
-        return;
-      }
-
-      const firstElement = elements[0];
-      const lastElement = elements[elements.length - 1];
-
-      if (е.shiftKey) {
-        if (document.activeElement === firstElement) {
-          е.preventDefault();
-          lastElement.focus();
-        }
-      } else if (document.activeElement === lastElement) {
-        е.preventDefault();
-        firstElement.focus();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      previousFocus?.focus();
-    };
-  }, [onClose]);
+  useDialogAccessibility(dialogRef, onClose);
 
   return (
     <div
@@ -121,7 +63,7 @@ export function AddTeamDialog({ project, onClose }: Props) {
           </button>
         </div>
 
-        {addTeam.error && <Alert>{errorMessage(addTeam.error)}</Alert>}
+        {addTeam.error && <ErrorAlert error={addTeam.error} />}
 
         <div className="mt-2 space-y-4">
           <div>
@@ -134,6 +76,7 @@ export function AddTeamDialog({ project, onClose }: Props) {
             <select
               id="team-select"
               value={teamId}
+              required
               onChange={(e) =>
                 setTeamId(e.target.value ? Number(e.target.value) : "")
               }

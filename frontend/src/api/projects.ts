@@ -41,11 +41,16 @@ export const useEditProject = (projectId: number) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (body: ProjectUpdate) =>
-      (await axiosClient.patch<ProjectUpdate>(`/projects/${projectId}`, body)).data,
-    onSuccess: () =>
+      (await axiosClient.patch<ProjectUpdate>(`/projects/${projectId}`, body))
+        .data,
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: projectKeys.detail(projectId),
-      }),
+      });
+      queryClient.invalidateQueries({
+        queryKey: projectKeys.all,
+      });
+    },
   });
 };
 

@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
-import { errorMessage } from "../../api/errors";
 import { useAddProjectMember } from "../../api/projects";
 import type { Project, ProjectRole } from "../../api/types";
 import { useAllUsers } from "../../api/users";
-import { Alert } from "../ui/Alert";
+import { useDialogAccessibility } from "../../utils/hooks/useDialogAccessibility";
 import { Button } from "../ui/Button";
+import { ErrorAlert } from "../ui/ErrorAlert";
 
 type Props = {
   project: Project;
@@ -29,65 +29,7 @@ export function AddMemberDialog({ project, onClose }: Props) {
     addMember.mutate({ userId: Number(userId), role }, { onSuccess: onClose });
   };
 
-  useEffect(() => {
-    const dialog = dialogRef.current;
-
-    if (!dialog) return;
-
-    const previousFocus = document.activeElement as HTMLElement | null;
-
-    const getFocusableElements = () =>
-      Array.from(
-        dialog.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), select:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
-        ),
-      );
-
-    const focusableElements = getFocusableElements();
-
-    if (focusableElements.length > 0) {
-      focusableElements[0].focus();
-    }
-
-    const handleKeyDown = (е: KeyboardEvent) => {
-      if (е.key === "Escape") {
-        е.preventDefault();
-        onClose();
-        return;
-      }
-
-      if (е.key !== "Tab") {
-        return;
-      }
-
-      const elements = getFocusableElements();
-
-      if (elements.length === 0) {
-        е.preventDefault();
-        return;
-      }
-
-      const firstElement = elements[0];
-      const lastElement = elements[elements.length - 1];
-
-      if (е.shiftKey) {
-        if (document.activeElement === firstElement) {
-          е.preventDefault();
-          lastElement.focus();
-        }
-      } else if (document.activeElement === lastElement) {
-        е.preventDefault();
-        firstElement.focus();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      previousFocus?.focus();
-    };
-  }, [onClose]);
+  useDialogAccessibility(dialogRef, onClose);
 
   return (
     <div
@@ -116,7 +58,7 @@ export function AddMemberDialog({ project, onClose }: Props) {
           </button>
         </div>
 
-        {addMember.error && <Alert>{errorMessage(addMember.error)}</Alert>}
+        {addMember.error && <ErrorAlert error={addMember.error} />}
 
         <div className="mt-2 space-y-4">
           <div>
@@ -154,8 +96,8 @@ export function AddMemberDialog({ project, onClose }: Props) {
               onChange={(e) => setRole(e.target.value as ProjectRole)}
               className="block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
             >
+              <option value="admin">Admin</option>
               <option value="member">Member</option>
-              <option value="lead">Lead</option>
             </select>
           </div>
         </div>
