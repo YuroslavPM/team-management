@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from enum import StrEnum
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, PlainSerializer
@@ -6,6 +7,7 @@ from pydantic.alias_generators import to_camel
 
 UserRole = Literal["admin", "member"]
 TeamRole = Literal["lead", "member"]
+ProjectRole = Literal["admin", "member"]
 
 
 def _iso_utc(value: datetime) -> str:
@@ -106,3 +108,49 @@ class TeamUpdate(ApiModel):
 class TeamMemberIn(ApiModel):
     user_id: int
     role: TeamRole = "member"
+
+
+# --- projects ------------------------------------------------------------------
+
+
+class ProjectStatus(StrEnum):
+    PLANNED = "planned"
+    ACTIVE = "active"
+    ON_HOLD = "on_hold"
+    DONE = "done"
+
+
+class ProjectMemberOut(ApiModel):
+    user_id: int
+    display_name: str
+    role: ProjectRole
+
+
+class ProjectOut(ApiModel):
+    id: int
+    name: str
+    description: str
+    status: ProjectStatus
+    team_ids: list[int]
+    members: list[ProjectMemberOut]
+    created_at: Timestamp
+    updated_at: Timestamp
+
+
+class ProjectCreate(ApiModel):
+    name: str = Field(min_length=1, max_length=120)
+    description: str = Field(default="", max_length=5000)
+    status: ProjectStatus = ProjectStatus.PLANNED
+    team_ids: list[int] = Field(default_factory=list)
+
+
+class ProjectUpdate(ApiModel):
+    name: str = Field(default="", min_length=1, max_length=120)
+    description: str = Field(default="", max_length=5000)
+    status: ProjectStatus | None = None
+    team_ids: list[int] | None = None
+
+
+class ProjectMemberIn(ApiModel):
+    user_id: int
+    role: ProjectRole = "member"
