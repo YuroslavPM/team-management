@@ -38,7 +38,7 @@ export const TeamsPage = () => {
 
       {data && (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {data.items.map((team) => (
+          {data?.items?.map((team) => (
             <li key={team.id} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
               <Link to={`/teams/${team.id}`} className="text-base font-semibold text-slate-900 hover:text-brand-700">
                 {team.name}
