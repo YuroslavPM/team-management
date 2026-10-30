@@ -13,7 +13,8 @@ export const useTeams = () =>
   useQuery({
     queryKey: teamKeys.list(),
     queryFn: async () =>
-      (await axiosClient.get<Page<Team>>("/teams", { params: { limit: 100 } })).data,
+      (await axiosClient.get<Page<Team>>("/teams", { params: { limit: 100 } }))
+        .data,
   });
 
 export const useTeam = (teamId: number) =>
@@ -45,16 +46,29 @@ export const useAddTeamMember = (teamId: number) => {
 
 export const useRemoveTeamMember = (teamId: number) => {
   const queryClient = useQueryClient();
+  const queryKey = teamKeys.detail(teamId);
   return useMutation({
     mutationFn: async (userId: number) => {
       await axiosClient.delete(`/teams/${teamId}/members/${userId}`);
     },
-    // Optimistic: drop the member from the cached team right away.
-    onMutate: (userId) => {
-      queryClient.setQueryData<Team>(teamKeys.detail(teamId), (team) =>
-        team ? { ...team, members: team.members.filter((m) => m.userId !== userId) } : team,
-      );
+
+    onMutate: async (userId) => {
+      await queryClient.cancelQueries({ queryKey });
+      const perviousTeam = queryClient.getQueryData<Team>(queryKey);
+      if (perviousTeam) {
+        queryClient.setQueryData<Team>(queryKey, {
+          ...perviousTeam,
+          members: perviousTeam.members.filter((m) => m.userId !== userId),
+        });
+      }
+      return { perviousTeam };
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: teamKeys.list() }),
+    onError: (_error, _userId, context) => {
+      if (context?.perviousTeam) {
+        queryClient.setQueryData(queryKey, context.perviousTeam);
+      }
+    },
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: teamKeys.list() }),
   });
 };

@@ -9,7 +9,7 @@ import { Button } from "../components/ui/Button";
 import { PageHeader } from "../components/ui/PageHeader";
 import { Spinner } from "../components/ui/Spinner";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 5;
 
 export const UsersPage = () => {
   const [search, setSearch] = useState("");
@@ -18,12 +18,25 @@ export const UsersPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchUsers({ search: search || undefined, limit: PAGE_SIZE, offset })
-      .then((page) => {
-        setData(page);
-        setError(null);
-      })
-      .catch((err) => setError(errorMessage(err)));
+    let ignore = false;
+
+    const timeoutId = setTimeout(() => {
+      fetchUsers({ search: search || undefined, limit: PAGE_SIZE, offset })
+        .then((page) => {
+          if (ignore) return;
+          setData(page);
+          setError(null);
+        })
+        .catch((err) => {
+          if (ignore) return;
+          setError(errorMessage(err));
+        });
+    }, 300);
+
+    return () => {
+      ignore = true;
+      clearTimeout(timeoutId);
+    };
   }, [search, offset]);
 
   const total = data?.total ?? 0;
@@ -57,24 +70,37 @@ export const UsersPage = () => {
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-50 text-xs font-medium tracking-wide text-slate-500 uppercase">
               <tr>
-                <th scope="col" className="px-4 py-3">Name</th>
-                <th scope="col" className="px-4 py-3">Email</th>
-                <th scope="col" className="px-4 py-3">Role</th>
+                <th scope="col" className="px-4 py-3">
+                  Name
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Email
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Role
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {data?.items?.map((user) => (
                 <tr key={user.id}>
-                  <td className="px-4 py-3 font-medium text-slate-900">{user.displayName}</td>
+                  <td className="px-4 py-3 font-medium text-slate-900">
+                    {user.displayName}
+                  </td>
                   <td className="px-4 py-3 text-slate-600">{user.email}</td>
                   <td className="px-4 py-3">
-                    <Badge tone={user.role === "admin" ? "brand" : "neutral"}>{user.role}</Badge>
+                    <Badge tone={user.role === "admin" ? "brand" : "neutral"}>
+                      {user.role}
+                    </Badge>
                   </td>
                 </tr>
               ))}
               {data?.items?.length === 0 && (
                 <tr>
-                  <td colSpan={3} className="px-4 py-8 text-center text-slate-500">
+                  <td
+                    colSpan={3}
+                    className="px-4 py-8 text-center text-slate-500"
+                  >
                     No users match “{search}”.
                   </td>
                 </tr>
@@ -83,7 +109,8 @@ export const UsersPage = () => {
           </table>
           <div className="flex items-center justify-between border-t border-slate-100 px-4 py-3 text-sm text-slate-600">
             <span>
-              {total === 0 ? 0 : offset + 1}–{Math.min(offset + PAGE_SIZE, total)} of {total}
+              {total === 0 ? 0 : offset + 1}–
+              {Math.min(offset + PAGE_SIZE, total)} of {total}
             </span>
             <div className="flex gap-2">
               <Button
