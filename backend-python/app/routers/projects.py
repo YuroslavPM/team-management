@@ -76,7 +76,8 @@ def _project_out(db: Session, project: Project) -> ProjectOut:
     )
     memberships = (
         db.execute(
-            select(ProjectMember)
+            select(ProjectMember.user_id, User.display_name, ProjectMember.role)
+            .join(User, User.id == ProjectMember.user_id)
             .where(ProjectMember.project_id == project.id)
             .order_by(ProjectMember.user_id)
         )
@@ -85,11 +86,11 @@ def _project_out(db: Session, project: Project) -> ProjectOut:
     )
     members = [
         ProjectMemberOut(
-            user_id=m.user_id,
-            display_name=db.get(User, m.user_id).display_name,
-            role=m.role,
+            user_id=user_id,
+            display_name=display_name,
+            role=role,
         )
-        for m in memberships
+        for user_id, display_name, role in memberships
     ]
     return ProjectOut(
         id=project.id,
@@ -176,12 +177,23 @@ def update_project(
 ):
     project = _require_project_admin(db, me, project_id)
     changes = body.model_dump(exclude_unset=True)
+
+    if changes.get("name")=="":
+        changes.pop("name")
+
+    if "name" in changes:
+        changes["name"] = changes["name"].strip()
+        if not changes["name"]:
+            raise ApiError(422, "Name cannot be empty")
+
     team_ids = changes.pop("team_ids", None)
+    
     if not changes and team_ids is None:
         raise ApiError(422, "Nothing to update")
 
     if "name" in changes and changes["name"] != project.name:
-        if db.execute(select(Project.id).where(Project.name == changes["name"])).first():
+        existing = db.scalar(select(Project.id).where(Project.name == changes["name"], Project.id != project.id))
+        if existing is not None:
             raise ApiError(409, "A project with that name already exists")
 
     if team_ids is not None:

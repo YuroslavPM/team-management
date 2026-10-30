@@ -145,8 +145,8 @@ class ProjectCreate(ApiModel):
 
 
 class ProjectUpdate(ApiModel):
-    name: str | None = Field(default=None, min_length=1, max_length=120)
-    description: str | None = Field(default=None, max_length=5000)
+    name: str = Field(default="", min_length=1, max_length=120)
+    description: str = Field(default="", max_length=5000)
     status: ProjectStatus | None = None
     team_ids: list[int] | None = None
 
