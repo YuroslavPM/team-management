@@ -178,7 +178,7 @@ def update_project(
     project = _require_project_admin(db, me, project_id)
     changes = body.model_dump(exclude_unset=True)
 
-    if changes.get("name")=="":
+    if changes.get("name") == "":
         changes.pop("name")
 
     if "name" in changes:
@@ -187,12 +187,14 @@ def update_project(
             raise ApiError(422, "Name cannot be empty")
 
     team_ids = changes.pop("team_ids", None)
-    
+
     if not changes and team_ids is None:
         raise ApiError(422, "Nothing to update")
 
     if "name" in changes and changes["name"] != project.name:
-        existing = db.scalar(select(Project.id).where(Project.name == changes["name"], Project.id != project.id))
+        existing = db.scalar(
+            select(Project.id).where(Project.name == changes["name"], Project.id != project.id)
+        )
         if existing is not None:
             raise ApiError(409, "A project with that name already exists")
 
