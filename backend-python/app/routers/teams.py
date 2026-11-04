@@ -76,7 +76,7 @@ def create_team(body: TeamCreate, me: User = Depends(current_user), db: Session 
     require_admin(me)
 
     if _team_name_exists(db, body.name):
-        _return_response(409, "A team with this name already exists", details={"field": "name"})
+        _return_response(409, "A team with this name already exists", details={"field": "name", "message":"This team name already exists"})
 
     team = Team(name=body.name, description=body.description)
     db.add(team)
@@ -111,7 +111,7 @@ def update_team(
 
     if "name" in changes and changes["name"] != team.name:
         if _team_name_exists(db, body.name):
-            _return_response(409, "A team with that name already exists", details={"field": "name"})
+            _return_response(409, "A team with that name already exists", details={"field": "message", "value":"This team name already exists"})
 
     for field, value in changes.items():
         setattr(team, field, value)
@@ -145,14 +145,14 @@ def add_member(
 
     if db.get(User, body.user_id) is None:
         _return_response(
-            404, "User not found", details={"field": "user_id", "value": "not_found_user_id"}
+            404, "User not found", details={"field": "user_id", "message": "User not found"}
         )
 
     if team.memberships.__contains__(body.user_id):
         _return_response(
             409,
             "User already in team",
-            details={"field": "user_id", "value": "user_id_already_in_team"},
+            details={"field": "user_id", "message": "User is already in team"},
         )
 
     db.add(TeamMember(team_id=team_id, user_id=body.user_id, role=body.role))

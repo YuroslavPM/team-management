@@ -33,13 +33,7 @@ def error_body(code: str, message: str, details=None) -> dict:
 
 
 def _return_response(status_code: int, message: str, details=None):
-
-    error = {"code": status_code, "message": message}
-
-    if details is not None:
-        error["details"] = details
-
-    return JSONResponse(status_code=status_code, content={"error": error})
+    raise ApiError(status_code, message, details=details)
 
 
 def install_error_handlers(app: FastAPI) -> None:

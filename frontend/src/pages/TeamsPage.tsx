@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 
-import { errorMessage } from "../api/errors";
+import { errorMessage, getErrorDetail } from "../api/errors";
 import { useCreateTeam, useTeams } from "../api/teams";
 import { useAuth } from "../auth/authContext";
 import { Alert } from "../components/ui/Alert";
@@ -74,6 +74,8 @@ function NewTeamForm({ onDone }: { onDone: () => void }) {
     }
   });
 
+
+
   return (
     <form
       onSubmit={onSubmit}
@@ -81,8 +83,8 @@ function NewTeamForm({ onDone }: { onDone: () => void }) {
       className="mb-6 space-y-4 rounded-lg border border-slate-200 bg-white p-5"
     >
       {createTeam.error && <Alert>{errorMessage(createTeam.error)}</Alert>}
-      <Field label="Name" error={errors.name?.message} {...register("name", { required: "Name is required" })} />
-      <Field label="Description" {...register("description")} />
+      <Field label="Name" error={errors.name?.message ?? getErrorDetail(createTeam.error)} {...register("name", { required: "Name is required" })} />
+      <Field label="Description" {...register("description")}/>
       <div className="flex gap-2">
         <Button type="submit" disabled={createTeam.isPending}>
           Create team
