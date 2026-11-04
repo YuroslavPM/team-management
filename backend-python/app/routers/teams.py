@@ -76,7 +76,11 @@ def create_team(body: TeamCreate, me: User = Depends(current_user), db: Session 
     require_admin(me)
 
     if _team_name_exists(db, body.name):
-        _return_response(409, "A team with this name already exists", details={"field": "name", "message":"This team name already exists"})
+        _return_response(
+            409,
+            "A team with this name already exists",
+            details={"field": "name", "message": "This team name already exists"},
+        )
 
     team = Team(name=body.name, description=body.description)
     db.add(team)
@@ -111,7 +115,11 @@ def update_team(
 
     if "name" in changes and changes["name"] != team.name:
         if _team_name_exists(db, body.name):
-            _return_response(409, "A team with that name already exists", details={"field": "message", "value":"This team name already exists"})
+            _return_response(
+                409,
+                "A team with that name already exists",
+                details={"field": "message", "value": "This team name already exists"},
+            )
 
     for field, value in changes.items():
         setattr(team, field, value)
