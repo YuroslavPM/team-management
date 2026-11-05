@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.auth import current_user, require_admin
 from app.db import get_db
-from app.errors import _return_response
+from app.errors import _error_response
 from app.models import Team, TeamMember, User
 from app.schemas import Page, TeamCreate, TeamMemberIn, TeamMemberOut, TeamOut, TeamUpdate
 
@@ -12,7 +12,7 @@ router = APIRouter(prefix="/teams", tags=["teams"])
 
 
 def _not_found():
-    _return_response(404, "Team not found")
+    _error_response(404, "Team not found")
 
 
 def _team_name_exists(db: Session, name: str, exclude_team_id: int | None = None) -> bool:
@@ -76,7 +76,7 @@ def create_team(body: TeamCreate, me: User = Depends(current_user), db: Session 
     require_admin(me)
 
     if _team_name_exists(db, body.name):
-        _return_response(
+        _error_response(
             409,
             "A team with this name already exists",
             details={"field": "name", "message": "This team name already exists"},
@@ -107,15 +107,15 @@ def update_team(
     if team is None:
         return _not_found()
     if not _can_manage(db, me, team_id):
-        _return_response(409, "Only admins and the team lead can edit this team")
+        _error_response(409, "Only admins and the team lead can edit this team")
 
     changes = body.model_dump(exclude_unset=True)
     if not changes:
-        _return_response(422, "Nothing to update")
+        _error_response(422, "Nothing to update")
 
     if "name" in changes and changes["name"] != team.name:
-        if _team_name_exists(db, body.name):
-            _return_response(
+        if _team_name_exists(db, body.name, team_id):
+            _error_response(
                 409,
                 "A team with that name already exists",
                 details={"field": "message", "value": "This team name already exists"},
@@ -149,15 +149,20 @@ def add_member(
     if team is None:
         return _not_found()
     if not _can_manage(db, me, team_id):
-        _return_response(403, "Only admins and the team lead can add members")
+        _error_response(403, "Only admins and the team lead can add members")
 
     if db.get(User, body.user_id) is None:
-        _return_response(
+        _error_response(
             404, "User not found", details={"field": "user_id", "message": "User not found"}
         )
 
-    if team.memberships.__contains__(body.user_id):
-        _return_response(
+    user_already_in_team = db.execute(
+        select(TeamMember.id).where(
+            TeamMember.team_id == team_id, TeamMember.user_id == body.user_id
+        )
+    ).first()
+    if user_already_in_team:
+        _error_response(
             409,
             "User already in team",
             details={"field": "user_id", "message": "User is already in team"},
@@ -178,13 +183,13 @@ def remove_member(
     if db.get(Team, team_id) is None:
         return _not_found()
     if not _can_manage(db, me, team_id):
-        _return_response(403, "Only admins and the team lead can remove members")
+        _error_response(403, "Only admins and the team lead can remove members")
 
     membership = db.execute(
         select(TeamMember).where(TeamMember.team_id == team_id, TeamMember.user_id == user_id)
     ).scalar_one_or_none()
     if membership is None:
-        _return_response(404, "Not a member of this team")
+        _error_response(404, "Not a member of this team")
 
     db.delete(membership)
     db.commit()
