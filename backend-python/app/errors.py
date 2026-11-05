@@ -1,5 +1,7 @@
 """The error envelope from contracts/openapi.yaml: {"error": {code, message, details?}}."""
 
+from typing import TypedDict
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -17,6 +19,11 @@ CODES = {
 }
 
 
+class ErrorDetail(TypedDict):
+    field: str
+    message: str
+
+
 class ApiError(Exception):
     def __init__(self, status: int, message: str, code: str | None = None, details=None):
         self.status = status
@@ -30,6 +37,21 @@ def error_body(code: str, message: str, details=None) -> dict:
     if details is not None:
         body["details"] = details
     return {"error": body}
+
+
+def _error_response(
+    status_code: int,
+    message: str,
+    details: ErrorDetail | None = None,
+) -> dict:
+    if isinstance(details, dict):
+        details = [details]
+
+    raise ApiError(
+        status_code,
+        message,
+        details=details or None,
+    )
 
 
 def install_error_handlers(app: FastAPI) -> None:
