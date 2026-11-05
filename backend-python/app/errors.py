@@ -31,9 +31,19 @@ def error_body(code: str, message: str, details=None) -> dict:
         body["details"] = details
     return {"error": body}
 
+def _error_response(
+    status_code: int,
+    message: str,
+    details: dict | None = None,
+) -> dict:
+    if isinstance(details, dict):
+        details = [details]
 
-def _error_response(status_code: int, message: str, details=None):
-    raise ApiError(status_code, message, details=details)
+    raise ApiError(
+        status_code,
+        message,
+        details=details or [],
+    )
 
 
 def install_error_handlers(app: FastAPI) -> None:

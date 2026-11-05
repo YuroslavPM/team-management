@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 
-import { errorMessage, getErrorDetail } from "../api/errors";
+import { errorMessage, getErrorDetailByKey } from "../api/errors";
 import { useCreateTeam, useTeams } from "../api/teams";
 import { useAuth } from "../auth/authContext";
 import { Alert } from "../components/ui/Alert";
@@ -39,13 +39,22 @@ export const TeamsPage = () => {
       {data && (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {data?.items?.map((team) => (
-            <li key={team.id} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-              <Link to={`/teams/${team.id}`} className="text-base font-semibold text-slate-900 hover:text-brand-700">
+            <li
+              key={team.id}
+              className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+            >
+              <Link
+                to={`/teams/${team.id}`}
+                className="text-base font-semibold text-slate-900 hover:text-brand-700"
+              >
                 {team.name}
               </Link>
-              <p className="mt-1 line-clamp-2 text-sm text-slate-500">{team.description || "No description"}</p>
+              <p className="mt-1 line-clamp-2 text-sm text-slate-500">
+                {team.description || "No description"}
+              </p>
               <p className="mt-4 text-xs text-slate-500">
-                {team.members.length} {team.members.length === 1 ? "member" : "members"}
+                {team.members.length}{" "}
+                {team.members.length === 1 ? "member" : "members"}
                 {team.members.some((m) => m.role === "lead") &&
                   ` · led by ${team.members.find((m) => m.role === "lead")!.displayName}`}
               </p>
@@ -74,8 +83,6 @@ function NewTeamForm({ onDone }: { onDone: () => void }) {
     }
   });
 
-
-
   return (
     <form
       onSubmit={onSubmit}
@@ -83,8 +90,12 @@ function NewTeamForm({ onDone }: { onDone: () => void }) {
       className="mb-6 space-y-4 rounded-lg border border-slate-200 bg-white p-5"
     >
       {createTeam.error && <Alert>{errorMessage(createTeam.error)}</Alert>}
-      <Field label="Name" error={errors.name?.message ?? getErrorDetail(createTeam.error)} {...register("name", { required: "Name is required" })} />
-      <Field label="Description" {...register("description")}/>
+      <Field
+        label="Name"
+        error={errors.name?.message ?? getErrorDetailByKey(createTeam.error, "name")}
+        {...register("name", { required: "Name is required" })}
+      />
+      <Field label="Description" {...register("description")} />
       <div className="flex gap-2">
         <Button type="submit" disabled={createTeam.isPending}>
           Create team

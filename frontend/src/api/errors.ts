@@ -14,8 +14,13 @@ export function errorMessage(
   return fallback;
 }
 
-export function getErrorDetail(error: unknown) {
+export function getErrorDetailByKey(error: unknown, key: string) {
   if (isAxiosError<ApiErrorBody>(error)) {
-    return String(error.response?.data?.error?.details?.[0]?.message);
+    console.log(error.response?.data?.error);
+    const detail = error.response?.data?.error?.details?.find(
+      (e) => e.field === key,
+    );
+
+    return typeof detail?.message === "string" ? detail.message : undefined;
   }
 }
