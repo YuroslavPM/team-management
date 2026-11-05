@@ -16,7 +16,6 @@ export function errorMessage(
 
 export function getErrorDetailByKey(error: unknown, key: string) {
   if (isAxiosError<ApiErrorBody>(error)) {
-    console.log(error.response?.data?.error);
     const detail = error.response?.data?.error?.details?.find(
       (e) => e.field === key,
     );

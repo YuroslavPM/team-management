@@ -107,7 +107,7 @@ def update_team(
     if team is None:
         return _not_found()
     if not _can_manage(db, me, team_id):
-        _error_response(409, "Only admins and the team lead can edit this team")
+        _error_response(403, "Only admins and the team lead can edit this team")
 
     changes = body.model_dump(exclude_unset=True)
     if not changes:

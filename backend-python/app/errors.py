@@ -1,5 +1,7 @@
 """The error envelope from contracts/openapi.yaml: {"error": {code, message, details?}}."""
 
+from typing import TypedDict
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -15,6 +17,11 @@ CODES = {
     422: "validation_error",
     429: "rate_limited",
 }
+
+
+class ErrorDetail(TypedDict):
+    field: str
+    message: str
 
 
 class ApiError(Exception):
@@ -35,7 +42,7 @@ def error_body(code: str, message: str, details=None) -> dict:
 def _error_response(
     status_code: int,
     message: str,
-    details: dict | None = None,
+    details: ErrorDetail | None = None,
 ) -> dict:
     if isinstance(details, dict):
         details = [details]
@@ -43,7 +50,7 @@ def _error_response(
     raise ApiError(
         status_code,
         message,
-        details=details or [],
+        details=details or None,
     )
 
 
