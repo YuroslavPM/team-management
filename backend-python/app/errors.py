@@ -31,6 +31,7 @@ def error_body(code: str, message: str, details=None) -> dict:
         body["details"] = details
     return {"error": body}
 
+
 def _error_response(
     status_code: int,
     message: str,
