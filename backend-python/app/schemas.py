@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from enum import StrEnum
 from typing import Annotated, Literal
 
@@ -154,3 +154,53 @@ class ProjectUpdate(ApiModel):
 class ProjectMemberIn(ApiModel):
     user_id: int
     role: ProjectRole = "member"
+
+
+# --- tasks ------------------------------------------------------------------
+
+
+class TaskStatus(StrEnum):
+    TODO = "todo"
+    IN_PROGRESS = "in_progress"
+    REVIEW = "review"
+    DONE = "done"
+
+
+class TaskPriority(StrEnum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    URGENT = "urgent"
+
+
+class TaskCreate(ApiModel):
+    title: str = Field(min_length=1, max_length=120)
+    description: str = Field(default="", max_length=1000)
+    status: TaskStatus = TaskStatus.TODO
+    priority: TaskPriority = TaskPriority.MEDIUM
+    assignee_id: int | None = None
+    due_date: date | None = None
+
+
+class TaskUpdate(ApiModel):
+    version: int
+    title: str | None = Field(default=None, min_length=1, max_length=120)
+    description: str | None = Field(default=None, max_length=1000)
+    status: TaskStatus | None = None
+    priority: TaskPriority | None = None
+    assignee_id: int | None = None
+    due_date: date | None = None
+
+
+class TaskOut(ApiModel):
+    id: int
+    project_id: int
+    title: str
+    description: str
+    status: TaskStatus
+    priority: TaskPriority
+    assignee_id: int | None
+    due_date: date | None
+    version: int
+    created_at: Timestamp
+    updated_at: Timestamp

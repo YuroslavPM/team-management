@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Query, Response
-from sqlalchemy import select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app.auth import current_user, hash_password, require_admin
@@ -27,24 +27,34 @@ def list_users(
     _me: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
-    users = db.execute(select(User).order_by(User.id)).scalars().all()
+    query = select(User)
+
     if search:
-        needle = search.lower()
-        users = [
-            u
-            for u in users
-            if needle in u.email.lower()
-            or needle in u.display_name.lower()
-            or needle in f"{u.first_name} {u.last_name}".lower()
-        ]
+        needle = f"%{search.strip()}%"
+        query = query.where(
+            or_(
+                User.email.ilike(needle),
+                User.display_name.ilike(needle),
+                (User.first_name + " " + User.last_name).ilike(needle),
+            )
+        )
     if role:
-        users = [u for u in users if u.role == role]
-    return Page[UserOut](items=users, total=len(users), limit=limit, offset=offset)
+        users = query.where(User.role == role)
+
+    total = db.execute(select(func.count()).select_from(query.subquery())).scalar_one()
+
+    users = db.execute(query.order_by(User.id).limit(limit).offset(offset)).scalars().all()
+
+    return Page[UserOut](items=users, total=total, limit=limit, offset=offset)
 
 
 @router.post("", response_model=UserOut, status_code=201)
 def create_user(body: UserCreate, _me: User = Depends(current_user), db: Session = Depends(get_db)):
     email = body.email.lower()
+
+    if db.execute(select(User.id).where(User.role == "member")).first():
+        raise ApiError(403)
+
     if db.execute(select(User.id).where(User.email == email)).first():
         raise ApiError(409, "Email already in use")
     user = User(
@@ -73,13 +83,18 @@ def update_user(
     db: Session = Depends(get_db),
 ):
     user = _get_user(db, user_id)
+    role = user.role
+
     if me.id != user.id and me.role != "admin":
         raise ApiError(403, "You can only edit your own profile")
     changes = body.model_dump(exclude_unset=True)
     if not changes:
         raise ApiError(422, "Nothing to update")
     for field, value in changes.items():
-        setattr(user, field, value)
+        if field == "role" and role != "admin":
+            continue
+        else:
+            setattr(user, field, value)
     db.commit()
     return user
 

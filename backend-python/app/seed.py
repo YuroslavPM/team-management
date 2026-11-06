@@ -5,7 +5,7 @@ The starter only has users and teams. When you add projects and tasks, extend
 """
 
 import json
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 from sqlalchemy import insert
@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.auth import hash_password
 from app.db import Base
-from app.models import Project, ProjectMember, ProjectTeams, Team, TeamMember, User
+from app.models import Project, ProjectMember, ProjectTeams, Task, Team, TeamMember, User
 
 SEED_FILE = Path(__file__).resolve().parents[2] / "contracts" / "seed.json"
 
@@ -23,6 +23,12 @@ LARGE_TEAMS = 40
 
 def _ts(value: str) -> datetime:
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+def _date(value: str | None):
+    if value is None:
+        return None
+    return date.fromisoformat(value)
 
 
 def reset(db: Session, size: str = "small") -> None:
@@ -103,6 +109,25 @@ def load_small(db: Session) -> None:
                 "role": m["role"],
             }
             for m in seed["projectMembers"]
+        ],
+    )
+    db.execute(
+        insert(Task),
+        [
+            {
+                "id": t["id"],
+                "project_id": t["projectId"],
+                "title": t["title"],
+                "description": t["description"],
+                "status": t["status"],
+                "priority": t["priority"],
+                "assignee_id": t["assigneeId"],
+                "due_date": _date(t["dueDate"]),
+                "version": t["version"],
+                "created_at": _ts(t["createdAt"]),
+                "updated_at": _ts(t["updatedAt"]),
+            }
+            for t in seed["tasks"]
         ],
     )
     db.flush()
