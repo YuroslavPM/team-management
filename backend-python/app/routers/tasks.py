@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.auth import current_user
 from app.db import get_db
-from app.errors import ApiError, _error_response
+from app.errors import _error_response
 from app.models import ProjectMember, Task, TaskPriority, TaskStatus, User
 from app.routers.projects import _get_visible_project, _require_project_admin
 from app.schemas import Page, TaskCreate, TaskOut, TaskUpdate
