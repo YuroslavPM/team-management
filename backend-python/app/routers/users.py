@@ -49,11 +49,9 @@ def list_users(
 
 
 @router.post("", response_model=UserOut, status_code=201)
-def create_user(body: UserCreate, _me: User = Depends(current_user), db: Session = Depends(get_db)):
+def create_user(body: UserCreate, me: User = Depends(current_user), db: Session = Depends(get_db)):
+    require_admin(me)
     email = body.email.lower()
-
-    if db.execute(select(User.id).where(User.role == "member")).first():
-        raise ApiError(403)
 
     if db.execute(select(User.id).where(User.email == email)).first():
         raise ApiError(409, "Email already in use")
