@@ -5,9 +5,9 @@ import { Link } from "react-router-dom";
 import { errorMessage } from "../../api/errors";
 import { useProjects } from "../../api/projects";
 import {
+  projectStatusOptions,
   type ProjectStatusType,
   type StatusFilter,
-  statusOptions,
 } from "../../api/types";
 import { useAuth } from "../../auth/authContext";
 import { ProjectCard } from "../../components/projects/ProjectCard";
@@ -26,7 +26,7 @@ export const ProjectsPage = () => {
 
   const filteredOptions: ComboboxOption<StatusFilter>[] = [
     { label: "All statuses", value: "all" },
-    ...statusOptions,
+    ...projectStatusOptions,
   ];
 
   const filteredProjects = data?.items.filter(
