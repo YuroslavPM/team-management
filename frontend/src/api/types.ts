@@ -42,7 +42,7 @@ export const ProjectStatus = {
 
 export type ProjectStatusType = keyof typeof ProjectStatus;
 
-export const statusOptions: ComboboxOption<ProjectStatusType>[] =
+export const projectStatusOptions: ComboboxOption<ProjectStatusType>[] =
   Object.entries(ProjectStatus).map(([value, label]) => ({
     value: value as ProjectStatusType,
     label,
@@ -69,6 +69,59 @@ export type ProjectUpdate = {
   description?: string;
   status?: ProjectStatusType;
   teamIds?: number[];
+};
+
+export const TaskStatus = {
+  todo: "Todo",
+  in_progress: "In progress",
+  review: "Review",
+  done: "Done",
+} as const;
+
+export type TaskStatusType = keyof typeof TaskStatus;
+
+export const taskStatusOptions: ComboboxOption<TaskStatusType>[] =
+  Object.entries(TaskStatus).map(([value, label]) => ({
+    value: value as TaskStatusType,
+    label,
+  }));
+
+export const TaskPriority = {
+  low: "Low",
+  medium: "Medium",
+  high: "High",
+  urgent: "Urgent",
+} as const;
+
+export type TaskPriorityType = keyof typeof TaskPriority;
+
+export const taskPriorityOptions: ComboboxOption<TaskPriorityType>[] =
+  Object.entries(TaskPriority).map(([value, label]) => ({
+    value: value as TaskPriorityType,
+    label,
+  }));
+
+export type Task = {
+  id: number;
+  project_id: number;
+  title: string;
+  description: string;
+  status: TaskStatusType;
+  priority: TaskPriorityType;
+  assigneeId: number | null;
+  dueDate: string;
+  version: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TaskBody = {
+  title: string;
+  description: string;
+  status: TaskStatusType;
+  priority: TaskPriorityType;
+  assigneeId?: number;
+  dueDate: string;
 };
 
 export type Page<T> = {

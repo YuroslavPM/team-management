@@ -14,11 +14,12 @@ import {
   useProject,
   useRemoveProjectMember,
 } from "../../api/projects";
+import { useDeleteTask, useProjectTasks } from "../../api/tasks";
 import { useTeams } from "../../api/teams";
 import {
   type Project,
+  projectStatusOptions,
   type ProjectStatusType,
-  statusOptions,
 } from "../../api/types";
 import { useAuth } from "../../auth/authContext";
 import { ConfirmModal } from "../../components/layout/ConfirmModal";
@@ -26,6 +27,7 @@ import { AddMemberDialog } from "../../components/projects/AddMemberDialog";
 import { AddTeamDialog } from "../../components/projects/AddTeamDialog";
 import { EditProjectDialog } from "../../components/projects/EditProjectDialog";
 import { ProjectSection } from "../../components/projects/ProjectSection";
+import { TaskDialog } from "../../components/tasks/TaskDialog";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { Combobox } from "../../components/ui/Combobox";
@@ -33,6 +35,8 @@ import { ErrorAlert } from "../../components/ui/ErrorAlert";
 import { PageHeader } from "../../components/ui/PageHeader";
 import { Spinner } from "../../components/ui/Spinner";
 import { canProjectManage } from "../../utils/helpers/userHelpers";
+
+type Mode = "create" | "edit" | "view";
 
 export const ProjectDetailPage = () => {
   const projectId = Number(useParams().projectId);
@@ -60,15 +64,20 @@ function ProjectDetail({ project }: { project: Project }) {
 
   const { user } = useAuth();
   const { data, error: teamError } = useTeams();
+  const { data: projectTasks, error: taskError } = useProjectTasks(project.id);
 
   const [addTeam, setAddTeam] = useState(false);
   const [addMember, setAddMember] = useState(false);
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
-
+  const [openedTaskId, setOpenedTaskId] = useState<number>();
+  const [openTask, setOpenTask] = useState(false);
+  const [deletingTask, setDeletingTask] = useState(false);
+  const [mode, setMode] = useState<Mode>("view");
   const removeMember = useRemoveProjectMember(project.id);
   const editProject = useEditProject(project.id);
   const deleteProject = useDeleteProject(project.id);
+  const deleteProjectTask = useDeleteTask(openedTaskId);
 
   const canManage = canProjectManage(user!, project);
 
@@ -81,13 +90,18 @@ function ProjectDetail({ project }: { project: Project }) {
     };
   });
 
+  const openedTask = projectTasks?.items.find(
+    (task) => task.id === openedTaskId,
+  );
+
   const errors = [
     teamError,
     removeMember.error,
     editProject.error,
     deleteProject.error,
+    taskError,
   ].filter((e) => e !== null);
-
+  
   return (
     <>
       <PageHeader
@@ -108,13 +122,12 @@ function ProjectDetail({ project }: { project: Project }) {
           )
         }
       />
-
       {errors.map((error, index) => {
         <ErrorAlert key={index} error={error} />;
       })}
       <div className="mb-4 w-48">
         <Combobox<ProjectStatusType>
-          options={statusOptions}
+          options={projectStatusOptions}
           value={project.status}
           disabled={editProject.isPending && !canManage}
           onChange={(value) => {
@@ -170,7 +183,6 @@ function ProjectDetail({ project }: { project: Project }) {
           )}
         </ul>
       </ProjectSection>
-
       <ProjectSection
         title="Teams in project:"
         action={
@@ -214,7 +226,77 @@ function ProjectDetail({ project }: { project: Project }) {
           )}
         </ul>
       </ProjectSection>
+      <ProjectSection
+        title="Project tasks:"
+        action={
+          canManage && (
+            <Button
+              onClick={() => {
+                setOpenedTaskId(undefined);
+                setMode("create");
+                setOpenTask(true);
+              }}
+            >
+              <UserRoundGroup className="size-4" aria-hidden />
+              Add task
+            </Button>
+          )
+        }
+      >
+        <ul className="divide-y divide-slate-100">
+          {projectTasks?.items.map((task) => (
+            <li
+              key={task.id}
+              className="flex items-center justify-between px-5 py-3"
+            >
+              <span className="text-sm font-medium text-slate-900">
+                {task.title}
+              </span>
+              <div>
 
+              <Button
+                variant="secondary"
+                disabled={editProject.isPending}
+                aria-label={`View`}
+                onClick={() => {
+                  setOpenedTaskId(task.id);
+                  setMode("view");
+                  setOpenTask(true);
+                }}
+              >
+                View
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => {
+                  setOpenedTaskId(task.id);
+                  setDeletingTask(true);
+                }}
+              >
+                Delete
+              </Button>
+              </div>
+            </li>
+          ))}
+
+          {projectTasks?.items.length === 0 && (
+            <li className="px-5 py-6 text-sm text-slate-500">No tasks yet.</li>
+          )}
+        </ul>
+      </ProjectSection>
+
+      {openTask && (
+        <TaskDialog
+          key={mode === "create" ? "create" : `task-${openedTaskId}`}
+          mode={mode}
+          project={project}
+          task={mode === "create" ? undefined : openedTask}
+          onClose={() => {
+            setOpenTask(false);
+            setOpenedTaskId(undefined);
+          }}
+        />
+      )}
       {addTeam && canManage && (
         <AddTeamDialog project={project} onClose={() => setAddTeam(false)} />
       )}
@@ -230,7 +312,6 @@ function ProjectDetail({ project }: { project: Project }) {
           onClose={() => setEditing(false)}
         />
       )}
-
       {deleting && canManage && (
         <ConfirmModal
           reason={"delete this project?"}
@@ -242,6 +323,15 @@ function ProjectDetail({ project }: { project: Project }) {
             });
           }}
           onClose={() => setDeleting(false)}
+        />
+      )}
+      {deletingTask && canManage && (
+        <ConfirmModal
+          reason={"delete this task?"}
+          onClick={() => {
+            deleteProjectTask.mutate();
+          }}
+          onClose={() => setDeletingTask(false)}
         />
       )}
     </>

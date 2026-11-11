@@ -1,9 +1,11 @@
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from enum import StrEnum
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, PlainSerializer
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, PlainSerializer, field_validator
 from pydantic.alias_generators import to_camel
+
+from app.models import TaskPriority, TaskStatus
 
 UserRole = Literal["admin", "member"]
 TeamRole = Literal["lead", "member"]
@@ -154,3 +156,57 @@ class ProjectUpdate(ApiModel):
 class ProjectMemberIn(ApiModel):
     user_id: int
     role: ProjectRole = "member"
+
+
+# --- tasks ------------------------------------------------------------------
+
+
+def _empty_due_date(value: Any) -> date | None:
+    if value is None or value == "":
+        return None
+    return value
+
+
+class TaskCreate(ApiModel):
+    title: str = Field(min_length=1, max_length=120)
+    description: str = Field(default="", max_length=1000)
+    status: TaskStatus = TaskStatus.TODO
+    priority: TaskPriority = TaskPriority.MEDIUM
+    assignee_id: int | None = None
+    due_date: date | None = None
+
+    @field_validator("due_date", mode="before")
+    @classmethod
+    def due_date_optional(cls, value: Any) -> date | None:
+        return _empty_due_date(value)
+
+
+class TaskUpdate(ApiModel):
+    title: str | None = Field(default=None, min_length=1, max_length=120)
+    description: str | None = Field(default=None, max_length=1000)
+    status: TaskStatus | None = None
+    priority: TaskPriority | None = None
+    assignee_id: int | None = None
+    due_date: date | None = None
+
+    @field_validator("due_date", mode="before")
+    @classmethod
+    def due_date_optional(cls, value: Any) -> date | None:
+        return _empty_due_date(value)
+
+
+class TaskOut(ApiModel):
+    id: int
+    project_id: int
+    title: str
+    description: str
+    status: TaskStatus
+    priority: TaskPriority
+    assignee_id: int | None
+    due_date: Annotated[
+        date | None,
+        PlainSerializer(lambda d: d.isoformat() if d else "", return_type=str),
+    ]
+    version: int
+    created_at: Timestamp
+    updated_at: Timestamp
