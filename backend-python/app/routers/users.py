@@ -18,6 +18,10 @@ def _get_user(db: Session, user_id: int) -> User:
     return user
 
 
+def _escape_like(value: str) -> str:
+    return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+
 @router.get("", response_model=Page[UserOut])
 def list_users(
     limit: int = Query(20, ge=1, le=100),
@@ -30,21 +34,19 @@ def list_users(
     query = select(User)
 
     if search:
-        needle = f"%{search.strip()}%"
+        needle = f"%{_escape_like(search.strip().lower())}%"
         query = query.where(
             or_(
-                User.email.ilike(needle),
-                User.display_name.ilike(needle),
-                (User.first_name + " " + User.last_name).ilike(needle),
+                func.lower(User.email).like(needle, escape="\\"),
+                func.lower(User.display_name).like(needle, escape="\\"),
+                func.lower(User.first_name + " " + User.last_name).like(needle, escape="\\"),
             )
         )
     if role:
-        users = query.where(User.role == role)
+        query = query.where(User.role == role)
 
     total = db.execute(select(func.count()).select_from(query.subquery())).scalar_one()
-
     users = db.execute(query.order_by(User.id).limit(limit).offset(offset)).scalars().all()
-
     return Page[UserOut](items=users, total=total, limit=limit, offset=offset)
 
 

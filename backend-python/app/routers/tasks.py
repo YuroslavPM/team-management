@@ -6,7 +6,7 @@ from app.auth import current_user
 from app.db import get_db
 from app.errors import _error_response
 from app.models import ProjectMember, Task, TaskPriority, TaskStatus, User
-from app.routers.projects import _get_visible_project, _require_project_admin
+from app.project_access import get_visible_project, require_project_admin
 from app.schemas import Page, TaskCreate, TaskOut, TaskUpdate
 
 router = APIRouter(tags=["tasks"])
@@ -31,19 +31,15 @@ _PRIORITY_RANK = case(
 )
 
 
-def _task_out(task: Task) -> TaskOut:
-    return TaskOut.model_validate(task)
-
-
 def _require_visible_task(db: Session, me: User, task_id: int) -> Task:
     task = db.get(Task, task_id)
-    if task is None or _get_visible_project(db, me, task.project_id) is None:
+    if task is None or get_visible_project(db, me, task.project_id) is None:
         _error_response(404, "Task not found")
     return task
 
 
-def _require_project_member(db: Session, me: User, project_id: int):
-    project = _get_visible_project(db, me, project_id)
+def _require_project(db: Session, me: User, project_id: int):
+    project = get_visible_project(db, me, project_id)
     if project is None:
         _error_response(404, "Project not found")
     return project
@@ -107,7 +103,7 @@ def list_project_tasks(
     query = _apply_sort(query, sort)
     tasks = db.execute(query.limit(limit).offset(offset)).scalars().all()
     return Page[TaskOut](
-        items=[_task_out(t) for t in tasks],
+        items=[TaskOut.model_validate(t) for t in tasks],
         total=total,
         limit=limit,
         offset=offset,
@@ -120,9 +116,9 @@ def create_task(
     body: TaskCreate,
 ) -> TaskOut:
     _validate_assignee(db, project_id, body.assignee_id)
-    if body.title.strip == "":
+    if body.title.strip() == "":
         _error_response(
-            409,
+            422,
             "Fill the title",
             details={"field": "title", "message": "This task does not contain a title"},
         )
@@ -140,7 +136,7 @@ def create_task(
     db.add(task)
     db.commit()
     db.refresh(task)
-    return _task_out(task)
+    return TaskOut.model_validate(task)
 
 
 @router.get("/projects/{project_id}/tasks", response_model=Page[TaskOut])
@@ -155,7 +151,7 @@ def get_project_tasks(
     me: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
-    _require_project_member(db, me, project_id)
+    _require_project(db, me, project_id)
     return list_project_tasks(
         db,
         project_id,
@@ -175,7 +171,7 @@ def create_project_task(
     me: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
-    _require_project_member(db, me, project_id)
+    _require_project(db, me, project_id)
     return create_task(db, project_id, body)
 
 
@@ -198,7 +194,7 @@ def get_me_tasks(
         .all()
     )
     return Page[TaskOut](
-        items=[_task_out(t) for t in tasks],
+        items=[TaskOut.model_validate(t) for t in tasks],
         total=total,
         limit=limit,
         offset=offset,
@@ -211,7 +207,7 @@ def get_task(
     me: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
-    return _task_out(_require_visible_task(db, me, task_id))
+    return TaskOut.model_validate(_require_visible_task(db, me, task_id))
 
 
 @router.patch("/tasks/{task_id}", response_model=TaskOut)
@@ -222,11 +218,7 @@ def update_task(
     db: Session = Depends(get_db),
 ):
     task = _require_visible_task(db, me, task_id)
-    if body.version != task.version:
-        _error_response(409, "Version does not match")
-
     changes = body.model_dump(exclude_unset=True)
-    changes.pop("version", None)
     if not changes:
         _error_response(422, "Nothing to update")
 
@@ -238,7 +230,7 @@ def update_task(
     task.version += 1
     db.commit()
     db.refresh(task)
-    return _task_out(task)
+    return TaskOut.model_validate(task)
 
 
 @router.delete("/tasks/{task_id}", status_code=204)
@@ -248,7 +240,7 @@ def delete_task(
     db: Session = Depends(get_db),
 ):
     task = _require_visible_task(db, me, task_id)
-    _require_project_admin(db, me, task.project_id)
+    require_project_admin(db, me, task.project_id)
     db.delete(task)
     db.commit()
     return Response(status_code=204)
