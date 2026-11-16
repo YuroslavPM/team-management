@@ -12,15 +12,13 @@ def fail_startup(message: str) -> None:
 
 load_dotenv(Path(__file__).resolve().parent / ".env")
 
-APP_ENV = os.getenv("APP_ENV")
-raw_port = os.getenv("PORT")
-DATABASE_URL = os.getenv("DATABASE_URL")
-raw_bd_test_mode = os.getenv("BD_TEST_MODE")
-raw_cors = os.getenv("CORS_ORIGINS")
+APP_ENV = os.getenv("APP_ENV", "development")
+raw_port = os.getenv("PORT", "8000")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./team-management.db")
+raw_bd_test_mode = os.getenv("BD_TEST_MODE", "0")
+raw_cors = os.getenv("CORS_ORIGINS", "http://localhost:5173")
 TOKEN_BYTES = 32
 
-if raw_port is None:
-    fail_startup('PORT must be an integer between 1 and 65535, got ""')
 try:
     PORT = int(raw_port)
 except ValueError:
@@ -39,8 +37,6 @@ if not DATABASE_URL or not DATABASE_URL.strip():
 if APP_ENV not in ("development", "test", "production"):
     fail_startup(f'APP_ENV must be development, test or production, got "{APP_ENV}"')
 
-if raw_cors is None:
-    fail_startup('CORS_ORIGINS must contain at least one http(s):// origin, got ""')
 CORS_ORIGINS = [origin.strip() for origin in raw_cors.split(",") if origin.strip()]
 if not CORS_ORIGINS:
     fail_startup('CORS_ORIGINS must contain at least one http(s):// origin, got ""')
