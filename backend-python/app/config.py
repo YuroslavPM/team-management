@@ -38,7 +38,10 @@ if APP_ENV not in ("development", "test", "production"):
     fail_startup(f'APP_ENV must be development, test or production, got "{APP_ENV}"')
 
 CORS_ORIGINS = [origin.strip() for origin in raw_cors.split(",") if origin.strip()]
-if not CORS_ORIGINS:
+if not CORS_ORIGINS or any(
+    not origin.startswith(("http://", "https://")) or origin.endswith("://")
+    for origin in CORS_ORIGINS
+):
     fail_startup('CORS_ORIGINS must contain at least one http(s):// origin, got ""')
 for origin in CORS_ORIGINS:
     if not (origin.startswith("http://") or origin.startswith("https://")):
