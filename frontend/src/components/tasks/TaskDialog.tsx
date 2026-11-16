@@ -80,7 +80,7 @@ export function TaskDialog({ mode, project, task, onClose }: Props) {
       status: taskStatus,
       priority: taskPriority,
       assigneeId: taskAssignee,
-      dueDate: taskDueDate,
+      dueDate: taskDueDate || null,
     };
     if (currentMode === "create") {
       createProjectTask.mutate(body, { onSuccess: onClose });

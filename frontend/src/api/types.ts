@@ -109,7 +109,7 @@ export type Task = {
   status: TaskStatusType;
   priority: TaskPriorityType;
   assigneeId: number | null;
-  dueDate: string;
+  dueDate: string | null;
   version: number;
   created_at: string;
   updated_at: string;
@@ -121,7 +121,7 @@ export type TaskBody = {
   status: TaskStatusType;
   priority: TaskPriorityType;
   assigneeId?: number;
-  dueDate: string;
+  dueDate: string | null;
 };
 
 export type Page<T> = {

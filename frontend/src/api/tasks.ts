@@ -5,13 +5,14 @@ import type { Page, Project, Task, TaskBody } from "./types";
 
 export const taskKeys = {
   all: ["tasks"] as const,
-  list: () => [...taskKeys.all, "list"] as const,
+  list: (projectId: number) => [...taskKeys.all, "list", projectId] as const,
+  me: () => [...taskKeys.all, "me"] as const,
   detail: (id: number) => [...taskKeys.all, "detail", id] as const,
 };
 
 export const useProjectTasks = (projectId: number) =>
   useQuery({
-    queryKey: taskKeys.list(),
+    queryKey: taskKeys.list(projectId),
     queryFn: async () =>
       (
         await axiosClient.get<Page<Task>>(`/projects/${projectId}/tasks`, {
@@ -22,7 +23,7 @@ export const useProjectTasks = (projectId: number) =>
 
 export const useMyTasks = () =>
   useQuery({
-    queryKey: taskKeys.list(),
+    queryKey: taskKeys.me(),
     queryFn: async () => (await axiosClient.get<Task>(`me/tasks`)).data,
   });
 

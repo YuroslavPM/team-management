@@ -101,7 +101,7 @@ function ProjectDetail({ project }: { project: Project }) {
     deleteProject.error,
     taskError,
   ].filter((e) => e !== null);
-  
+
   return (
     <>
       <PageHeader
@@ -122,9 +122,9 @@ function ProjectDetail({ project }: { project: Project }) {
           )
         }
       />
-      {errors.map((error, index) => {
-        <ErrorAlert key={index} error={error} />;
-      })}
+      {errors.map((error, index) => (
+        <ErrorAlert key={index} error={error} />
+      ))}
       <div className="mb-4 w-48">
         <Combobox<ProjectStatusType>
           options={projectStatusOptions}
@@ -253,28 +253,27 @@ function ProjectDetail({ project }: { project: Project }) {
                 {task.title}
               </span>
               <div>
-
-              <Button
-                variant="secondary"
-                disabled={editProject.isPending}
-                aria-label={`View`}
-                onClick={() => {
-                  setOpenedTaskId(task.id);
-                  setMode("view");
-                  setOpenTask(true);
-                }}
-              >
-                View
-              </Button>
-              <Button
-                variant="danger"
-                onClick={() => {
-                  setOpenedTaskId(task.id);
-                  setDeletingTask(true);
-                }}
-              >
-                Delete
-              </Button>
+                <Button
+                  variant="secondary"
+                  disabled={editProject.isPending}
+                  aria-label={`View`}
+                  onClick={() => {
+                    setOpenedTaskId(task.id);
+                    setMode("view");
+                    setOpenTask(true);
+                  }}
+                >
+                  View
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => {
+                    setOpenedTaskId(task.id);
+                    setDeletingTask(true);
+                  }}
+                >
+                  Delete
+                </Button>
               </div>
             </li>
           ))}
