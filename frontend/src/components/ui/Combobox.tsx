@@ -1,15 +1,15 @@
 import type { KeyboardEvent } from "react";
 import { useEffect, useId, useRef, useState } from "react";
 
-export type ComboboxOption<T extends string = string> = {
+export type ComboboxOption<T extends string | number = string> = {
   label: string;
   value: T;
   disabled?: boolean;
 };
 
-type ComboboxProps<T extends string = string> = {
+type ComboboxProps<T extends string | number = string> = {
   options: ComboboxOption<T>[];
-  value: T | null;
+  value: T | null | undefined;
   onChange: (value: T | null) => void;
   placeholder?: string;
   label?: string;
@@ -18,7 +18,7 @@ type ComboboxProps<T extends string = string> = {
   className?: string;
 };
 
-export function Combobox<T extends string = string>({
+export function Combobox<T extends string | number = string>({
   options,
   value,
   onChange,
@@ -38,7 +38,7 @@ export function Combobox<T extends string = string>({
 
   const [inputValue, setInputValue] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-  const [activeValue, setActiveValue] = useState<string | null>(null);
+  const [activeValue, setActiveValue] = useState<T | null>(null);
 
   const query = inputValue ?? "";
 
@@ -162,7 +162,7 @@ export function Combobox<T extends string = string>({
   }, []);
 
   useEffect(() => {
-    if (!open || !activeValue) return;
+    if (!open || activeValue === null) return;
 
     const activeElement = document.getElementById(
       `${id}-option-${encodeURIComponent(activeValue)}`,

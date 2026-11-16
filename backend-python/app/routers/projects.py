@@ -5,7 +5,15 @@ from sqlalchemy.orm import Session
 from app.auth import current_user
 from app.db import get_db
 from app.errors import ApiError
-from app.models import Project, ProjectMember, ProjectStatus, ProjectTeams, Team, User
+from app.models import (
+    Project,
+    ProjectMember,
+    ProjectStatus,
+    ProjectTeams,
+    Team,
+    User,
+)
+from app.project_access import get_visible_project, require_project_admin
 from app.schemas import (
     Page,
     ProjectCreate,
@@ -16,40 +24,6 @@ from app.schemas import (
 )
 
 router = APIRouter(prefix="/projects", tags=["projects"])
-
-
-def _get_visible_project(db: Session, me: User, project_id: int) -> Project | None:
-    project = db.get(Project, project_id)
-    if project is None:
-        return None
-    if me.role == "admin":
-        return project
-    membership = db.execute(
-        select(ProjectMember.id).where(
-            ProjectMember.project_id == project_id,
-            ProjectMember.user_id == me.id,
-        )
-    ).first()
-    if membership is None:
-        return None
-    return project
-
-
-def _require_project_admin(db: Session, me: User, project_id: int) -> Project:
-    project = _get_visible_project(db, me, project_id)
-    if project is None:
-        raise ApiError(404, "Project not found")
-    if me.role == "admin":
-        return project
-    role = db.execute(
-        select(ProjectMember.role).where(
-            ProjectMember.project_id == project_id,
-            ProjectMember.user_id == me.id,
-        )
-    ).scalar_one_or_none()
-    if role != "admin":
-        raise ApiError(403, "Project admin required")
-    return project
 
 
 def _validate_team_ids(db: Session, team_ids: list[int]) -> None:
@@ -158,7 +132,7 @@ def get_project(
     me: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
-    project = _get_visible_project(db, me, project_id)
+    project = get_visible_project(db, me, project_id)
     if project is None:
         raise ApiError(404, "Project not found")
     return _project_out(db, project)
@@ -171,7 +145,7 @@ def update_project(
     me: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
-    project = _require_project_admin(db, me, project_id)
+    project = require_project_admin(db, me, project_id)
     changes = body.model_dump(exclude_unset=True)
 
     if changes.get("name") == "":
@@ -212,7 +186,7 @@ def delete_project(
     me: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
-    project = _require_project_admin(db, me, project_id)
+    project = require_project_admin(db, me, project_id)
     db.delete(project)
     db.commit()
     return Response(status_code=204)
@@ -225,7 +199,7 @@ def add_project_member(
     me: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
-    project = _require_project_admin(db, me, project_id)
+    project = require_project_admin(db, me, project_id)
     if db.get(User, body.user_id) is None:
         raise ApiError(404, "User not found")
     existing = db.execute(
@@ -250,7 +224,7 @@ def remove_project_member(
     me: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
-    _require_project_admin(db, me, project_id)
+    require_project_admin(db, me, project_id)
     membership = db.execute(
         select(ProjectMember).where(
             ProjectMember.project_id == project_id,
