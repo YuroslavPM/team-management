@@ -2,6 +2,10 @@ import os
 import tempfile
 
 _tmp = tempfile.mkdtemp()
+
+os.environ.setdefault("APP_ENV", "test")
+os.environ.setdefault("PORT", "8000")
+os.environ.setdefault("CORS_ORIGINS", "http://localhost:5173")
 os.environ["DATABASE_URL"] = f"sqlite:///{_tmp}/test.db"
 os.environ["BD_TEST_MODE"] = "1"
 
